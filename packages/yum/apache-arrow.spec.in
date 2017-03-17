@@ -1,0 +1,47 @@
+# -*- rpm -*-
+
+Name:		@PACKAGE@
+Version:	@VERSION@
+Release:	1%{?dist}
+Summary:	Apache Arrow is a data processing library for analysis
+
+Group:		Development/Libraries
+License:	Apache-2.0
+URL:		https://arrow.apache.org/
+Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
+BuildRequires:	pkgconfig
+BuildRequires:	gcc-c++
+BuildRequires:	cmake
+BuildRequires:	boost-devel
+BuildRequires:	git
+Requires:	boost-system
+Requires:	boost-filesystem
+
+%description
+This package provides Apache Arrow.
+
+%prep
+%setup -q -n arrow-%{version}
+
+%build
+mkdir cpp/build
+cd cpp/build
+cmake .. \
+  -DARROW_JEMALLOC=no \
+  -DARROW_BUILD_STATIC=no \
+  -DARROW_BUILD_TESTS=no
+make
+
+%install
+cd cpp/build
+make install DESTDIR=$RPM_BUILD_ROOT
+
+%files
+%doc README.md LICENSE.txt NOTICE.txt
+%{_libdir}/*.so
+
+%changelog
+* Fri Mar 17 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.0-1
+- initial packaging for CentOS.

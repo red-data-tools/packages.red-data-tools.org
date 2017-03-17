@@ -1,0 +1,9 @@
+/*.tar.gz
+/packages/apt/.vagrant/
+/packages/apt/repositories/
+/packages/apt/tmp/
+/packages/apt/env.sh
+/packages/yum/.vagrant/
+/packages/yum/repositories/
+/packages/yum/tmp/
+/packages/yum/env.sh

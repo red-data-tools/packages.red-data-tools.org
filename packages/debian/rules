@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+# -*- makefile-gmake -*-
+#
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	LANG=C dh_auto_configure \
+	  --sourcedirectory=cpp \
+	  -- \
+	  -DCMAKE_BUILD_TYPE=release \
+	  -DARROW_BUILD_TESTS=no
+
+override_dh_auto_build:
+	dh_auto_build --sourcedirectory=cpp
+
+override_dh_auto_install:
+	dh_auto_install --sourcedirectory=cpp
+
+# disable 'make check'.
+override_dh_auto_test:

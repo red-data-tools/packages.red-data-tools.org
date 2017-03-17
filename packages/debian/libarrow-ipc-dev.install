@@ -1,0 +1,3 @@
+usr/include/arrow/ipc/*.h
+usr/lib/*/libarrow_ipc.so
+usr/lib/*/pkgconfig/arrow-ipc.pc

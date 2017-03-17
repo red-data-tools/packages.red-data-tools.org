@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  vms = [
+    {
+      :id => "debian-jessie-i386",
+      :box => "bento/debian-8.6-i386",
+    },
+    {
+      :id => "debian-jessie-amd64",
+      :box => "bento/debian-8.7",
+    },
+  ]
+
+  vms.each do |vm|
+    config.vm.define(vm[:id]) do |node|
+      node.vm.box = vm[:box]
+      node.vm.provision(:shell, :privileged => false, :path => "build-deb.sh")
+    end
+  end
+end

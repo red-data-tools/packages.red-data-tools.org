@@ -1,0 +1,3 @@
+usr/include/arrow/io/*.h
+usr/lib/*/libarrow_io.so
+usr/lib/*/pkgconfig/arrow-io.pc
