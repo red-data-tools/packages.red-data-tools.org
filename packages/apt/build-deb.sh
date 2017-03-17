@@ -20,6 +20,14 @@ run sudo apt-get install -y lsb-release
 
 distribution=$(lsb_release --id --short | tr 'A-Z' 'a-z')
 code_name=$(lsb_release --codename --short)
+case "${distribution}" in
+  debian)
+    component=main
+    ;;
+  ubuntu)
+    component=universe
+    ;;
+esac
 
 run sudo apt-get update
 run sudo apt-get install -V -y build-essential devscripts ${DEPENDED_PACKAGES}
