@@ -140,7 +140,7 @@ namespace :package do
 
     desc "Build RPM packages"
     task :build => [archive_name, repositories_dir] do
-      rpm_package = "arrow"
+      rpm_package_base = "arrow"
 
       tmp_dir = "#{yum_dir}/tmp"
       rm_rf(tmp_dir)
@@ -151,7 +151,7 @@ namespace :package do
       File.open(env_sh, "w") do |file|
         file.puts(<<-ENV)
 SOURCE_ARCHIVE=#{archive_name}
-PACKAGE=#{rpm_package}
+PACKAGE_BASE=#{rpm_package_base}
 VERSION=#{version}
 DEPENDED_PACKAGES="
 pkg-config
@@ -159,27 +159,34 @@ cmake
 boost-devel
 git
 jemalloc-devel
+gtk-doc
+gobject-introspection-devel
 "
         ENV
       end
 
       tmp_distribution_dir = "#{tmp_dir}/#{distribution}"
       mkdir_p(tmp_distribution_dir)
-      spec = "#{tmp_distribution_dir}/#{rpm_package}.spec"
-      spec_in = "#{yum_dir}/#{rpm_package}.spec.in"
-      spec_in_data = File.read(spec_in)
-      spec_data = spec_in_data.gsub(/@(.+)@/) do |matched|
-        case $1
-        when "PACKAGE"
-          rpm_package
-        when "VERSION"
-          version
-        else
-          matched
+      [
+        "",
+        "-glib",
+      ].each do |suffix|
+        spec = "#{tmp_distribution_dir}/#{rpm_package_base}#{suffix}.spec"
+        spec_in = "#{yum_dir}/#{rpm_package_base}#{suffix}.spec.in"
+        spec_in_data = File.read(spec_in)
+        spec_data = spec_in_data.gsub(/@(.+)@/) do |matched|
+          case $1
+          when "PACKAGE"
+            "#{rpm_package_base}#{suffix}"
+          when "VERSION"
+            version
+          else
+            matched
+          end
         end
-      end
-      File.open(spec, "w") do |spec_file|
-        spec_file.print(spec_data)
+        File.open(spec, "w") do |spec_file|
+          spec_file.print(spec_data)
+        end
       end
 
       cd(yum_dir) do
@@ -275,6 +282,9 @@ git
 libboost-system-dev
 libboost-filesystem-dev
 libjemalloc-dev
+gtk-doc-tools
+libgirepository1.0-dev
+libglib2.0-doc
 "
         ENV
       end

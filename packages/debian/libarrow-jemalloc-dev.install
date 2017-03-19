@@ -1,3 +1,4 @@
 usr/include/arrow/jemalloc/*.h
+usr/lib/*/libarrow_jemalloc.a
 usr/lib/*/libarrow_jemalloc.so
 usr/lib/*/pkgconfig/arrow-jemalloc.pc

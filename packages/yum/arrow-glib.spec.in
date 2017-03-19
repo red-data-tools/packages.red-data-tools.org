@@ -1,0 +1,88 @@
+# -*- rpm -*-
+
+Name:		@PACKAGE@
+Version:	@VERSION@
+Release:	1%{?dist}
+Summary:	Apache Arrow is a data processing library for analysis
+
+Group:		Development/Libraries
+License:	Apache-2.0
+URL:		https://arrow.apache.org/
+Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
+BuildRequires:	pkgconfig
+BuildRequires:	gcc-c++
+BuildRequires:	arrow-devel = %{version}-%{release}
+BuildRequires:	gtk-doc
+BuildRequires:	gobject-introspection-devel
+
+%description
+Apache Arrow is a data processing library for analysis.
+
+%prep
+%setup -q -n apache-arrow-%{version}
+
+%build
+cd c_glib
+%configure \
+  --enable-gtk-doc
+make %{?_smp_mflags}
+
+%install
+cd c_glib
+make install DESTDIR=$RPM_BUILD_ROOT
+
+%package libs
+Summary:	Runtime libraries for Apache Arrow
+Group:		System Environment/Libraries
+License:	Apache-2.0
+Requires:	arrow-libs = %{version}-%{release}
+Requires:	glib2
+
+%description libs
+This package contains the libraries for Apache Arrow.
+
+%files libs
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_libdir}/libarrow-glib*.so.*
+%{_datadir}/gir-1.0/Arrow*.gir
+
+%package devel
+Summary:	Libraries and header files for Apache Arrow
+Group:		Development/Libraries
+License:	Apache-2.0
+Requires:	arrow-devel = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description devel
+Libraries and header files for Apache Arrow.
+
+%files devel
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_includedir}/arrow-glib/
+%{_libdir}/libarrow-glib*.a
+%{_libdir}/libarrow-glib*.so
+%{_libdir}/pkgconfig/arrow*-glib.pc
+%{_libdir}/girepository-1.0/Arrow*.typelib
+
+%package doc
+Summary:	Documentation for Apache Arrow
+Group:		Documentation
+License:	Apache-2.0
+Requires:	arrow-devel = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description doc
+Documentation for Apache Arrow.
+
+%files doc
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_datadir}/gtk-doc/html/arrow-glib/
+
+%changelog
+* Sun Mar 19 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170319-1
+- initial packaging for CentOS.

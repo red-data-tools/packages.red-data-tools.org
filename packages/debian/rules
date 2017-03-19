@@ -16,11 +16,28 @@ override_dh_auto_configure:
 	  -DCMAKE_BUILD_TYPE=Release \
 	  -DARROW_BUILD_TESTS=no
 
+	(mkdir -p cpp/build && \
+	   cd cpp/build && \
+	   LANG=C cmake .. \
+	     -DCMAKE_INSTALL_PREFIX=../install \
+	     -DCMAKE_BUILD_TYPE=Release \
+	     -DARROW_BUILD_TESTS=no && \
+	   make && \
+	   make install)
+	dh_auto_configure \
+	  --sourcedirectory=c_glib \
+	  -- \
+	  PKG_CONFIG_PATH=$$PWD/cpp/install/lib/pkgconfig \
+	  --enable-gtk-doc
+
 override_dh_auto_build:
 	dh_auto_build --sourcedirectory=cpp
+	LD_LIBRARY_PATH=$$PWD/cpp/install/lib \
+	  dh_auto_build --sourcedirectory=c_glib
 
 override_dh_auto_install:
 	dh_auto_install --sourcedirectory=cpp
+	dh_auto_install --sourcedirectory=c_glib
 
 # disable 'make check'.
 override_dh_auto_test:

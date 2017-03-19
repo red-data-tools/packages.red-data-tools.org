@@ -1,0 +1,5 @@
+usr/include/arrow-glib/io-*.h
+usr/lib/*/libarrow-io-glib.a
+usr/lib/*/libarrow-io-glib.so
+usr/lib/*/pkgconfig/arrow-io-glib.pc
+usr/share/gir-1.0/ArrowIO-1.0.gir

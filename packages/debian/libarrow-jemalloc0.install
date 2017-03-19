@@ -1,2 +1,1 @@
-usr/lib/*/libarrow_jemalloc.a
 usr/lib/*/libarrow_jemalloc.so.*

@@ -59,11 +59,16 @@ cd
 if [ -n "${SOURCE_ARCHIVE}" ]; then
   run cp /vagrant/tmp/${SOURCE_ARCHIVE} rpmbuild/SOURCES/
 else
-  run cp /vagrant/tmp/${PACKAGE}-${VERSION}.* rpmbuild/SOURCES/
+  run cp /vagrant/tmp/${PACKAGE_BASE}-${VERSION}.* rpmbuild/SOURCES/
 fi
-run cp /vagrant/tmp/${distribution}/${PACKAGE}.spec rpmbuild/SPECS/
-
-run rpmbuild -ba ${rpmbuild_options} rpmbuild/SPECS/${PACKAGE}.spec
+for suffix in "" "-glib"; do
+    run cp \
+	/vagrant/tmp/${distribution}/${PACKAGE_BASE}${suffix}.spec \
+	rpmbuild/SPECS/
+    run rpmbuild -ba ${rpmbuild_options} \
+	rpmbuild/SPECS/${PACKAGE_BASE}${suffix}.spec
+    run yum install -y rpmbuild/RPMS/*/*.rpm
+done
 
 run mv rpmbuild/RPMS/*/* "${rpm_dir}/"
 run mv rpmbuild/SRPMS/* "${srpm_dir}/"
