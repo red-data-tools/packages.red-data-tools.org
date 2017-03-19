@@ -13,7 +13,7 @@ override_dh_auto_configure:
 	LANG=C dh_auto_configure \
 	  --sourcedirectory=cpp \
 	  -- \
-	  -DCMAKE_BUILD_TYPE=release \
+	  -DCMAKE_BUILD_TYPE=Release \
 	  -DARROW_BUILD_TESTS=no
 
 override_dh_auto_build:

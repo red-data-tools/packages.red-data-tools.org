@@ -2,7 +2,7 @@
 
 require "open-uri"
 
-version = "0.2.1"
+version = "0.2.1.20170319"
 
 package = "apache-arrow"
 rsync_base_path = "packages@packages.groonga.org:public"
@@ -50,6 +50,49 @@ file archive_name do
        "--prefix", "#{archive_base_name}/",
        "--output", full_archive_name)
   end
+
+  archive_base_name_original = "#{archive_base_name}.original"
+  rm_rf(archive_base_name)
+  sh("tar", "xf", full_archive_name)
+  mv(archive_base_name,
+     archive_base_name_original)
+  sh("tar", "xf", full_archive_name)
+  rm_f(full_archive_name)
+
+  full_arrow_glib_tar_gz = nil
+  rm_rf("tmp")
+  mkdir_p("tmp/build")
+  install_prefix = File.expand_path("tmp/local")
+  cd("tmp/build") do
+    sh("cmake", "../../#{archive_base_name}/cpp",
+       "-DCMAKE_INSTALL_PREFIX=#{install_prefix}",
+       "-DARROW_BUILD_TESTS=no")
+    sh("make", "-j8")
+    sh("make", "install")
+  end
+  arrow_glib_tar_gz = nil
+  cd("#{archive_base_name}/c_glib") do
+    sh("./autogen.sh")
+    sh("./configure",
+       "PKG_CONFIG_PATH=#{install_prefix}/lib/pkgconfig",
+       "--enable-gtk-doc",
+       "--enable-debug")
+    sh({"LD_LIBRARY_PATH" => "#{install_prefix}/lib"},
+       "make", "-j8")
+    sh("make", "dist")
+    arrow_glib_tar_gz = Dir.glob("arrow-glib-*.tar.gz").first
+    mv(arrow_glib_tar_gz, "../../")
+  end
+  rm_rf(archive_base_name)
+  mv(archive_base_name_original,
+     archive_base_name)
+  sh("tar", "xf", arrow_glib_tar_gz)
+  rm_rf("#{archive_base_name}/c_glib")
+  mv(File.basename(arrow_glib_tar_gz, ".tar.gz"),
+     "#{archive_base_name}/c_glib")
+  rm_f(arrow_glib_tar_gz)
+  sh("tar", "czf", full_archive_name, archive_base_name)
+  rm_rf(archive_base_name)
 end
 
 desc "Create release package"
@@ -117,6 +160,7 @@ pkg-config
 cmake
 boost-devel
 git
+jemalloc-devel
 "
         ENV
       end
