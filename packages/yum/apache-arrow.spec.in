@@ -18,16 +18,20 @@ BuildRequires:	boost-devel
 BuildRequires:	git
 BuildRequires:	jemalloc-devel
 
+%description
+Apache Arrow is a data processing library for analysis.
+
 %prep
 %setup -q -n apache-arrow-%{version}
 
 %build
 mkdir cpp/build
 cd cpp/build
-cmake .. \
-  -DARROW_BUILD_STATIC=no \
+%cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
   -DARROW_BUILD_TESTS=no
-make
+make %{?_smp_mflags}
+make install DESTDIR=$RPM_BUILD_ROOT
 
 %install
 cd cpp/build
@@ -58,13 +62,14 @@ Requires:	%{name}-libs = %{version}-%{release}
 %description devel
 Libraries and header files for Apache Arrow.
 
-%files
+%files devel
 %defattr(-,root,root,-)
 %doc README.md LICENSE.txt NOTICE.txt
 %{_includedir}/arrow/
+%{_libdir}/libarrow*.a
 %{_libdir}/libarrow*.so
 %{_libdir}/pkgconfig/arrow*.pc
 
 %changelog
-* Sun Mar 19 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1-1
+* Sun Mar 19 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170319-1
 - initial packaging for CentOS.
