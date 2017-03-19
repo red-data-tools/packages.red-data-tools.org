@@ -1,6 +1,6 @@
 # -*- rpm -*-
 
-Name:		arrow
+Name:		@PACKAGE@
 Version:	@VERSION@
 Release:	1%{?dist}
 Summary:	Apache Arrow is a data processing library for analysis
@@ -31,7 +31,6 @@ cd cpp/build
   -DCMAKE_BUILD_TYPE=Release \
   -DARROW_BUILD_TESTS=no
 make %{?_smp_mflags}
-make install DESTDIR=$RPM_BUILD_ROOT
 
 %install
 cd cpp/build

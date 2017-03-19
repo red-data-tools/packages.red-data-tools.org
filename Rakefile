@@ -140,6 +140,8 @@ namespace :package do
 
     desc "Build RPM packages"
     task :build => [archive_name, repositories_dir] do
+      rpm_package = "arrow"
+
       tmp_dir = "#{yum_dir}/tmp"
       rm_rf(tmp_dir)
       mkdir_p(tmp_dir)
@@ -149,7 +151,7 @@ namespace :package do
       File.open(env_sh, "w") do |file|
         file.puts(<<-ENV)
 SOURCE_ARCHIVE=#{archive_name}
-PACKAGE=#{package}
+PACKAGE=#{rpm_package}
 VERSION=#{version}
 DEPENDED_PACKAGES="
 pkg-config
@@ -163,13 +165,13 @@ jemalloc-devel
 
       tmp_distribution_dir = "#{tmp_dir}/#{distribution}"
       mkdir_p(tmp_distribution_dir)
-      spec = "#{tmp_distribution_dir}/#{package}.spec"
-      spec_in = "#{yum_dir}/#{package}.spec.in"
+      spec = "#{tmp_distribution_dir}/#{rpm_package}.spec"
+      spec_in = "#{yum_dir}/#{rpm_package}.spec.in"
       spec_in_data = File.read(spec_in)
       spec_data = spec_in_data.gsub(/@(.+)@/) do |matched|
         case $1
         when "PACKAGE"
-          package
+          rpm_package
         when "VERSION"
           version
         else
