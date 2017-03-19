@@ -118,10 +118,6 @@ namespace :package do
       cd(source_dir) do
         ln_sf(archive_name, "#{package}-latest.tar.gz")
       end
-      cp(windows_archive_name, source_dir)
-      cd(source_dir) do
-        ln_sf(windows_archive_name, "#{package}-latest.zip")
-      end
       sh("rsync", "-avz", "--progress", "--delete", "#{source_dir}/", rsync_path)
     end
   end

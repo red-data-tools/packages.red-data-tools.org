@@ -3,6 +3,7 @@
 /packages/apt/repositories/
 /packages/apt/tmp/
 /packages/apt/env.sh
+/packages/source/
 /packages/yum/.vagrant/
 /packages/yum/repositories/
 /packages/yum/tmp/
