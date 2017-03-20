@@ -101,7 +101,7 @@ Pre-Depends: ${misc:Pre-Depends}
 Depends:
   ${misc:Depends},
   ${shlibs:Depends},
-  libarrow-ipc0 (= ${binary:Version})
+  libarrow-ipc0 (= ${binary:Version}),
   libarrow-io-glib0 (= ${binary:Version})
 Description: Apache Arrow is a data processing library for analysis
  .
