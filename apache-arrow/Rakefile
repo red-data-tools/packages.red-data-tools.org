@@ -9,7 +9,7 @@ class ApacheArrowPackageTask < PackageTask
   end
 
   private
-  def define_archive_tasko
+  def define_archive_task
     file @archive_name do
       cd("../vendor/arrow") do
         sh("git", "archive", "HEAD",
@@ -47,5 +47,5 @@ class ApacheArrowPackageTask < PackageTask
   end
 end
 
-task = ApacheArrowGLibPackageTask.new
+task = ApacheArrowPackageTask.new
 task.define

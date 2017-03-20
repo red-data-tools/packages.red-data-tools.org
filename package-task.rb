@@ -164,15 +164,16 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
 
       desc "Sign packages"
       task :sign do
-        sh("#{@groonga_source_dir}/yum/sign-rpm.sh",
-           gpg_uid,
+        sh("#{@groonga_source_dir}/packages/yum/sign-rpm.sh",
+           @gpg_uid,
            "#{repositories_dir}/",
            distribution)
       end
 
       desc "Update repositories"
       task :update do
-        sh("#{@groonga_source_dir}/yum/update-repository.sh",
+        sh("#{@groonga_source_dir}/packages/yum/update-repository.sh",
+           @gpg_uid,
            "groonga",
            "#{repositories_dir}/",
            distribution)
@@ -263,7 +264,7 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
       desc "Sign packages"
       task :sign do
         sh("#{@groonga_source_dir}/packages/apt/sign-packages.sh",
-           gpg_uid,
+           @gpg_uid,
            "#{repositories_dir}/",
            code_names.join(" "))
       end
@@ -281,7 +282,7 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
         desc "Sign repositories"
         task :sign do
           sh("#{@groonga_source_dir}/packages/apt/sign-repository.sh",
-             gpg_uid,
+             @gpg_uid,
              "#{repositories_dir}/",
              code_names.join(" "))
         end
