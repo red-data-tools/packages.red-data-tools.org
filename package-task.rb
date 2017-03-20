@@ -63,10 +63,9 @@ class PackageTask
       rsync_path = "#{@rsync_base_path}/source/#{@package}"
       source_dir = "source"
 
-      directory source_dir
-
       desc "Download sources"
-      task :download => source_dir do
+      task :download do
+        mkdir_p(source_dir)
         sh("rsync",
            "-avz",
            "--progress",
@@ -76,7 +75,8 @@ class PackageTask
       end
 
       desc "Upload sources"
-      task :upload => [@archive_name, source_dir] do
+      task :upload => [@archive_name] do
+        mkdir_p(source_dir)
         cp(@archive_name, source_dir)
         cd(source_dir) do
           ln_sf(@archive_name, "#{@package}-latest.tar.gz")
