@@ -44,8 +44,6 @@ class ApacheArrowGLibPackageTask < PackageTask
           sh("tar", "xf", tar_gz)
           mv(File.basename(tar_gz, ".tar.gz"),
              @archive_base_name)
-          cp("README.md", @archive_base_name)
-          cp("../LICENSE.txt", @archive_base_name)
           sh("tar", "czf", @full_archive_name, @archive_base_name)
         end
       end
