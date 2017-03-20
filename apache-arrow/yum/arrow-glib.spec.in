@@ -46,8 +46,8 @@ This package contains the libraries for Apache Arrow.
 %files libs
 %defattr(-,root,root,-)
 %doc README.md LICENSE.txt NOTICE.txt
-%{_libdir}/libarrow-glib*.so.*
-%{_datadir}/gir-1.0/Arrow*.gir
+%{_libdir}/*.so.*
+%{_datadir}/gir-1.0/*.gir
 
 %package devel
 Summary:	Libraries and header files for Apache Arrow
@@ -63,10 +63,10 @@ Libraries and header files for Apache Arrow.
 %defattr(-,root,root,-)
 %doc README.md LICENSE.txt NOTICE.txt
 %{_includedir}/arrow-glib/
-%{_libdir}/libarrow-glib*.a
-%{_libdir}/libarrow-glib*.so
-%{_libdir}/pkgconfig/arrow*-glib.pc
-%{_libdir}/girepository-1.0/Arrow*.typelib
+%{_libdir}/*.a
+%{_libdir}/*.so
+%{_libdir}/pkgconfig/*.pc
+%{_libdir}/girepository-1.0/*.typelib
 
 %package doc
 Summary:	Documentation for Apache Arrow
