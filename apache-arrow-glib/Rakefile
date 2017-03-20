@@ -1,0 +1,78 @@
+# -*- ruby -*-
+
+require_relative "../package-task"
+
+class ApacheArrowGLibPackageTask < PackageTask
+  def initialize
+    super("apache-arrow-glib", "0.2.1.20170320")
+    @rpm_package = "arrow-glib"
+  end
+
+  private
+  def define_archive_task
+    file @archive_name do
+      arrow_archive_base_name = "apache-arrow-#{@version}"
+      arrow_archive_name = "#{arrow_archive_base_name}.tar.gz"
+      full_arrow_archive_name = File.expand_path(arrow_archive_name)
+      cd("../vendor/arrow") do
+        sh("git", "archive", "HEAD",
+           "--prefix", "#{arrow_archive_base_name}/",
+           "--output", full_arrow_archive_name)
+      end
+
+      rm_rf(arrow_archive_base_name)
+      sh("tar", "xf", full_arrow_archive_name)
+      rm_rf(full_arrow_archive_name)
+      cd(arrow_archive_base_name) do
+        cpp_install_dir = File.expand_path("install")
+        cd("cpp") do
+          sh("cmake", ".",
+             "-DCMAKE_INSTALL_PREFIX=#{cpp_install_dir}",
+             "-DARROW_BUILD_TESTS=no")
+          sh("make", "-j8")
+          sh("make", "install")
+        end
+        cd("c_glib") do
+          sh("./autogen.sh")
+          sh("./configure",
+             "PKG_CONFIG_PATH=#{cpp_install_dir}/lib/pkgconfig",
+             "--enable-gtk-doc")
+          sh({"LD_LIBRARY_PATH" => "#{cpp_install_dir}/lib"},
+             "make", "-j8")
+          sh("make", "dist")
+          tar_gz = Dir.glob("*.tar.gz").first
+          sh("tar", "xf", tar_gz)
+          mv(File.basename(tar_gz, ".tar.gz"),
+             @archive_base_name)
+          sh("tar", "czf", @full_archive_name, @archive_base_name)
+        end
+      end
+      rm_rf(arrow_archive_base_name)
+    end
+  end
+
+  def rpm_depended_packages
+    [
+      "pkg-config",
+      "arrow-devel",
+      "gtk-doc",
+      "gobject-introspection-devel",
+    ]
+  end
+
+  def deb_depended_packages
+    [
+      "debhelper",
+      "pkg-config",
+      "libarrow-dev",
+      "libarrow-io-dev",
+      "libarrow-ipc-dev",
+      "gtk-doc-tools",
+      "libgirepository1.0-dev",
+      "libglib2.0-doc",
+    ]
+  end
+end
+
+task = ApacheArrowGLibPackageTask.new
+task.define

@@ -8,7 +8,7 @@ Summary:	Apache Arrow is a data processing library for analysis
 Group:		Development/Libraries
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
-Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
+Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-@PACKAGE@-%{version}.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 BuildRequires:	pkgconfig
@@ -22,7 +22,7 @@ BuildRequires:	jemalloc-devel
 Apache Arrow is a data processing library for analysis.
 
 %prep
-%setup -q -n apache-arrow-%{version}
+%setup -q -n apache-@PACKAGE@-%{version}
 
 %build
 mkdir cpp/build
@@ -70,5 +70,5 @@ Libraries and header files for Apache Arrow.
 %{_libdir}/pkgconfig/arrow*.pc
 
 %changelog
-* Sun Mar 19 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170319-1
+* Mon Mar 20 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170320-1
 - initial packaging for CentOS.

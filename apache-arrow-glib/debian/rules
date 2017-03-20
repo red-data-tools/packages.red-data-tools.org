@@ -10,17 +10,9 @@ export DH_OPTIONS
 	dh $@
 
 override_dh_auto_configure:
-	LANG=C dh_auto_configure \
-	  --sourcedirectory=cpp \
+	dh_auto_configure \
 	  -- \
-	  -DCMAKE_BUILD_TYPE=Release \
-	  -DARROW_BUILD_TESTS=no
-
-override_dh_auto_build:
-	dh_auto_build --sourcedirectory=cpp
-
-override_dh_auto_install:
-	dh_auto_install --sourcedirectory=cpp
+	  --enable-gtk-doc
 
 # disable 'make check'.
 override_dh_auto_test:

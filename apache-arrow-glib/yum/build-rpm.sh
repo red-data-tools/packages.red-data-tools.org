@@ -28,7 +28,15 @@ case "${architecture}" in
     ;;
 esac
 
-run yum install -y epel-release
+case ${distribution} in
+  centos)
+    release_rpm=groonga-release-1.2.0-1.noarch.rpm
+    run yum install -y \
+        http://packages.groonga.org/${distribution}/${release_rpm}
+    run yum makecache
+    ;;
+esac
+
 run yum groupinstall -y "Development Tools"
 run yum install -y rpm-build rpmdevtools tar ${DEPENDED_PACKAGES}
 
