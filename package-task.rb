@@ -185,7 +185,7 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
            "-avz",
            "--progress",
            "--delete",
-           "#{@rsync_path}/#{distribution}/",
+           "#{rsync_path}/#{distribution}/",
            "#{repositories_dir}/#{distribution}")
       end
 
@@ -196,7 +196,7 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
            "--progress",
            "--delete",
            "#{repositories_dir}/#{distribution}/",
-           "#{@rsync_path}/#{distribution}")
+           "#{rsync_path}/#{distribution}")
       end
 
       desc "Release Yum packages"
