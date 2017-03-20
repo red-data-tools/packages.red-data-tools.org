@@ -30,6 +30,7 @@ make %{?_smp_mflags}
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
+rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %package libs
 Summary:	Runtime libraries for Apache Arrow
@@ -43,7 +44,7 @@ This package contains the libraries for Apache Arrow.
 
 %files libs
 %defattr(-,root,root,-)
-%doc README.md LICENSE.txt NOTICE.txt
+%doc README.md LICENSE.txt
 %{_libdir}/*.so.*
 %{_datadir}/gir-1.0/*.gir
 
@@ -59,7 +60,7 @@ Libraries and header files for Apache Arrow.
 
 %files devel
 %defattr(-,root,root,-)
-%doc README.md LICENSE.txt NOTICE.txt
+%doc README.md LICENSE.txt
 %{_includedir}/arrow-glib/
 %{_libdir}/*.a
 %{_libdir}/*.so
@@ -78,7 +79,7 @@ Documentation for Apache Arrow.
 
 %files doc
 %defattr(-,root,root,-)
-# %doc README.md LICENSE.txt NOTICE.txt
+%doc README.md LICENSE.txt
 %{_datadir}/gtk-doc/html/arrow-glib/
 
 %changelog
