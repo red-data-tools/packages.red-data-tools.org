@@ -12,7 +12,8 @@ export DH_OPTIONS
 override_dh_auto_configure:
 	dh_auto_configure \
 	  -- \
-	  --enable-gtk-doc
+	  --enable-gtk-doc \
+	  --with-html-dir=$${prefix}/share/doc/libarrow-glib-doc
 
 # disable 'make check'.
 override_dh_auto_test:
