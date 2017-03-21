@@ -199,17 +199,17 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
            "#{repositories_dir}/#{distribution}/",
            "#{rsync_path}/#{distribution}")
       end
-
-      desc "Release Yum packages"
-      yum_tasks = [
-        "yum:download",
-        "yum:build",
-        "yum:sign",
-        "yum:update",
-        "yum:upload",
-      ]
-      task :yum => yum_tasks
     end
+
+    desc "Release Yum packages"
+    yum_tasks = [
+      "yum:download",
+      "yum:build",
+      "yum:sign",
+      "yum:update",
+      "yum:upload",
+    ]
+    task :yum => yum_tasks
   end
 
   def define_apt_task
