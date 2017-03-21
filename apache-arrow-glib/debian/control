@@ -7,7 +7,8 @@ Build-Depends:
   pkg-config,
   libarrow-dev,
   libgirepository1.0-dev,
-  gtk-doc-tools
+  gtk-doc-tools,
+  gobject-introspection
 Build-Depends-Indep: libglib2.0-doc
 Standards-Version: 3.9.6
 Homepage: https://arrow.apache.org/
