@@ -6,10 +6,9 @@ Build-Depends:
   debhelper (>= 9),
   pkg-config,
   libarrow-dev,
-  libarrow-io-dev,
-  libarrow-ipc-dev,
+  libglib2.0-dev,
   gtk-doc-tools,
-  gobject-introspection
+  gobject-introspection,
 Build-Depends-Indep: libglib2.0-doc
 Standards-Version: 3.9.6
 Homepage: https://arrow.apache.org/
