@@ -1,5 +1,0 @@
-usr/include/arrow-glib/ipc-*.h
-usr/lib/*/libarrow-ipc-glib.a
-usr/lib/*/libarrow-ipc-glib.so
-usr/lib/*/pkgconfig/arrow-ipc-glib.pc
-usr/share/gir-1.0/ArrowIPC-1.0.gir

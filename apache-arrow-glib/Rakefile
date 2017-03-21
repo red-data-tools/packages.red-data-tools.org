@@ -68,7 +68,7 @@ class ApacheArrowGLibPackageTask < PackageTask
       "libarrow-io-dev",
       "libarrow-ipc-dev",
       "gtk-doc-tools",
-      "libgirepository1.0-dev",
+      "gobject-introspection",
       "libglib2.0-doc",
     ]
   end
