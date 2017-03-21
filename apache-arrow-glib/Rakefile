@@ -65,9 +65,8 @@ class ApacheArrowGLibPackageTask < PackageTask
       "debhelper",
       "pkg-config",
       "libarrow-dev",
-      "libglib2.0-dev",
+      "libgirepository1.0-dev",
       "gtk-doc-tools",
-      "gobject-introspection",
       "libglib2.0-doc",
     ]
   end
