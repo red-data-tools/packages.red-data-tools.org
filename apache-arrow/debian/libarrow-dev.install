@@ -1,5 +1,4 @@
-usr/include/arrow/*.h
-usr/include/arrow/util/*.h
-usr/lib/*/libarrow.a
-usr/lib/*/libarrow.so
-usr/lib/*/pkgconfig/arrow.pc
+usr/include/arrow/
+usr/lib/*/*.a
+usr/lib/*/*.so
+usr/lib/*/pkgconfig/*.pc
