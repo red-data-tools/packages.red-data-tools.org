@@ -335,6 +335,9 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
              "--pgp-sign-key", env_value("LAUNCHPAD_UPLOADER_PGP_KEY"))
       end
     end
+
+    desc "Release .deb packages for Ubuntu"
+    task :ubuntu => ["ubuntu:upload"]
   end
 
   def define_version_task
