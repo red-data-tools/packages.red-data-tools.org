@@ -10,27 +10,29 @@ export DH_OPTIONS
 	dh $@
 
 override_dh_auto_configure:
-	mkdir -p build/flatbuffers_ep-prefix
-	cp vendor/flatbuffers/* build/flatbuffers_ep-prefix/
+	tar xf vendor/flatbuffers/*
+	(cd flatbuffers-* && \
+	  cmake . \
+	    -DCMAKE_CXX_FLAGS=-fPIC \
+	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../vendor/flatbuffers \
+	    -DFLATBUFFERS_BUILD_TESTS=no && \
+	  make && \
+	  make install)
 	env \
 	  LANG=C \
-	  RAPIDJSON_HOME=vendor/rapidjson \
+	  FLATBUFFERS_HOME=$${PWD}/vendor/flatbuffers \
+	  RAPIDJSON_HOME=$${PWD}/vendor/rapidjson \
 	    dh_auto_configure \
 	      --sourcedirectory=cpp \
-	      --builddirectory=build \
 	      -- \
 	      -DCMAKE_BUILD_TYPE=Release \
 	      -DARROW_BUILD_TESTS=no
 
 override_dh_auto_build:
-	dh_auto_build \
-	  --sourcedirectory=cpp \
-	  --builddirectory=build \
+	dh_auto_build --sourcedirectory=cpp
 
 override_dh_auto_install:
-	dh_auto_install \
-	  --sourcedirectory=cpp \
-	  --builddirectory=build
+	dh_auto_install --sourcedirectory=cpp
 
 # disable 'make check'.
 override_dh_auto_test:
