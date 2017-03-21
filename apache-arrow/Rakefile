@@ -4,7 +4,7 @@ require_relative "../package-task"
 
 class ApacheArrowPackageTask < PackageTask
   def initialize
-    super("apache-arrow", "0.2.1.20170320")
+    super("apache-arrow", "0.2.1.20170321")
     @rpm_package = "arrow"
   end
 
