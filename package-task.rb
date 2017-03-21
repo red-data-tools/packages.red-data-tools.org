@@ -310,7 +310,7 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
       end
     end
 
-    desc "Release APT packages"
+    desc "Release APT repositories"
     apt_tasks = [
       "apt:download",
       "apt:build",
