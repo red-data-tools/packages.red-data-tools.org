@@ -10,17 +10,27 @@ export DH_OPTIONS
 	dh $@
 
 override_dh_auto_configure:
-	LANG=C dh_auto_configure \
-	  --sourcedirectory=cpp \
-	  -- \
-	  -DCMAKE_BUILD_TYPE=Release \
-	  -DARROW_BUILD_TESTS=no
+	mkdir -p build/flatbuffers_ep-prefix
+	cp vendor/flatbuffers/* build/flatbuffers_ep-prefix/
+	env \
+	  LANG=C \
+	  RAPIDJSON_HOME=vendor/rapidjson \
+	    dh_auto_configure \
+	      --sourcedirectory=cpp \
+	      --builddirectory=build \
+	      -- \
+	      -DCMAKE_BUILD_TYPE=Release \
+	      -DARROW_BUILD_TESTS=no
 
 override_dh_auto_build:
-	dh_auto_build --sourcedirectory=cpp
+	dh_auto_build \
+	  --sourcedirectory=cpp \
+	  --builddirectory=build \
 
 override_dh_auto_install:
-	dh_auto_install --sourcedirectory=cpp
+	dh_auto_install \
+	  --sourcedirectory=cpp \
+	  --builddirectory=build
 
 # disable 'make check'.
 override_dh_auto_test:
