@@ -4,7 +4,7 @@ require_relative "../package-task"
 
 class ApacheArrowGLibPackageTask < PackageTask
   def initialize
-    super("apache-arrow-glib", "0.2.1.20170321")
+    super("apache-arrow-glib", "0.2.1.20170322")
     @rpm_package = "arrow-glib"
   end
 

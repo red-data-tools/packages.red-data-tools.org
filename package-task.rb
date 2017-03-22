@@ -350,7 +350,6 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
              env_value("OLD_RELEASE_DATE"),
              @version,
              env_value("NEW_RELEASE_DATE"),
-             "Rakefile",
              "debian/changelog",
              "yum/#{@rpm_package}.spec.in")
       end
