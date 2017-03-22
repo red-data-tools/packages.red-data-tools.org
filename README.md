@@ -95,3 +95,11 @@ package.
 ```text
 % sudo yum install -y --enablerepo=epel arrow-glib-devel
 ```
+
+## License
+
+Apache-2.0
+
+Copyright 2017 Kouhei Sutou \<kou@clear-code.com\>
+
+See LICENSE and NOTICE for details.
