@@ -26,7 +26,10 @@ Apache Arrow is a data processing library for analysis.
 %build
 %configure \
   --enable-gtk-doc
-make %{?_smp_mflags}
+
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+LD_LIBRARY_PATH=$PWD/arrow-glib/.libs/ make %{?_smp_mflags}
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
