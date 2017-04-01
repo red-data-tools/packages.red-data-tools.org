@@ -13,8 +13,6 @@ run()
 
 . /vagrant/env.sh
 
-run sudo sed -i'' -e 's/httpredir/ftp.jp/g' /etc/apt/sources.list
-
 run sudo apt-get update
 run sudo apt-get install -y lsb-release
 
@@ -23,9 +21,10 @@ code_name=$(lsb_release --codename --short)
 case "${distribution}" in
   debian)
     component=main
+    run sudo apt-get install -y apt-transport-https
     run cat <<EOF | run sudo tee /etc/apt/sources.list.d/groonga.list
-deb http://packages.groonga.org/debian/ ${code_name} main
-deb-src http://packages.groonga.org/debian/ ${code_name} main
+deb https://packages.groonga.org/debian/ ${code_name} ${component}
+deb-src https://packages.groonga.org/debian/ ${code_name} ${component}
 EOF
     run sudo apt-get update
     run sudo apt-get install -y --allow-unauthenticated groonga-keyring
