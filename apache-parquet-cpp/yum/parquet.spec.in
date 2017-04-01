@@ -1,0 +1,112 @@
+# -*- rpm -*-
+
+Name:		@PACKAGE@
+Version:	@VERSION@
+Release:	1%{?dist}
+Summary:	Apache Parquet is a columner storage format
+
+Group:		Development/Libraries
+License:	Apache-2.0
+URL:		https://parquet.apache.org/
+Source0:	https://dist.apache.org/repos/dist/release/parquet/apache-parquet-cpp-%{version}/apache-parquet-cpp-%{version}.tar.gz
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
+BuildRequires:	pkgconfig
+BuildRequires:	gcc-c++
+BuildRequires:	cmake3
+BuildRequires:	libtool
+BuildRequires:	bison
+BuildRequires:	flex
+BuildRequires:	zlib-devel
+BuildRequires:	zlib-static
+BuildRequires:	boost-devel
+BuildRequires:	arrow-devel
+
+%description
+Apache Parquet is a columner storage format.
+
+%prep
+%setup -q -n apache-parquet-cpp-%{version}
+
+%build
+(cd vendor/snappy-* && \
+  ./configure \
+    CXXFLAGS="-DNDEBUG -O2" \
+    --with-pic \
+    --prefix=${PWD}/../../vendor/snappy && \
+  make %{?_smp_mflags} && \
+  make install)
+(cd vendor/thrift-* && \
+  cmake3 . \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_C_FLAGS="-fPIC" \
+    -DCMAKE_INSTALL_PREFIX=${PWD}/../../vendor/thrift \
+    -DCMAKE_INSTALL_RPATH=${PWD}/../../vendor/thrift/lib \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DBUILD_TESTING=OFF \
+    -DWITH_QT4=OFF \
+    -DWITH_C_GLIB=OFF \
+    -DWITH_JAVA=OFF \
+    -DWITH_PYTHON=OFF \
+    -DWITH_CPP=ON \
+    -DWITH_STATIC_LIB=ON && \
+  make %{?_smp_mflags} && \
+  make install)
+(cd vendor/brotli-* && \
+  cmake3 . \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_C_FLAGS="-fPIC" \
+    -DCMAKE_INSTALL_PREFIX=${PWD}/../../vendor/brotli \
+    -DBUILD_SHARED_LIBS=OFF && \
+  make %{?_smp_mflags} && \
+  make install)
+%cmake3 . \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DSnappy_HOME=${PWD}/vendor/snappy \
+  -DThrift_HOME=${PWD}/vendor/thrift \
+  -DBrotli_HOME=${PWD}/vendor/brotli \
+  -DPARQUET_ZLIB_VENDORED=OFF \
+  -DPARQUET_BUILD_TESTS=OFF
+make %{?_smp_mflags}
+
+%install
+make install DESTDIR=$RPM_BUILD_ROOT
+
+%package libs
+Summary:	Runtime libraries for Apache Parquet
+Group:		System Environment/Libraries
+License:	Apache-2.0
+Requires:	boost-system
+Requires:	boost-filesystem
+Requires:	boost-program-options
+Requires:	boost-regex
+Requires:	arrow-libs
+
+%description libs
+This package contains the libraries for Apache Parquet
+
+%files libs
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_libdir}/libparquet*.so.*
+
+%package devel
+Summary:	Libraries and header files for Apache Parquet
+Group:		Development/Libraries
+License:	Apache-2.0
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description devel
+Libraries and header files for Apache Parquet.
+
+%files devel
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_includedir}/parquet/
+%{_libdir}/libparquet*.a
+%{_libdir}/libparquet*.so
+%{_libdir}/pkgconfig/parquet*.pc
+
+%changelog
+* Sat Apr 01 2017 Kouhei Sutou <kou@clear-code.com> - 1.0.1.20170401-1
+- new upstream release.

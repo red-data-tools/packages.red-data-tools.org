@@ -7,3 +7,6 @@
 [submodule "vendor/cutter"]
 	path = vendor/cutter
 	url = https://github.com/clear-code/cutter.git
+[submodule "vendor/parquet-cpp"]
+	path = vendor/parquet-cpp
+	url = https://github.com/apache/parquet-cpp.git

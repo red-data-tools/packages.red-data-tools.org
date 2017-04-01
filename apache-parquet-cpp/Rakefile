@@ -1,0 +1,93 @@
+# -*- ruby -*-
+
+require_relative "../package-task"
+
+class ApacheParquetCppPackageTask < PackageTask
+  def initialize
+    super("apache-parquet-cpp", "1.0.1.20170401")
+    @rpm_package = "parquet"
+  end
+
+  private
+  def define_archive_task
+    file @archive_name do
+      cd("../vendor/parquet-cpp") do
+        sh("git", "archive", "HEAD",
+           "--prefix", "#{@archive_base_name}/",
+           "--output", @archive_name)
+        rm_f(@archive_base_name)
+        sh("tar", "xf", @archive_name)
+        rm_f(@archive_name)
+
+        mkdir_p("#{@archive_base_name}/vendor/")
+
+        snappy_version = "1.1.4"
+        snappy_tar_gz = "snappy-#{snappy_version}.tar.gz"
+        download("https://github.com/google/snappy/releases/download/#{snappy_version}/#{snappy_tar_gz}",
+                 "./")
+        sh("tar", "xf", snappy_tar_gz)
+        rm_f(snappy_tar_gz)
+        mv(File.basename(snappy_tar_gz, ".tar.gz"),
+           "#{@archive_base_name}/vendor/")
+
+        thrift_version = "0.10.0"
+        thrift_tar_gz = "thrift-#{thrift_version}.tar.gz"
+        download("https://www.apache.org/dist/thrift/#{thrift_version}/#{thrift_tar_gz}",
+                 "./")
+        sh("tar", "xf", thrift_tar_gz)
+        rm_f(thrift_tar_gz)
+        mv(File.basename(thrift_tar_gz, ".tar.gz"),
+           "#{@archive_base_name}/vendor/")
+
+        brotli_version = "5db62dcc9d386579609540cdf8869e95ad334bbd"
+        brotli_zip = "#{brotli_version}.zip"
+        download("https://github.com/google/brotli/archive/#{brotli_version}.zip",
+                 "./")
+        sh("unzip", brotli_zip)
+        rm_f(brotli_zip)
+        mv("brotli-#{brotli_version}",
+           "#{@archive_base_name}/vendor/")
+
+        sh("tar", "czf", @full_archive_name, @archive_base_name)
+        rm_rf(@archive_base_name)
+      end
+    end
+  end
+
+  def rpm_depended_packages
+    [
+      "pkg-config",
+      "cmake3",
+      "libtool",
+      "bison",
+      "flex",
+      "zlib-devel",
+      "zlib-static",
+      "boost-devel",
+      "arrow-devel",
+    ]
+  end
+
+  def deb_depended_packages
+    [
+      "debhelper",
+      "pkg-config",
+      "cmake",
+      "libtool",
+      "bison",
+      "flex",
+      "zlib1g-dev",
+      "libboost-dev",
+      "libboost-system-dev",
+      "libboost-filesystem-dev",
+      "libboost-program-options-dev",
+      "libboost-regex-dev",
+      "libarrow-dev",
+      "python3-dev",
+      "python3-numpy",
+    ]
+  end
+end
+
+task = ApacheParquetCppPackageTask.new
+task.define
