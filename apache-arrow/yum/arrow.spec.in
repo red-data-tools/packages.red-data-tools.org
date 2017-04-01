@@ -13,7 +13,7 @@ Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apach
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 BuildRequires:	pkgconfig
 BuildRequires:	gcc-c++
-BuildRequires:	cmake
+BuildRequires:	cmake3
 BuildRequires:	boost-devel
 BuildRequires:	git
 BuildRequires:	jemalloc-devel
@@ -27,7 +27,7 @@ Apache Arrow is a data processing library for analysis.
 %build
 mkdir cpp/build
 cd cpp/build
-%cmake .. \
+%cmake3 .. \
   -DCMAKE_BUILD_TYPE=Release \
   -DARROW_BUILD_TESTS=no
 make %{?_smp_mflags}

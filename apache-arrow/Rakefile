@@ -39,7 +39,7 @@ class ApacheArrowPackageTask < PackageTask
   def rpm_depended_packages
     [
       "pkg-config",
-      "cmake",
+      "cmake3",
       "boost-devel",
       "git",
       "jemalloc-devel",
