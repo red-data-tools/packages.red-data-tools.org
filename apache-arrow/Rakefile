@@ -43,8 +43,6 @@ class ApacheArrowPackageTask < PackageTask
       "boost-devel",
       "git",
       "jemalloc-devel",
-      "gtk-doc",
-      "gobject-introspection-devel",
     ]
   end
 
@@ -57,9 +55,8 @@ class ApacheArrowPackageTask < PackageTask
       "libboost-system-dev",
       "libboost-filesystem-dev",
       "libjemalloc-dev",
-      "gtk-doc-tools",
-      "libgirepository1.0-dev",
-      "libglib2.0-doc",
+      "python3-dev",
+      "python3-numpy",
     ]
   end
 end

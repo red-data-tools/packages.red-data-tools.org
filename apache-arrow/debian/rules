@@ -15,7 +15,7 @@ override_dh_auto_configure:
 	  cmake . \
 	    -DCMAKE_CXX_FLAGS=-fPIC \
 	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../vendor/flatbuffers \
-	    -DFLATBUFFERS_BUILD_TESTS=no && \
+	    -DFLATBUFFERS_BUILD_TESTS=OFF && \
 	  make && \
 	  make install)
 	env \
@@ -26,7 +26,10 @@ override_dh_auto_configure:
 	      --sourcedirectory=cpp \
 	      -- \
 	      -DCMAKE_BUILD_TYPE=Release \
-	      -DARROW_BUILD_TESTS=no
+	      -DARROW_BUILD_TESTS=OFF \
+	      -DARROW_PYTHON=ON \
+	      -DPythonInterp_FIND_VERSION=ON \
+	      -DPythonInterp_FIND_VERSION_MAJOR=3
 
 override_dh_auto_build:
 	dh_auto_build --sourcedirectory=cpp
