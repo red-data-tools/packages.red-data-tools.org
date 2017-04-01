@@ -70,6 +70,9 @@ Libraries and header files for Apache Arrow.
 %{_libdir}/pkgconfig/arrow*.pc
 
 %changelog
+* Sat Apr 01 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170401-1
+- new upstream release.
+
 * Wed Mar 22 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170322-1
 - new upstream release.
 
