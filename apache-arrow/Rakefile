@@ -15,6 +15,7 @@ class ApacheArrowPackageTask < PackageTask
         sh("git", "archive", "HEAD",
            "--prefix", "#{@archive_base_name}/",
            "--output", @archive_name)
+        rm_f(@archive_base_name)
         sh("tar", "xf", @archive_name)
         rm_f(@archive_name)
 
