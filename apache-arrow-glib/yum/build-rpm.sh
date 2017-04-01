@@ -30,9 +30,9 @@ esac
 
 case ${distribution} in
   centos)
-    release_rpm=groonga-release-1.2.0-1.noarch.rpm
+    release_rpm=groonga-release-1.3.0-1.noarch.rpm
     run yum install -y \
-        http://packages.groonga.org/${distribution}/${release_rpm}
+        https://packages.groonga.org/${distribution}/${release_rpm}
     run yum makecache
     ;;
 esac
