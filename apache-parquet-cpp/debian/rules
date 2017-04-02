@@ -58,6 +58,7 @@ override_dh_auto_configure:
 	  -DThrift_HOME=$${PWD}/vendor/thrift \
 	  -DBrotli_HOME=$${PWD}/vendor/brotli \
 	  -DZLIB_HOME=$${PWD}/vendor/zlib \
+	  -DPARQUET_ZLIB_VENDORED=OFF \
 	  -DPARQUET_BUILD_TESTS=OFF
 
 # disable 'make check'.
