@@ -48,6 +48,15 @@ class ApacheParquetCppPackageTask < PackageTask
         mv("brotli-#{brotli_version}",
            "#{@archive_base_name}/vendor/")
 
+        zlib_version = "1.2.8"
+        zlib_tar_gz = "zlib-#{zlib_version}.tar.gz"
+        download("http://zlib.net/fossils/#{zlib_tar_gz}",
+                 "./")
+        sh("tar", "xf", zlib_tar_gz)
+        rm_f(zlib_tar_gz)
+        mv(File.basename(zlib_tar_gz, ".tar.gz"),
+           "#{@archive_base_name}/vendor/")
+
         sh("tar", "czf", @full_archive_name, @archive_base_name)
         rm_rf(@archive_base_name)
       end
@@ -61,8 +70,7 @@ class ApacheParquetCppPackageTask < PackageTask
       "libtool",
       "bison",
       "flex",
-      "zlib-devel",
-      "zlib-static",
+      "openssl-devel",
       "boost-devel",
       "arrow-devel",
     ]
@@ -76,7 +84,7 @@ class ApacheParquetCppPackageTask < PackageTask
       "libtool",
       "bison",
       "flex",
-      "zlib1g-dev",
+      "libssl-dev",
       "libboost-dev",
       "libboost-system-dev",
       "libboost-filesystem-dev",

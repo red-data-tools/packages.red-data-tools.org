@@ -21,6 +21,7 @@ override_dh_auto_configure:
 	  cmake . \
 	    -DCMAKE_CXX_FLAGS="-fPIC" \
 	    -DCMAKE_C_FLAGS="-fPIC" \
+	    -DCMAKE_BUILD_TYPE=Release \
 	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../../vendor/thrift \
 	    -DCMAKE_INSTALL_RPATH=$${PWD}/../../vendor/thrift/lib \
 	    -DBUILD_SHARED_LIBS=OFF \
@@ -37,7 +38,16 @@ override_dh_auto_configure:
 	  cmake . \
 	    -DCMAKE_CXX_FLAGS="-fPIC" \
 	    -DCMAKE_C_FLAGS="-fPIC" \
+	    -DCMAKE_BUILD_TYPE=Release \
 	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../../vendor/brotli \
+	    -DBUILD_SHARED_LIBS=OFF && \
+	  make && \
+	  make install)
+	(cd vendor/zlib-* && \
+	  cmake . \
+	    -DCMAKE_C_FLAGS="-fPIC" \
+	    -DCMAKE_BUILD_TYPE=Release \
+	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../../vendor/zlib \
 	    -DBUILD_SHARED_LIBS=OFF && \
 	  make && \
 	  make install)
@@ -47,7 +57,7 @@ override_dh_auto_configure:
 	  -DSnappy_HOME=$${PWD}/vendor/snappy \
 	  -DThrift_HOME=$${PWD}/vendor/thrift \
 	  -DBrotli_HOME=$${PWD}/vendor/brotli \
-	  -DPARQUET_ZLIB_VENDORED=OFF \
+	  -DZLIB_HOME=$${PWD}/vendor/zlib \
 	  -DPARQUET_BUILD_TESTS=OFF
 
 # disable 'make check'.
