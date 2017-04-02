@@ -2,6 +2,12 @@
 
 Packages for Apache Arrow and related projects.
 
+## Supported packages
+
+  * Apache Arrow C++
+  * Apache Arrow GLib (C API)
+  * Apache Parquet C++
+
 ## Supported platforms
 
 There are packages for the following platforms:
@@ -94,6 +100,29 @@ package.
 
 ```text
 % sudo yum install -y --enablerepo=epel arrow-glib-devel
+```
+
+## Apache Parquet C++
+
+This section describes how to install
+[Apache Parquet C++](https://github.com/apache/parquet) package.
+
+### Debian GNU/Linux
+
+```text
+% sudo apt install -y libparquet-dev
+```
+
+### Ubuntu
+
+```text
+% sudo apt install -y libparquet-dev
+```
+
+### CentOS 7
+
+```text
+% sudo yum install -y --enablerepo=epel parquet-devel
 ```
 
 ## License
