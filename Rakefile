@@ -24,5 +24,5 @@ end
 task :default => [
   "apache-arrow",
   "apache-arrow-glib",
-  "apache-parquet",
+  "apache-parquet-cpp",
 ]
