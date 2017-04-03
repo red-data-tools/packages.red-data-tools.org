@@ -19,7 +19,7 @@ There are packages for the following platforms:
 
 ## Package repository
 
-http://packages.groonga.org/ provides packages. You need to enable
+https://packages.groonga.org/ provides packages. You need to enable
 the package repository before you install packages.
 
 ### Debian GNU/Linux
@@ -28,8 +28,8 @@ You add the following apt-lines to
 `/etc/apt/sources.list.d/groonga.list`:
 
 ```text
-deb http://packages.groonga.org/debian/ jessie main
-deb-src http://packages.groonga.org/debian/ jessie main
+deb https://packages.groonga.org/debian/ jessie main
+deb-src https://packages.groonga.org/debian/ jessie main
 ```
 
 Then you run the following command lines:
@@ -51,7 +51,7 @@ Then you run the following command lines:
 ### CentOS 7
 
 ```text
-% sudo yum install -y http://packages.groonga.org/centos/groonga-release-1.2.0-1.noarch.rpm
+% sudo yum install -y https://packages.groonga.org/centos/groonga-release-1.2.0-1.noarch.rpm
 ```
 
 ## Apache Arrow C++
