@@ -52,7 +52,7 @@ Then you run the following command lines:
 ### CentOS 7
 
 ```text
-% sudo yum install -y https://packages.groonga.org/centos/groonga-release-1.2.0-1.noarch.rpm
+% sudo yum install -y https://packages.groonga.org/centos/groonga-release-1.3.0-1.noarch.rpm
 ```
 
 ## Apache Arrow C++
