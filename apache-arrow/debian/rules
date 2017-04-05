@@ -6,8 +6,10 @@
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
+BUILD_TYPE=release
+
 %:
-	dh $@
+	dh $@ --with gir
 
 override_dh_auto_configure:
 	tar xf vendor/flatbuffers/*
@@ -24,18 +26,39 @@ override_dh_auto_configure:
 	  RAPIDJSON_HOME=$${PWD}/vendor/rapidjson \
 	    dh_auto_configure \
 	      --sourcedirectory=cpp \
+	      --builddirectory=cpp_build \
 	      -- \
-	      -DCMAKE_BUILD_TYPE=Release \
+	      -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
 	      -DARROW_BUILD_TESTS=OFF \
 	      -DARROW_PYTHON=ON \
 	      -DPythonInterp_FIND_VERSION=ON \
 	      -DPythonInterp_FIND_VERSION_MAJOR=3
+	dh_auto_configure \
+	  --sourcedirectory=c_glib \
+	  --builddirectory=c_glib_build \
+	  -- \
+	  --with-arrow-cpp-build-dir=$${PWD}/cpp_build \
+	  --with-arrow-cpp-build-type=$(BUILD_TYPE) \
+	  --enable-gtk-doc \
+	  --with-html-dir=\$${prefix}/share/doc/libarrow-glib-doc
 
 override_dh_auto_build:
-	dh_auto_build --sourcedirectory=cpp
+	dh_auto_build				\
+	  --sourcedirectory=cpp			\
+	  --builddirectory=cpp_build
+	env							\
+	  LD_LIBRARY_PATH=$${PWD}/cpp_build/$(BUILD_TYPE)	\
+	    dh_auto_build					\
+	      --sourcedirectory=c_glib				\
+	      --builddirectory=c_glib_build
 
 override_dh_auto_install:
-	dh_auto_install --sourcedirectory=cpp
+	dh_auto_install				\
+	  --sourcedirectory=cpp			\
+	  --builddirectory=cpp_build
+	dh_auto_install				\
+	  --sourcedirectory=c_glib		\
+	  --builddirectory=c_glib_build
 
 # disable 'make check'.
 override_dh_auto_test:
