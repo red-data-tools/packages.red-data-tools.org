@@ -92,8 +92,6 @@ Libraries and header files for Apache Arrow C++.
 %{_libdir}/libarrow_*.a
 %{_libdir}/libarrow_*.so
 %{_libdir}/pkgconfig/arrow.pc
-%{_libdir}/pkgconfig/arrow-io.pc
-%{_libdir}/pkgconfig/arrow-ipc.pc
 %{_libdir}/pkgconfig/arrow-jemalloc.pc
 
 %package glib-libs
@@ -109,7 +107,7 @@ This package contains the libraries for Apache Arrow GLib.
 %files glib-libs
 %defattr(-,root,root,-)
 %doc README.md LICENSE.txt NOTICE.txt
-%{_libdir}/libarrow*-glib.so.*
+%{_libdir}/libarrow-glib.so.*
 %{_datadir}/gir-1.0/*.gir
 
 %package glib-devel
@@ -128,9 +126,9 @@ Libraries and header files for Apache Arrow GLib.
 %defattr(-,root,root,-)
 %doc README.md LICENSE.txt NOTICE.txt
 %{_includedir}/arrow-glib/
-%{_libdir}/libarrow*-glib.a
-%{_libdir}/libarrow*-glib.so
-%{_libdir}/pkgconfig/arrow*-glib.pc
+%{_libdir}/libarrow-glib.a
+%{_libdir}/libarrow-glib.so
+%{_libdir}/pkgconfig/arrow-glib.pc
 %{_libdir}/girepository-1.0/*.typelib
 
 %package glib-doc
@@ -150,6 +148,9 @@ Documentation for Apache Arrow GLib.
 %{_datadir}/gtk-doc/html/arrow-glib/
 
 %changelog
+* Tue Apr 11 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170411-1
+- new upstream release.
+
 * Wed Apr 05 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170405-1
 - new upstream release.
 
