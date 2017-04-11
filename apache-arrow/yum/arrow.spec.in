@@ -63,6 +63,7 @@ Group:		System Environment/Libraries
 License:	Apache-2.0
 Requires:	boost-system
 Requires:	boost-filesystem
+Requires:	boost-regex
 Requires:	jemalloc
 
 %description libs
