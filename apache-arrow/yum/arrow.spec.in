@@ -130,6 +130,7 @@ Libraries and header files for Apache Arrow GLib.
 %{_libdir}/libarrow-glib.so
 %{_libdir}/pkgconfig/arrow-glib.pc
 %{_libdir}/girepository-1.0/*.typelib
+%{_datadir}/arrow-glib/example/*.c
 
 %package glib-doc
 Summary:	Documentation for Apache Arrow GLib
