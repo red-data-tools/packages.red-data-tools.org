@@ -348,7 +348,7 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
              @package,
              env_value("OLD_RELEASE"),
              env_value("OLD_RELEASE_DATE"),
-             @version,
+             env_value("NEW_RELEASE"),
              env_value("NEW_RELEASE_DATE"),
              "debian/changelog",
              "yum/#{@rpm_package}.spec.in")

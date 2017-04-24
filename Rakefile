@@ -7,13 +7,6 @@ task "apache-arrow" do
   end
 end
 
-desc "Update Apache Arrow GLib packages"
-task "apache-arrow-glib" do
-  cd("apache-arrow-glib") do
-    ruby("-S", "rake", "source", "yum", "apt", "ubuntu")
-  end
-end
-
 desc "Update Apache Parquet C++ packages"
 task "apache-parquet-cpp" do
   cd("apache-parquet-cpp") do
@@ -23,6 +16,5 @@ end
 
 task :default => [
   "apache-arrow",
-  "apache-arrow-glib",
   "apache-parquet-cpp",
 ]

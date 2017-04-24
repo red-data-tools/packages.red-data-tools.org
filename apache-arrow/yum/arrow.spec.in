@@ -63,7 +63,6 @@ Group:		System Environment/Libraries
 License:	Apache-2.0
 Requires:	boost-system
 Requires:	boost-filesystem
-Requires:	boost-regex
 Requires:	jemalloc
 
 %description libs
@@ -149,6 +148,9 @@ Documentation for Apache Arrow GLib.
 %{_datadir}/gtk-doc/html/arrow-glib/
 
 %changelog
+* Mon Apr 24 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170424-1
+- new upstream release.
+
 * Tue Apr 11 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170411-1
 - new upstream release.
 
