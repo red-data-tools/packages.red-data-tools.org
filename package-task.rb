@@ -330,7 +330,7 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
              "--package", @package,
              "--version", @version,
              "--source-archive", @archive_name,
-             "--code-names", "xenial,yakkety",
+             "--code-names", "xenial,yakkety,zesty",
              "--debian-directory", "debian",
              "--pgp-sign-key", env_value("LAUNCHPAD_UPLOADER_PGP_KEY"))
       end
