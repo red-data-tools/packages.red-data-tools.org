@@ -15,6 +15,7 @@ There are packages for the following platforms:
   * Debian GNU/Linux jessie
   * Ubuntu 16.04 LTS
   * Ubuntu 16.10
+  * Ubuntu 17.04
   * CentOS 7
 
 ## Package repository
