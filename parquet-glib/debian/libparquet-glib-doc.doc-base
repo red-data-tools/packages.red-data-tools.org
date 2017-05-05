@@ -1,0 +1,9 @@
+Document: parquet-glib
+Title: parquet-glib Reference Manual
+Author: Kouhei Sutou
+Abstract: Parquet GLib is a wrapper library for Apache Parquet
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/libparquet-glib-doc/parquet-glib/index.html
+Files: /usr/share/doc/libparquet-glib-doc/parquet-glib/*.html

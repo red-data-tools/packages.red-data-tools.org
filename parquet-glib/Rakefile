@@ -1,0 +1,63 @@
+# -*- ruby -*-
+
+require_relative "../package-task"
+
+class ParquetGLibPackageTask < PackageTask
+  def initialize
+    super("parquet-glib", "1.0.0.20170505")
+    @rpm_package = "parquet-glib"
+  end
+
+  private
+  def define_archive_task
+    file @archive_name do
+      cd("../vendor/parquet-glib") do
+        sh("./autogen.sh")
+        sh({
+             "PKG_CONFIG_PATH" => "/tmp/local/lib/pkgconfig",
+           },
+           "./configure",
+           "--prefix=/tmp/local",
+           "--enable-gtk-doc",
+           "--enable-debug")
+        sh({
+             "LD_LIBRARY_PATH" => "/tmp/local/lib",
+           },
+           "make", "-j8",
+           "INTROSPECTION_SCANNER_ARGS=--add-include-path=/tmp/local/share/gir-1.0",
+           "INTROSPECTION_COMPILER_ARGS=--includedir=/tmp/local/share/gir-1.0")
+        sh("make", "dist")
+        tar_gz = Dir.glob("*.tar.gz").first
+        sh("tar", "xf", tar_gz)
+        mv(File.basename(tar_gz, ".tar.gz"),
+           @archive_base_name)
+        sh("tar", "czf", @full_archive_name, @archive_base_name)
+      end
+    end
+  end
+
+  def rpm_depended_packages
+    [
+      "pkg-config",
+      "parquet-devel",
+      "arrow-glib-devel",
+      "gtk-doc",
+      "gobject-introspection-devel",
+    ]
+  end
+
+  def deb_depended_packages
+    [
+      "debhelper",
+      "pkg-config",
+      "libparquet-dev",
+      "libarrow-glib-dev",
+      "libgirepository1.0-dev",
+      "gtk-doc-tools",
+      "libglib2.0-doc",
+    ]
+  end
+end
+
+task = ApacheArrowPackageTask.new
+task.define

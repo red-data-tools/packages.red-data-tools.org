@@ -1,0 +1,174 @@
+# -*- rpm -*-
+
+Name:		@PACKAGE@
+Version:	@VERSION@
+Release:	1%{?dist}
+Summary:	Apache Arrow is a data processing library for analysis
+
+Group:		Development/Libraries
+License:	Apache-2.0
+URL:		https://arrow.apache.org/
+Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-@PACKAGE@-%{version}.tar.gz
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
+BuildRequires:	pkgconfig
+BuildRequires:	gcc-c++
+BuildRequires:	cmake3
+BuildRequires:	boost-devel
+BuildRequires:	git
+BuildRequires:	jemalloc-devel
+BuildRequires:	gtk-doc
+BuildRequires:	gobject-introspection-devel
+
+%description
+Apache Arrow is a data processing library for analysis.
+
+%prep
+%setup -q -n apache-@PACKAGE@-%{version}
+
+%build
+build_type=release
+mkdir cpp/build
+cd cpp/build
+%cmake3 .. \
+  -DCMAKE_BUILD_TYPE=$build_type \
+  -DARROW_BUILD_TESTS=no
+make %{?_smp_mflags}
+cd -
+
+cd c_glib
+%configure \
+  --with-arrow-cpp-build-dir=$PWD/../cpp/build \
+  --with-arrow-cpp-build-type=$build_type \
+  --enable-gtk-doc
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+LD_LIBRARY_PATH=$PWD/arrow-glib/.libs/:$PWD/../cpp/build/$build_type \
+  make %{?_smp_mflags}
+cd -
+
+%install
+cd cpp/build
+make install DESTDIR=$RPM_BUILD_ROOT
+cd -
+
+cd c_glib
+make install DESTDIR=$RPM_BUILD_ROOT
+rm $RPM_BUILD_ROOT%{_libdir}/*.la
+cd -
+
+%package libs
+Summary:	Runtime libraries for Apache Arrow C++
+Group:		System Environment/Libraries
+License:	Apache-2.0
+Requires:	boost-system
+Requires:	boost-filesystem
+Requires:	jemalloc
+
+%description libs
+This package contains the libraries for Apache Arrow C++.
+
+%files libs
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_libdir}/libarrow.so.*
+%{_libdir}/libarrow_*.so.*
+
+%package devel
+Summary:	Libraries and header files for Apache Arrow C++
+Group:		Development/Libraries
+License:	Apache-2.0
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description devel
+Libraries and header files for Apache Arrow C++.
+
+%files devel
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_includedir}/arrow/
+%{_libdir}/libarrow.a
+%{_libdir}/libarrow.so
+%{_libdir}/libarrow_*.a
+%{_libdir}/libarrow_*.so
+%{_libdir}/pkgconfig/arrow.pc
+%{_libdir}/pkgconfig/arrow-jemalloc.pc
+
+%package glib-libs
+Summary:	Runtime libraries for Apache Arrow GLib
+Group:		System Environment/Libraries
+License:	Apache-2.0
+Requires:	arrow-libs = %{version}-%{release}
+Requires:	glib2
+
+%description glib-libs
+This package contains the libraries for Apache Arrow GLib.
+
+%files glib-libs
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_libdir}/libarrow-glib.so.*
+%{_datadir}/gir-1.0/*.gir
+
+%package glib-devel
+Summary:	Libraries and header files for Apache Arrow GLib
+Group:		Development/Libraries
+License:	Apache-2.0
+Requires:	arrow-devel = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
+Requires:	glib2-devel
+Requires:	gobject-introspection-devel
+
+%description glib-devel
+Libraries and header files for Apache Arrow GLib.
+
+%files glib-devel
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_includedir}/arrow-glib/
+%{_libdir}/libarrow-glib.a
+%{_libdir}/libarrow-glib.so
+%{_libdir}/pkgconfig/arrow-glib.pc
+%{_libdir}/girepository-1.0/*.typelib
+%{_datadir}/arrow-glib/example/
+
+%package glib-doc
+Summary:	Documentation for Apache Arrow GLib
+Group:		Documentation
+License:	Apache-2.0
+Requires:	arrow-devel = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description glib-doc
+Documentation for Apache Arrow GLib.
+
+%files glib-doc
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_docdir}/arrow-glib/
+%{_datadir}/gtk-doc/html/arrow-glib/
+
+%changelog
+* Thu May 04 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170504-1
+- new upstream release.
+
+* Mon Apr 24 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170424-1
+- new upstream release.
+
+* Tue Apr 11 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170411-1
+- new upstream release.
+
+* Wed Apr 05 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170405-1
+- new upstream release.
+
+* Sat Apr 01 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170401-1
+- new upstream release.
+
+* Wed Mar 22 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170322-1
+- new upstream release.
+
+* Tue Mar 21 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170321-1
+- new upstream release.
+
+* Mon Mar 20 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170320-1
+- initial packaging for CentOS.

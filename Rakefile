@@ -14,7 +14,15 @@ task "apache-parquet-cpp" do
   end
 end
 
+desc "Update Parquet GLib packages"
+task "parquet-glib" do
+  cd("parquet-glib") do
+    ruby("-S", "rake", "source", "yum", "apt", "ubuntu")
+  end
+end
+
 task :default => [
   "apache-arrow",
   "apache-parquet-cpp",
+  "parquet-glib",
 ]

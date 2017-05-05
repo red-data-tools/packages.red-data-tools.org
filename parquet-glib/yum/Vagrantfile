@@ -7,19 +7,15 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   vms = [
     {
-      :id => "debian-jessie-i386",
-      :box => "bento/debian-8.7-i386",
-    },
-    {
-      :id => "debian-jessie-amd64",
-      :box => "bento/debian-8.7",
+      :id => "centos-7-x86_64",
+      :box => "bento/centos-7.3",
     },
   ]
 
   vms.each do |vm|
     config.vm.define(vm[:id]) do |node|
       node.vm.box = vm[:box]
-      node.vm.provision(:shell, :privileged => false, :path => "build-deb.sh")
+      node.vm.provision(:shell, :path => "build-rpm.sh")
     end
   end
 end
