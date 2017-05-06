@@ -15,8 +15,6 @@ Build-Depends:
   libboost-filesystem-dev,
   libboost-program-options-dev,
   libboost-regex-dev,
-  zlib1g-dev,
-  libsnappy-dev,
   libarrow-dev
 Standards-Version: 3.9.6
 Homepage: https://parquet.apache.org/
@@ -54,7 +52,6 @@ Multi-Arch: same
 Depends:
   ${misc:Depends},
   zlib1g-dev,
-  libsnappy-dev,
   libparquet1 (= ${binary:Version}),
   libparquet-arrow1 (= ${binary:Version})
 Description: Apache Parquet is a columner storage format

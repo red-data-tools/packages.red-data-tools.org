@@ -72,8 +72,6 @@ class ApacheParquetCppPackageTask < PackageTask
       "flex",
       "openssl-devel",
       "boost-devel",
-      "zlib-devel",
-      "snappy-devel",
       "arrow-devel",
     ]
   end
@@ -92,8 +90,6 @@ class ApacheParquetCppPackageTask < PackageTask
       "libboost-filesystem-dev",
       "libboost-program-options-dev",
       "libboost-regex-dev",
-      "zlib1g-dev",
-      "libsnappy-dev",
       "libarrow-dev",
       "python3-dev",
       "python3-numpy",
