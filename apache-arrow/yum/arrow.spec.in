@@ -149,6 +149,9 @@ Documentation for Apache Arrow GLib.
 %{_datadir}/gtk-doc/html/arrow-glib/
 
 %changelog
+* Sat May 06 2017 Kouhei Sutou <kou@clear-code.com> - 0.3.1.20170506-1
+- new upstream release.
+
 * Thu May 04 2017 Kouhei Sutou <kou@clear-code.com> - 0.2.1.20170504-1
 - new upstream release.
 
