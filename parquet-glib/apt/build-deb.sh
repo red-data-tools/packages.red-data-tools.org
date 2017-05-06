@@ -21,16 +21,16 @@ code_name=$(lsb_release --codename --short)
 case "${distribution}" in
   debian)
     component=main
-    run cat <<EOF > /etc/apt/sources.list.d/groonga.list
+    sudo run cat <<EOF > /etc/apt/sources.list.d/groonga.list
 deb https://packages.groonga.org/debian/ ${code_name} main
 deb-src https://packages.groonga.org/debian/ ${code_name} main
 EOF
     ;;
   ubuntu)
     component=universe
-    run apt-get -y install software-properties-common
-    run add-apt-repository -y universe
-    run add-apt-repository -y ppa:groonga/ppa
+    sudo run apt-get -y install software-properties-common
+    sudo run add-apt-repository -y universe
+    sudo run add-apt-repository -y ppa:groonga/ppa
     ;;
 esac
 

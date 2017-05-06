@@ -22,7 +22,6 @@ class ParquetGLibPackageTask < PackageTask
              "../configure",
              "--prefix=/tmp/local",
              "--enable-gtk-doc",
-             "--enable-gtk-doc-pdf",
              "--enable-debug")
           sh({
                "LD_LIBRARY_PATH" => "/tmp/local/lib",
