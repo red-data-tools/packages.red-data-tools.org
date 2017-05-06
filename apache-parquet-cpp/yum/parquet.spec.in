@@ -19,6 +19,8 @@ BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	openssl-devel
 BuildRequires:	boost-devel
+BuildRequires:	zlib-devel
+BuildRequires:	snappy-devel
 BuildRequires:	arrow-devel
 
 %description
@@ -90,6 +92,8 @@ Requires:	boost-system
 Requires:	boost-filesystem
 Requires:	boost-program-options
 Requires:	boost-regex
+Requires:	zlib
+Requires:	snappy
 Requires:	arrow-libs
 
 %description libs
@@ -105,6 +109,8 @@ Summary:	Libraries and header files for Apache Parquet
 Group:		Development/Libraries
 License:	Apache-2.0
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	zlib-devel
+Requires:	snappy-devel
 
 %description devel
 Libraries and header files for Apache Parquet.
@@ -118,6 +124,9 @@ Libraries and header files for Apache Parquet.
 %{_libdir}/pkgconfig/parquet*.pc
 
 %changelog
+* Sat May 06 2017 Kouhei Sutou <kou@clear-code.com> - 1.0.1.20170506-1
+- new upstream release.
+
 * Thu May 04 2017 Kouhei Sutou <kou@clear-code.com> - 1.0.1.20170504-1
 - new upstream release.
 

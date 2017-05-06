@@ -4,7 +4,7 @@ require_relative "../package-task"
 
 class ApacheParquetCppPackageTask < PackageTask
   def initialize
-    super("apache-parquet-cpp", "1.0.1.20170504")
+    super("apache-parquet-cpp", "1.0.1.20170506")
     @rpm_package = "parquet"
   end
 
@@ -72,6 +72,8 @@ class ApacheParquetCppPackageTask < PackageTask
       "flex",
       "openssl-devel",
       "boost-devel",
+      "zlib-devel",
+      "snappy-devel",
       "arrow-devel",
     ]
   end
@@ -90,6 +92,8 @@ class ApacheParquetCppPackageTask < PackageTask
       "libboost-filesystem-dev",
       "libboost-program-options-dev",
       "libboost-regex-dev",
+      "zlib1g-dev",
+      "libsnappy-dev",
       "libarrow-dev",
       "python3-dev",
       "python3-numpy",
