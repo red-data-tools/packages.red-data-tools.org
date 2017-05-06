@@ -35,6 +35,7 @@ class ParquetGLibPackageTask < PackageTask
           mv(File.basename(tar_gz, ".tar.gz"),
              @archive_base_name)
           sh("tar", "czf", @full_archive_name, @archive_base_name)
+          rm_rf("build")
         end
       end
     end
