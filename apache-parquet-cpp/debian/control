@@ -42,8 +42,7 @@ Depends:
   ${misc:Depends},
   ${shlibs:Depends},
   libparquet1 (= ${binary:Version}),
-  libarrow0,
-  libarrow-io0
+  libarrow0
 Description: Apache Parquet is a columner storage format
  .
  This package provides library files to integrate Apache Arrrow.
