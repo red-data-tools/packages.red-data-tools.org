@@ -4,7 +4,7 @@ require_relative "../package-task"
 
 class ApacheParquetCppPackageTask < PackageTask
   def initialize
-    super("apache-parquet-cpp", "1.0.1.20170506")
+    super("apache-parquet-cpp", "1.0.1.20170507")
     @rpm_package = "parquet"
   end
 

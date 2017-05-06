@@ -124,6 +124,9 @@ Libraries and header files for Apache Parquet.
 %{_libdir}/pkgconfig/parquet*.pc
 
 %changelog
+* Sun May 07 2017 Kouhei Sutou <kou@clear-code.com> - 1.0.1.20170507-1
+- new upstream release.
+
 * Sat May 06 2017 Kouhei Sutou <kou@clear-code.com> - 1.0.1.20170506-1
 - new upstream release.
 
