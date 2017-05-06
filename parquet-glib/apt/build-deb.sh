@@ -14,23 +14,26 @@ run()
 . /vagrant/env.sh
 
 run sudo apt-get update
-run sudo apt-get install -y lsb-release apt-transport-https
+run sudo apt-get install -y lsb-release
 
 distribution=$(lsb_release --id --short | tr 'A-Z' 'a-z')
 code_name=$(lsb_release --codename --short)
 case "${distribution}" in
   debian)
     component=main
-    sudo run cat <<EOF > /etc/apt/sources.list.d/groonga.list
+    run sudo apt-get install -y apt-transport-https
+    run sudo tee /etc/apt/sources.list.d/groonga.list <<EOF
 deb https://packages.groonga.org/debian/ ${code_name} main
 deb-src https://packages.groonga.org/debian/ ${code_name} main
 EOF
+    run sudo apt-get update
+    run sudo apt-get install -y --allow-unauthenticated groonga-keyring
     ;;
   ubuntu)
     component=universe
-    sudo run apt-get -y install software-properties-common
-    sudo run add-apt-repository -y universe
-    sudo run add-apt-repository -y ppa:groonga/ppa
+    run sudo apt-get -y install software-properties-common
+    run sudo add-apt-repository -y universe
+    run sudo add-apt-repository -y ppa:groonga/ppa
     ;;
 esac
 
