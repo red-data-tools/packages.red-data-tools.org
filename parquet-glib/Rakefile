@@ -13,25 +13,30 @@ class ParquetGLibPackageTask < PackageTask
     file @archive_name do
       cd("../vendor/parquet-glib") do
         sh("./autogen.sh")
-        sh({
-             "PKG_CONFIG_PATH" => "/tmp/local/lib/pkgconfig",
-           },
-           "./configure",
-           "--prefix=/tmp/local",
-           "--enable-gtk-doc",
-           "--enable-debug")
-        sh({
-             "LD_LIBRARY_PATH" => "/tmp/local/lib",
-           },
-           "make", "-j8",
-           "INTROSPECTION_SCANNER_ARGS=--add-include-path=/tmp/local/share/gir-1.0",
-           "INTROSPECTION_COMPILER_ARGS=--includedir=/tmp/local/share/gir-1.0")
-        sh("make", "dist")
-        tar_gz = Dir.glob("*.tar.gz").first
-        sh("tar", "xf", tar_gz)
-        mv(File.basename(tar_gz, ".tar.gz"),
-           @archive_base_name)
-        sh("tar", "czf", @full_archive_name, @archive_base_name)
+        rm_rf("build")
+        mkdir_p("build")
+        cd("build") do
+          sh({
+               "PKG_CONFIG_PATH" => "/tmp/local/lib/pkgconfig",
+             },
+             "../configure",
+             "--prefix=/tmp/local",
+             "--enable-gtk-doc",
+             "--enable-gtk-doc-pdf",
+             "--enable-debug")
+          sh({
+               "LD_LIBRARY_PATH" => "/tmp/local/lib",
+             },
+             "make", "-j8",
+             "INTROSPECTION_SCANNER_ARGS=--add-include-path=/tmp/local/share/gir-1.0",
+             "INTROSPECTION_COMPILER_ARGS=--includedir=/tmp/local/share/gir-1.0")
+          sh("make", "dist")
+          tar_gz = Dir.glob("*.tar.gz").first
+          sh("tar", "xf", tar_gz)
+          mv(File.basename(tar_gz, ".tar.gz"),
+             @archive_base_name)
+          sh("tar", "czf", @full_archive_name, @archive_base_name)
+        end
       end
     end
   end
@@ -59,5 +64,5 @@ class ParquetGLibPackageTask < PackageTask
   end
 end
 
-task = ApacheArrowPackageTask.new
+task = ParquetGLibPackageTask.new
 task.define

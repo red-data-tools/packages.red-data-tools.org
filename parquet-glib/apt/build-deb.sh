@@ -14,16 +14,23 @@ run()
 . /vagrant/env.sh
 
 run sudo apt-get update
-run sudo apt-get install -y lsb-release
+run sudo apt-get install -y lsb-release apt-transport-https
 
 distribution=$(lsb_release --id --short | tr 'A-Z' 'a-z')
 code_name=$(lsb_release --codename --short)
 case "${distribution}" in
   debian)
     component=main
+    run cat <<EOF > /etc/apt/sources.list.d/groonga.list
+deb https://packages.groonga.org/debian/ ${code_name} main
+deb-src https://packages.groonga.org/debian/ ${code_name} main
+EOF
     ;;
   ubuntu)
     component=universe
+    run apt-get -y install software-properties-common
+    run add-apt-repository -y universe
+    run add-apt-repository -y ppa:groonga/ppa
     ;;
 esac
 

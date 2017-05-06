@@ -130,7 +130,7 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
         spec = "#{tmp_distribution_dir}/#{@rpm_package}.spec"
         spec_in = "#{yum_dir}/#{@rpm_package}.spec.in"
         spec_in_data = File.read(spec_in)
-        spec_data = spec_in_data.gsub(/@(.+)@/) do |matched|
+        spec_data = spec_in_data.gsub(/@(.+?)@/) do |matched|
           case $1
           when "PACKAGE"
             @rpm_package
