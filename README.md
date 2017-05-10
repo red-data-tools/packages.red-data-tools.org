@@ -37,7 +37,7 @@ deb-src https://packages.groonga.org/debian/ jessie main
 Then you run the following command lines:
 
 ```text
-% sudo apt install apt-transport-https
+% sudo apt install -y apt-transport-https
 % sudo apt update
 % sudo apt install -y --allow-unauthenticated groonga-keyring
 % sudo apt update
