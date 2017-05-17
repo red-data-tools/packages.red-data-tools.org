@@ -22,7 +22,7 @@ case "${distribution}" in
   debian)
     component=main
     if [ "${code_name}" = "jessie" ]; then
-      echo <<EOF | run sudo tee /etc/apt/sources.list.d/backports.list
+      run sudo tee /etc/apt/sources.list.d/backports.list <<EOF
 deb http://httpredir.debian.org/debian jessie-backports main
 EOF
     fi
