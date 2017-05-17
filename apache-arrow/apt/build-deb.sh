@@ -21,6 +21,11 @@ code_name=$(lsb_release --codename --short)
 case "${distribution}" in
   debian)
     component=main
+    if [ "${code_name}" = "jessie" ]; then
+      echo <<EOF | run sudo tee /etc/apt/sources.list.d/backports.list
+deb http://httpredir.debian.org/debian jessie-backports main
+EOF
+    fi
     ;;
   ubuntu)
     component=universe
@@ -29,6 +34,10 @@ esac
 
 run sudo apt-get update
 run sudo apt-get install -V -y build-essential devscripts ${DEPENDED_PACKAGES}
+
+if [ "${code_name}" = "jessie" ]; then
+  run sudo apt-get install -V -t ${code_name}-backports -y python3-numpy
+fi
 
 run mkdir -p build
 run cp /vagrant/tmp/${PACKAGE}-${VERSION}.tar.gz \
