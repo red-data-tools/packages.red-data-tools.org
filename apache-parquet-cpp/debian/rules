@@ -53,6 +53,7 @@ override_dh_auto_configure:
 	  make install)
 	dh_auto_configure \
 	  -- \
+	  -DCMAKE_CXX_FLAGS="-std=gnu++11" \
 	  -DCMAKE_BUILD_TYPE=Release \
 	  -DSnappy_HOME=$${PWD}/vendor/snappy \
 	  -DThrift_HOME=$${PWD}/vendor/thrift \
