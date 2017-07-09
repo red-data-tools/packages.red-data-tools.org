@@ -217,6 +217,7 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
       distribution = "debian"
       code_names = [
         "jessie",
+        "stretch",
       ]
       architectures = [
         "i386",
