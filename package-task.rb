@@ -147,6 +147,7 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
         cd(yum_dir) do
           sh("vagrant", "destroy", "--force")
           distribution_versions = {
+            #"6" => ["x86_64"],
             "7" => ["x86_64"],
           }
           threads = []
@@ -154,6 +155,7 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
             archs.each do |arch|
               id = "#{distribution}-#{ver}-#{arch}"
               threads << Thread.new(id) do |local_id|
+                # local_id = id
                 sh("vagrant", "up", local_id)
                 sh("vagrant", "destroy", "--force", local_id)
               end
@@ -216,7 +218,6 @@ DEPENDED_PACKAGES="#{rpm_depended_packages.join("\n")}"
     namespace :apt do
       distribution = "debian"
       code_names = [
-        "jessie",
         "stretch",
       ]
       architectures = [
@@ -252,8 +253,10 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
           threads = []
           code_names.each do |code_name|
             architectures.each do |arch|
+              next if code_name == "stretch" and arch == "i386"
               id = "#{distribution}-#{code_name}-#{arch}"
               threads << Thread.new(id) do |local_id|
+                local_id = id
                 sh("vagrant", "up", local_id)
                 sh("vagrant", "destroy", "--force", local_id)
               end
@@ -331,7 +334,7 @@ DEPENDED_PACKAGES="#{deb_depended_packages.join("\n")}"
              "--package", @package,
              "--version", @version,
              "--source-archive", @archive_name,
-             "--code-names", "xenial,yakkety,zesty",
+             "--code-names", "xenial,zesty",
              "--debian-directory", "debian",
              "--pgp-sign-key", env_value("LAUNCHPAD_UPLOADER_PGP_KEY"))
       end

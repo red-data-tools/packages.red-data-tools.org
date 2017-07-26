@@ -78,6 +78,9 @@ class ApacheArrowPackageTask < PackageTask
       "boost-devel",
       "git",
       "jemalloc-devel",
+      "python",
+      "python-devel",
+      "numpy",
       "gtk-doc",
       "gobject-introspection-devel",
     ]

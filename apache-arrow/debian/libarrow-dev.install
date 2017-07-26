@@ -4,4 +4,3 @@ usr/lib/*/libarrow_*.a
 usr/lib/*/libarrow.so
 usr/lib/*/libarrow_*.so
 usr/lib/*/pkgconfig/arrow.pc
-usr/lib/*/pkgconfig/arrow-jemalloc.pc

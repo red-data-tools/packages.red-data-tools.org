@@ -1,5 +1,10 @@
 # -*- rpm -*-
 
+%define _centos_ver %{?centos_ver:%{centos_ver}}%{!?centos_ver:7}
+
+%define use_python %{_centos_ver} >= 7
+%define use_glib %{_centos_ver} >= 7
+
 Name:		@PACKAGE@
 Version:	@VERSION@
 Release:	1%{?dist}
@@ -17,8 +22,14 @@ BuildRequires:	cmake3
 BuildRequires:	boost-devel
 BuildRequires:	git
 BuildRequires:	jemalloc-devel
+%if %{use_python}
+BuildRequires:	python-devel
+BuildRequires:	numpy
+%endif
+%if %{use_glib}
 BuildRequires:	gtk-doc
 BuildRequires:	gobject-introspection-devel
+%endif
 
 %description
 Apache Arrow is a data processing library for analysis.
@@ -32,10 +43,14 @@ mkdir cpp/build
 cd cpp/build
 %cmake3 .. \
   -DCMAKE_BUILD_TYPE=$build_type \
+%if %{use_python}
+  -DARROW_PYTHON=yes \
+%endif
   -DARROW_BUILD_TESTS=no
 make %{?_smp_mflags}
 cd -
 
+%if %{use_glib}
 cd c_glib
 %configure \
   --with-arrow-cpp-build-dir=$PWD/../cpp/build \
@@ -46,16 +61,19 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 LD_LIBRARY_PATH=$PWD/arrow-glib/.libs/:$PWD/../cpp/build/$build_type \
   make %{?_smp_mflags}
 cd -
+%endif
 
 %install
 cd cpp/build
 make install DESTDIR=$RPM_BUILD_ROOT
 cd -
 
+%if %{use_glib}
 cd c_glib
 make install DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
 cd -
+%endif
 
 %package libs
 Summary:	Runtime libraries for Apache Arrow C++
@@ -72,7 +90,6 @@ This package contains the libraries for Apache Arrow C++.
 %defattr(-,root,root,-)
 %doc README.md LICENSE.txt NOTICE.txt
 %{_libdir}/libarrow.so.*
-%{_libdir}/libarrow_*.so.*
 
 %package devel
 Summary:	Libraries and header files for Apache Arrow C++
@@ -89,11 +106,44 @@ Libraries and header files for Apache Arrow C++.
 %{_includedir}/arrow/
 %{_libdir}/libarrow.a
 %{_libdir}/libarrow.so
-%{_libdir}/libarrow_*.a
-%{_libdir}/libarrow_*.so
 %{_libdir}/pkgconfig/arrow.pc
-%{_libdir}/pkgconfig/arrow-jemalloc.pc
 
+%if %{use_python}
+%package python-libs
+Summary:	Apache Arrow CPython extensions
+Group:		System Environment/Libraries
+License:	Apache-2.0
+Requires:	arrow-libs = %{version}-%{release}
+Requires:	python2
+
+%description python-libs
+This package contains the Apache Arrow CPython extensions.
+
+%files python-libs
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_libdir}/libarrow_python.so.*
+
+%package python-devel
+Summary:	Libraries and header files for Apache Arrow CPython extensions
+Group:		Development/Libraries
+License:	Apache-2.0
+Requires:	arrow-devel = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
+Requires:	python-devel
+
+%description python-devel
+Libraries and header files for Apache Arrow CPython extensions.
+
+%files python-devel
+%defattr(-,root,root,-)
+%doc README.md LICENSE.txt NOTICE.txt
+%{_libdir}/libarrow_python.a
+%{_libdir}/libarrow_python.so
+%{_libdir}/pkgconfig/arrow-python.pc
+%endif
+
+%if %{use_glib}
 %package glib-libs
 Summary:	Runtime libraries for Apache Arrow GLib
 Group:		System Environment/Libraries
@@ -147,6 +197,7 @@ Documentation for Apache Arrow GLib.
 %doc README.md LICENSE.txt NOTICE.txt
 %{_docdir}/arrow-glib/
 %{_datadir}/gtk-doc/html/arrow-glib/
+%endif
 
 %changelog
 * Wed Jul 26 2017 Kouhei Sutou <kou@clear-code.com> - 0.6.0.20170726-1

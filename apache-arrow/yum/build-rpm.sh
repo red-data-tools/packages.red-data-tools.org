@@ -32,6 +32,11 @@ run yum install -y epel-release
 run yum groupinstall -y "Development Tools"
 run yum install -y rpm-build rpmdevtools tar ${DEPENDED_PACKAGES}
 
+if [ "${distribution_version}" = 6]; then
+  run yum install -y centos-release-scl
+  run yum install -y devtoolset-6
+fi
+
 if [ -x /usr/bin/rpmdev-setuptree ]; then
   rm -rf .rpmmacros
   run rpmdev-setuptree
@@ -64,7 +69,13 @@ fi
 run cp \
     /vagrant/tmp/${distribution}/${PACKAGE}.spec \
     rpmbuild/SPECS/
-run rpmbuild -ba ${rpmbuild_options} rpmbuild/SPECS/${PACKAGE}.spec
+
+if [ "${distribution_version}" = 6]; then
+  echo "rpmbuild -ba ${rpmbuild_options} rpmbuild/SPECS/${PACKAGE}.spec" | \
+    run scl enable devtoolset-6 bash
+else
+  run rpmbuild -ba ${rpmbuild_options} rpmbuild/SPECS/${PACKAGE}.spec
+fi
 
 run mv rpmbuild/RPMS/*/* "${rpm_dir}/"
 run mv rpmbuild/SRPMS/* "${srpm_dir}/"
