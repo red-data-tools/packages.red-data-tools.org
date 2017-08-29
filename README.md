@@ -108,7 +108,7 @@ package.
 ## Apache Parquet C++
 
 This section describes how to install
-[Apache Parquet C++](https://github.com/apache/parquet) package.
+[Apache Parquet C++](https://github.com/apache/parquet-cpp) package.
 
 ### Debian GNU/Linux
 
