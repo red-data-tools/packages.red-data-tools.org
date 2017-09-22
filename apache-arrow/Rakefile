@@ -1,108 +1,22 @@
 # -*- ruby -*-
 
-require_relative "../package-task"
+base_dir = File.join(__dir__, "..", "vendor", "arrow-dist", "cpp-linux")
+base_dir = File.expand_path(base_dir)
 
-class ApacheArrowPackageTask < PackageTask
-  def initialize
-    super("apache-arrow", "0.6.0.20170726")
-    @rpm_package = "arrow"
+task :apt do
+  cd(base_dir) do
+    ruby("-S", "rake", "apt")
   end
-
-  private
-  def define_archive_task
-    file @archive_name do
-      cd("../vendor/arrow") do
-        sh("git", "archive", "HEAD",
-           "--prefix", "#{@archive_base_name}/",
-           "--output", @archive_name)
-        rm_f(@archive_base_name)
-        sh("tar", "xf", @archive_name)
-        rm_f(@archive_name)
-
-        c_glib_tmp_dir = "c_glib_tmp"
-        rm_rf(c_glib_tmp_dir)
-        mkdir_p(c_glib_tmp_dir)
-        cp_r(@archive_base_name, c_glib_tmp_dir)
-        c_glib_dir = File.expand_path("#{@archive_base_name}/c_glib")
-        rm_rf(c_glib_dir)
-        cd("#{c_glib_tmp_dir}/#{@archive_base_name}") do
-          build_type = "debug"
-          cpp_dir = File.expand_path("cpp")
-          cpp_build_dir = File.expand_path("cpp_build")
-          mkdir_p(cpp_build_dir)
-          cd(cpp_build_dir) do
-            sh("cmake", cpp_dir,
-               "-DCMAKE_BUILD_TYPE=#{build_type}",
-               "-DARROW_BUILD_TESTS=no")
-            sh("make", "-j8")
-          end
-          cd("c_glib") do
-            sh("./autogen.sh")
-            sh("./configure",
-               "--with-arrow-cpp-build-dir=#{cpp_build_dir}",
-               "--with-arrow-cpp-build-type=#{build_type}",
-               "--enable-gtk-doc")
-            sh({"LD_LIBRARY_PATH" => "#{cpp_build_dir}/#{build_type}"},
-               "make", "-j8")
-            sh("make", "dist")
-            tar_gz = Dir.glob("*.tar.gz").first
-            sh("tar", "xf", tar_gz)
-            mv(File.basename(tar_gz, ".tar.gz"),
-               c_glib_dir)
-          end
-        end
-        rm_rf(c_glib_tmp_dir)
-
-        download("https://github.com/google/flatbuffers/archive/v1.6.0.tar.gz",
-                 "#{@archive_base_name}/vendor/flatbuffers/")
-
-        rapidjson_version = "1.1.0"
-        rapidjson_tar_gz = "v#{rapidjson_version}.tar.gz"
-        download("https://github.com/miloyip/rapidjson/archive/#{rapidjson_tar_gz}",
-                 ".")
-        sh("tar", "xf", rapidjson_tar_gz)
-        mv("rapidjson-#{rapidjson_version}",
-           "#{@archive_base_name}/vendor/rapidjson/")
-        rm_f(rapidjson_tar_gz)
-
-        sh("tar", "czf", @full_archive_name, @archive_base_name)
-        rm_rf(@archive_base_name)
-      end
-    end
-  end
-
-  def rpm_depended_packages
-    [
-      "pkg-config",
-      "cmake3",
-      "boost-devel",
-      "git",
-      "jemalloc-devel",
-      "python",
-      "python-devel",
-      "numpy",
-      "gtk-doc",
-      "gobject-introspection-devel",
-    ]
-  end
-
-  def deb_depended_packages
-    [
-      "debhelper",
-      "pkg-config",
-      "cmake",
-      "git",
-      "libboost-system-dev",
-      "libboost-filesystem-dev",
-      "libjemalloc-dev",
-      "python3-dev",
-      "python3-numpy",
-      "libgirepository1.0-dev",
-      "gtk-doc-tools",
-      "libglib2.0-doc",
-    ]
-  end
+  sh("rsync", "-av", "--delete",
+     "#{base_dir}/apt/repositories/",
+     "apt/repositories/")
 end
 
-task = ApacheArrowPackageTask.new
-task.define
+task :yum do
+  cd(base_dir) do
+    ruby("-S", "rake", "yum")
+  end
+  sh("rsync", "-av", "--delete",
+     "#{base_dir}/yum/repositories/",
+     "yum/repositories/")
+end

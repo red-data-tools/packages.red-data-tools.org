@@ -1,6 +1,0 @@
-usr/include/arrow/
-usr/lib/*/libarrow.a
-usr/lib/*/libarrow_*.a
-usr/lib/*/libarrow.so
-usr/lib/*/libarrow_*.so
-usr/lib/*/pkgconfig/arrow.pc
