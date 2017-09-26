@@ -1,5 +1,10 @@
 # -*- ruby -*-
 
+require_relative "repository-task"
+
+repository_task = RepositoryTask.new
+repository_task.define
+
 desc "Update Apache Arrow packages"
 task "apache-arrow" do
   cd("apache-arrow") do
