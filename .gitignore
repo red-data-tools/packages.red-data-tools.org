@@ -1,4 +1,7 @@
 /repositories/
+/rpm/
+/yum/RPM-GPG-KEY-*
+/yum/*.repo
 /*/*.tar.gz
 /*/apt/.vagrant/
 /*/apt/repositories/
