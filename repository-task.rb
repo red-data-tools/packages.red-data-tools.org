@@ -8,7 +8,7 @@ class RepositoryTask
     @repository_label = "Red Data Tools"
     @repository_url = "https://packages.red-data-tools.org"
     @rsync_base_path = "packages@packages.red-data-tools.org:public"
-    @gpg_uid = "38BA39D6"
+    @gpg_uid = "f72898cb"
   end
 
   def define
@@ -115,7 +115,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{gpg_key_path}
 
       desc "Sign packages"
       task :sign => gpg_key_path do
-        unless system("rpm", "-q", "gpg-pubkey-#{@gpg_uid.downcase}",
+        unless system("rpm", "-q", "gpg-pubkey-#{@gpg_uid}",
                       :out => IO::NULL)
           sh("rpm", "--import", gpg_key_path)
         end
