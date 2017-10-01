@@ -132,17 +132,8 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
              "--define=%_topdir #{rpm_dir}",
              "-ba",
              release_spec_path)
-          Dir.glob("#{repositories_dir}/#{distribution}/*") do |path|
-            next if File.symlink?(path)
-            next unless File.directory?(path)
-            distribution_version_dir = path
-            cp(Dir.glob("#{rpm_dir}/SRPMS/**/*.src.rpm"),
-               "#{distribution_version_dir}/source/SRPMS/")
-            Dir.glob("#{distribution_version_dir}/*/Packages") do |packages_dir|
-              cp(Dir.glob("#{rpm_dir}/RPMS/**/*.rpm"),
-                 packages_dir)
-            end
-          end
+          cp(Dir.glob("#{rpm_dir}/{RPMS/**/*.rpm,SRPMS/**/*.src.rpm}"),
+             "#{repositories_dir}/#{distribution}/")
           cp(gpg_key_path,
              "#{repositories_dir}/#{distribution}/#{rpm_gpg_key_path}")
         end
@@ -155,9 +146,9 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
           # "apache-parquet-cpp",
           # "parquet-glib",
         ].each do |repository|
-          cd(repository) do
-            ruby("-S", "rake", "yum")
-          end
+          # cd(repository) do
+          #   ruby("-S", "rake", "yum")
+          # end
           sh("rsync", "-av",
              "#{repository}/yum/repositories/",
              "#{repositories_dir}/")
