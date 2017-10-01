@@ -146,9 +146,9 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
           # "apache-parquet-cpp",
           # "parquet-glib",
         ].each do |repository|
-          # cd(repository) do
-          #   ruby("-S", "rake", "yum")
-          # end
+          cd(repository) do
+            ruby("-S", "rake", "yum")
+          end
           sh("rsync", "-av",
              "#{repository}/yum/repositories/",
              "#{repositories_dir}/")
