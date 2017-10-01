@@ -7,6 +7,7 @@ task :apt do
   cd(base_dir) do
     ruby("-S", "rake", "apt")
   end
+  mkdir_p("apt/repositories")
   sh("rsync", "-av", "--delete",
      "#{base_dir}/apt/repositories/",
      "apt/repositories/")
@@ -16,6 +17,7 @@ task :yum do
   cd(base_dir) do
     ruby("-S", "rake", "yum")
   end
+  mkdir_p("yum/repositories")
   sh("rsync", "-av", "--delete",
      "#{base_dir}/yum/repositories/",
      "yum/repositories/")
