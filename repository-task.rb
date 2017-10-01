@@ -89,7 +89,7 @@ class RepositoryTask
     release_source_path = "#{yum_dir}/#{repository_name}-release.tar.gz"
     release_spec_path = "#{yum_dir}/#{repository_name}-release.spec"
 
-    file repo_path do |task|
+    file repo_path => __FILE__ do |task|
       File.open(task.name, "w") do |repo|
         repo.puts(<<-REPOSITORY)
 [#{repository_name}]
