@@ -42,7 +42,11 @@ class RepositoryTask
   end
 
   def gpg_key_path
-    "GPG-KEY-#{repository_name}"
+    "GPG-KEY-#{gpg_uid}"
+  end
+
+  def rpm_gpg_key_path
+    "RPM-GPG-KEY-#{repository_name}"
   end
 
   def repositories_dir
@@ -93,16 +97,17 @@ name=#{repository_label} for CentOS $releasever - $basearch
 baseurl=#{repository_url}/centos/$releasever/$basearch/
 gpgcheck=1
 enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/#{File.basename(gpg_key_path)}
+gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
         REPOSITORY
       end
     end
 
     file release_source_path => [gpg_key_path, repo_path] do |task|
+      cp(gpg_key_path, "#{yum_dir}/#{rpm_gpg_key_path}")
       cd(yum_dir) do
         sh("tar", "czf",
            File.basename(task.name),
-           File.basename(gpg_key_path),
+           rpm_gpg_key_path,
            File.basename(repo_path))
       end
     end
@@ -128,6 +133,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{File.basename(gpg_key_path)}
              "-ba",
              release_spec_path)
           Dir.glob("#{repositories_dir}/#{distribution}/*") do |path|
+            next if File.symlink?(path)
             next unless File.directory?(path)
             distribution_version_dir = path
             cp(Dir.glob("#{rpm_dir}/SRPMS/**/*.src.rpm"),
@@ -138,7 +144,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{File.basename(gpg_key_path)}
             end
           end
           cp(gpg_key_path,
-             "#{repositories_dir}/#{distribution}/")
+             "#{repositories_dir}/#{distribution}/#{rpm_gpg_key_path}")
         end
       end
 
@@ -154,7 +160,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{File.basename(gpg_key_path)}
           end
           sh("rsync", "-av",
              "#{repository}/yum/repositories/",
-             "#{repositories_dir}/centos/")
+             "#{repositories_dir}/")
         end
       end
 
@@ -200,12 +206,16 @@ gpgkey=file:///etc/pki/rpm-gpg/#{File.basename(gpg_key_path)}
 
       desc "Update repositories"
       task :update => gpg_key_path do
-        Dir.glob("#{repositories_dir}/#{distribution}/*/*") do |arch_dir|
-          next unless File.directory?(arch_dir)
-          sh("createrepo", arch_dir)
+        Dir.glob("#{repositories_dir}/#{distribution}/*") do |version_dir|
+          next if File.symlink?(version_dir)
+          next unless File.directory?(version_dir)
+          Dir.glob("#{version_dir}/*") do |arch_dir|
+            next unless File.directory?(arch_dir)
+            sh("createrepo", arch_dir)
+          end
         end
         cp(gpg_key_path,
-           "#{repositories_dir}/#{distribution}/RPM-GPG-KEY-#{gpg_uid}")
+           "#{repositories_dir}/#{distribution}/#{rpm_gpg_key_path}")
       end
 
       desc "Download repositories"
