@@ -1,0 +1,18 @@
+Source: red-data-tools-keyring
+Section: misc
+Priority: important
+Maintainer: Red Data Tools <packages@red-data-tools.org>
+Build-Depends:
+  debhelper (>= 9)
+Standards-Version: 3.9.5
+Homepage: https://packages.red-data-tools.org/
+
+Package: red-data-tools-keyring
+Section: misc
+Architecture: all
+Depends:
+  ${misc:Depends},
+  gnupg
+Description: GnuPG archive key of the Red Data Tools repository
+ The Red Data Tools repository digitally signs its Release files. This
+ package contains the repository key used for that.
