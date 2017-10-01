@@ -13,48 +13,78 @@ Packages for Apache Arrow and related projects.
 
 There are packages for the following platforms:
 
-  * Debian GNU/Linux jessie
+  * Debian GNU/Linux stretch
+  * Ubuntu 14.04 LTS
   * Ubuntu 16.04 LTS
-  * Ubuntu 16.10
   * Ubuntu 17.04
+  * CentOS 6
   * CentOS 7
 
 ## Package repository
 
-https://packages.groonga.org/ provides packages. You need to enable
-the package repository before you install packages.
+https://packages.red-data-tools.org/ provides packages. You need to
+enable the package repository before you install packages.
 
 ### Debian GNU/Linux
 
-You add the following apt-lines to
-`/etc/apt/sources.list.d/groonga.list`:
+Install `apt-transport-https` to support HTTPS APT repository:
 
 ```text
-deb https://packages.groonga.org/debian/ jessie main
-deb-src https://packages.groonga.org/debian/ jessie main
+% sudo apt install -y -V apt-transport-https
 ```
 
-Then you run the following command lines:
+Run the following command lines to add apt-lines for APT repository on
+packages.red-data-tools.org:
 
 ```text
-% sudo apt install -y apt-transport-https
-% sudo apt update
-% sudo apt install -y --allow-unauthenticated groonga-keyring
+% sudo apt install -y -V lsb-release
+% cat <<APT_LINE | sudo tee /etc/apt/sources.list.d/red-data-tools.list
+deb https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main
+deb-src https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main
+APT_LINE
+```
+
+Run the following command lines to enable APT repositories on
+packages.red-data-tools.org:
+
+```text
+% sudo apt update --allow-insecure-repositories
+% sudo apt install -y -V --allow-unauthenticated red-data-tools-keyring
 % sudo apt update
 ```
 
 ### Ubuntu
 
+Install `apt-transport-https` to support HTTPS APT repository:
+
 ```text
-% sudo apt install -y software-properties-common
-% sudo add-apt-repository -y ppa:groonga/ppa
+% sudo apt install -y -V apt-transport-https
+```
+
+Run the following command lines to add apt-lines for APT repository on
+packages.red-data-tools.org:
+
+```text
+% sudo apt install -y -V lsb-release
+% cat <<APT_LINE | sudo tee /etc/apt/sources.list.d/red-data-tools.list
+deb https://packages.red-data-tools.org/ubuntu/ $(lsb_release --codename --short) universe
+deb-src https://packages.red-data-tools.org/ubuntu/ $(lsb_release --codename --short) universe
+APT_LINE
+```
+
+Run the following command lines to enable APT repositories on
+packages.red-data-tools.org:
+
+```text
+% sudo apt update --allow-insecure-repositories
+% sudo apt install -y -V --allow-unauthenticated red-data-tools-keyring
 % sudo apt update
 ```
 
-### CentOS 7
+### CentOS
 
 ```text
-% sudo yum install -y https://packages.groonga.org/centos/groonga-release-1.3.0-1.noarch.rpm
+% sudo yum install -y https://packages.red-data-tools.org/centos/red-data-tools-release-1.0.0-1.noarch.rpm
 ```
 
 ## Apache Arrow C++
@@ -66,16 +96,16 @@ package.
 ### Debian GNU/Linux
 
 ```text
-% sudo apt install -y libarrow-dev
+% sudo apt install -y -V libarrow-dev
 ```
 
 ### Ubuntu
 
 ```text
-% sudo apt install -y libarrow-dev
+% sudo apt install -y -V libarrow-dev
 ```
 
-### CentOS 7
+### CentOS
 
 ```text
 % sudo yum install -y --enablerepo=epel arrow-devel
@@ -90,13 +120,13 @@ package.
 ### Debian GNU/Linux
 
 ```text
-% sudo apt install -y libarrow-glib-dev
+% sudo apt install -y -V libarrow-glib-dev
 ```
 
 ### Ubuntu
 
 ```text
-% sudo apt install -y libarrow-glib-dev
+% sudo apt install -y -V libarrow-glib-dev
 ```
 
 ### CentOS 7
@@ -113,16 +143,16 @@ This section describes how to install
 ### Debian GNU/Linux
 
 ```text
-% sudo apt install -y libparquet-dev
+% sudo apt install -y -V libparquet-dev
 ```
 
 ### Ubuntu
 
 ```text
-% sudo apt install -y libparquet-dev
+% sudo apt install -y -V libparquet-dev
 ```
 
-### CentOS 7
+### CentOS
 
 ```text
 % sudo yum install -y --enablerepo=epel parquet-devel
@@ -136,13 +166,13 @@ This section describes how to install
 ### Debian GNU/Linux
 
 ```text
-% sudo apt install -y libparquet-glib-dev
+% sudo apt install -y -V libparquet-glib-dev
 ```
 
 ### Ubuntu
 
 ```text
-% sudo apt install -y libparquet-glib-dev
+% sudo apt install -y -V libparquet-glib-dev
 ```
 
 ### CentOS 7
