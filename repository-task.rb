@@ -68,6 +68,18 @@ class RepositoryTask
     end
   end
 
+  def products
+    products = (ENV["PRODUCTS"] || "").split(",")
+    if products.empty?
+      products = [
+        "apache-arrow",
+        "apache-parquet-cpp",
+        # "parquet-glib",
+      ]
+    end
+    products
+  end
+
   def define_repository_task
     directory repositories_dir
   end
@@ -141,16 +153,12 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
 
       desc "Build RPMs"
       task :build => repositories_dir do
-        [
-          "apache-arrow",
-          # "apache-parquet-cpp",
-          # "parquet-glib",
-        ].each do |repository|
-          cd(repository) do
+        products.each do |product|
+          cd(product) do
             ruby("-S", "rake", "yum")
           end
           sh("rsync", "-av",
-             "#{repository}/yum/repositories/",
+             "#{product}/yum/repositories/",
              "#{repositories_dir}/")
         end
       end
@@ -259,17 +267,13 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
     namespace :apt do
       desc "Build .deb"
       task :build => repositories_dir do
-        [
-          "apache-arrow",
-          # "apache-parquet-cpp",
-          # "parquet-glib",
-        ].each do |repository|
-          cd(repository) do
+        products.each do |product|
+          cd(product) do
             ruby("-S", "rake", "apt")
           end
           distributions.each do |distribution|
             sh("rsync", "-av",
-               "#{repository}/apt/repositories/#{distribution}",
+               "#{product}/apt/repositories/#{distribution}",
                "#{repositories_dir}/")
           end
         end
