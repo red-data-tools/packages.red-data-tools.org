@@ -1,4 +1,5 @@
 #!/bin/sh
+# -*- sh-indentation: 2; sh-basic-offset: 2 -*-
 
 run()
 {
@@ -11,7 +12,7 @@ run()
 
 rpmbuild_options=
 
-. /vagrant/env.sh
+. /host/env.sh
 
 distribution=$(cut -d " " -f 1 /etc/redhat-release | tr "A-Z" "a-z")
 if grep -q Linux /etc/redhat-release; then
@@ -28,19 +29,6 @@ case "${architecture}" in
     ;;
 esac
 
-case ${distribution} in
-  centos)
-    release_rpm=groonga-release-1.3.0-1.noarch.rpm
-    run yum install -y \
-        https://packages.groonga.org/${distribution}/${release_rpm}
-    run yum makecache
-    ;;
-esac
-
-run yum install -y epel-release
-run yum groupinstall -y "Development Tools"
-run yum install -y rpm-build rpmdevtools tar ${DEPENDED_PACKAGES}
-
 if [ -x /usr/bin/rpmdev-setuptree ]; then
   rm -rf .rpmmacros
   run rpmdev-setuptree
@@ -55,7 +43,7 @@ EOM
   run mkdir -p ~/rpmbuild/SRPMS
 fi
 
-repository="/vagrant/repositories/${distribution}/${distribution_version}"
+repository="/host/repositories/${distribution}/${distribution_version}"
 rpm_dir="${repository}/${architecture}/Packages"
 srpm_dir="${repository}/source/SRPMS"
 run mkdir -p "${rpm_dir}" "${srpm_dir}"
@@ -66,14 +54,33 @@ run mkdir -p "${rpm_dir}" "${srpm_dir}"
 cd
 
 if [ -n "${SOURCE_ARCHIVE}" ]; then
-  run cp /vagrant/tmp/${SOURCE_ARCHIVE} rpmbuild/SOURCES/
+  run cp /host/tmp/${SOURCE_ARCHIVE} rpmbuild/SOURCES/
 else
-  run cp /vagrant/tmp/${PACKAGE}-${VERSION}.* rpmbuild/SOURCES/
+  run cp /host/tmp/${PACKAGE}-${VERSION}.* rpmbuild/SOURCES/
 fi
 run cp \
-    /vagrant/tmp/${distribution}/${PACKAGE}.spec \
+    /host/tmp/${distribution}/${PACKAGE}.spec \
     rpmbuild/SPECS/
-run rpmbuild -ba ${rpmbuild_options} rpmbuild/SPECS/${PACKAGE}.spec
+
+cat <<BUILD > build.sh
+#!/bin/bash
+
+rpmbuild -ba ${rpmbuild_options} rpmbuild/SPECS/${PACKAGE}.spec
+BUILD
+run chmod +x build.sh
+if [ "${distribution_version}" = 6 ]; then
+  if [ "${DEBUG:-no}" = "yes" ]; then
+    run scl enable devtoolset-6 ./build.sh
+  else
+    run scl enable devtoolset-6 ./build.sh > /dev/null
+  fi
+else
+  if [ "${DEBUG:-no}" = "yes" ]; then
+    run ./build.sh
+  else
+    run ./build.sh > /dev/null
+  fi
+fi
 
 run mv rpmbuild/RPMS/*/* "${rpm_dir}/"
 run mv rpmbuild/SRPMS/* "${srpm_dir}/"

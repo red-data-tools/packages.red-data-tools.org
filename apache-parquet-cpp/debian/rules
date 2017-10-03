@@ -10,56 +10,10 @@ export DH_OPTIONS
 	dh $@
 
 override_dh_auto_configure:
-	(cd vendor/snappy-* && \
-	  ./configure \
-	    CXXFLAGS="-DNDEBUG -O2" \
-	    --with-pic \
-	    --prefix=$${PWD}/../../vendor/snappy && \
-	  make && \
-	  make install)
-	(cd vendor/thrift-* && \
-	  cmake . \
-	    -DCMAKE_CXX_FLAGS="-fPIC" \
-	    -DCMAKE_C_FLAGS="-fPIC" \
-	    -DCMAKE_BUILD_TYPE=Release \
-	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../../vendor/thrift \
-	    -DCMAKE_INSTALL_RPATH=$${PWD}/../../vendor/thrift/lib \
-	    -DBUILD_SHARED_LIBS=OFF \
-	    -DBUILD_TESTING=OFF \
-	    -DWITH_QT4=OFF \
-	    -DWITH_C_GLIB=OFF \
-	    -DWITH_JAVA=OFF \
-	    -DWITH_PYTHON=OFF \
-	    -DWITH_CPP=ON \
-	    -DWITH_STATIC_LIB=ON && \
-	  make && \
-	  make install)
-	(cd vendor/brotli-* && \
-	  cmake . \
-	    -DCMAKE_CXX_FLAGS="-fPIC" \
-	    -DCMAKE_C_FLAGS="-fPIC" \
-	    -DCMAKE_BUILD_TYPE=Release \
-	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../../vendor/brotli \
-	    -DBUILD_SHARED_LIBS=OFF && \
-	  make && \
-	  make install)
-	(cd vendor/zlib-* && \
-	  cmake . \
-	    -DCMAKE_C_FLAGS="-fPIC" \
-	    -DCMAKE_BUILD_TYPE=Release \
-	    -DCMAKE_INSTALL_PREFIX=$${PWD}/../../vendor/zlib \
-	    -DBUILD_SHARED_LIBS=OFF && \
-	  make && \
-	  make install)
 	dh_auto_configure \
 	  -- \
 	  -DCMAKE_CXX_FLAGS="-std=gnu++11" \
 	  -DCMAKE_BUILD_TYPE=Release \
-	  -DSnappy_HOME=$${PWD}/vendor/snappy \
-	  -DThrift_HOME=$${PWD}/vendor/thrift \
-	  -DBrotli_HOME=$${PWD}/vendor/brotli \
-	  -DZLIB_HOME=$${PWD}/vendor/zlib \
-	  -DPARQUET_ZLIB_VENDORED=OFF \
 	  -DPARQUET_BUILD_TESTS=OFF
 
 # disable 'make check'.

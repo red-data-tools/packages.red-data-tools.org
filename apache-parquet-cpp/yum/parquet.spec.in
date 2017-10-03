@@ -28,54 +28,8 @@ Apache Parquet is a columner storage format.
 %setup -q -n apache-parquet-cpp-%{version}
 
 %build
-(cd vendor/snappy-* && \
-  ./configure \
-    CXXFLAGS="-DNDEBUG -O2" \
-    --with-pic \
-    --prefix=${PWD}/../../vendor/snappy && \
-  make %{?_smp_mflags} && \
-  make install)
-(cd vendor/thrift-* && \
-  cmake3 . \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${PWD}/../../vendor/thrift \
-    -DCMAKE_INSTALL_RPATH=${PWD}/../../vendor/thrift/lib \
-    -DBUILD_SHARED_LIBS=OFF \
-    -DBUILD_TESTING=OFF \
-    -DWITH_QT4=OFF \
-    -DWITH_C_GLIB=OFF \
-    -DWITH_JAVA=OFF \
-    -DWITH_PYTHON=OFF \
-    -DWITH_CPP=ON \
-    -DWITH_STATIC_LIB=ON && \
-  make %{?_smp_mflags} && \
-  make install)
-(cd vendor/brotli-* && \
-  cmake3 . \
-    -DCMAKE_CXX_FLAGS="-fPIC" \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${PWD}/../../vendor/brotli \
-    -DBUILD_SHARED_LIBS=OFF && \
-  make %{?_smp_mflags} && \
-  make install)
-(cd vendor/zlib-* && \
-  cmake3 . \
-    -DCMAKE_C_FLAGS="-fPIC" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${PWD}/../../vendor/zlib \
-    -DBUILD_SHARED_LIBS=OFF && \
-  make %{?_smp_mflags} && \
-  make install)
 %cmake3 . \
   -DCMAKE_BUILD_TYPE=Release \
-  -DSnappy_HOME=${PWD}/vendor/snappy \
-  -DThrift_HOME=${PWD}/vendor/thrift \
-  -DBrotli_HOME=${PWD}/vendor/brotli \
-  -DZLIB_HOME=${PWD}/vendor/zlib \
-  -DPARQUET_ZLIB_VENDORED=OFF \
   -DPARQUET_BUILD_TESTS=OFF
 make %{?_smp_mflags}
 
@@ -119,6 +73,9 @@ Libraries and header files for Apache Parquet.
 %{_libdir}/pkgconfig/parquet*.pc
 
 %changelog
+* Thu Sep 21 2017 Kouhei Sutou <kou@clear-code.com> - 1.3.0-1
+- New upstream release.
+
 * Mon Jun 12 2017 Kouhei Sutou <kou@clear-code.com> - 1.1.1.20170612-1
 - new upstream release.
 
