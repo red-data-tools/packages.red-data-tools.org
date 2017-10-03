@@ -1,12 +1,3 @@
-[submodule "vendor/arrow"]
-	path = vendor/arrow
-	url = https://github.com/apache/arrow.git
-[submodule "vendor/groonga"]
-	path = vendor/groonga
-	url = https://github.com/groonga/groonga.git
-[submodule "vendor/cutter"]
-	path = vendor/cutter
-	url = https://github.com/clear-code/cutter.git
 [submodule "vendor/parquet-cpp"]
 	path = vendor/parquet-cpp
 	url = https://github.com/apache/parquet-cpp.git
