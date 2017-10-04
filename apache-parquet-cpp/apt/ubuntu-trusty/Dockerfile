@@ -18,7 +18,7 @@ RUN \
   apt install -y -V ${quiet} \
     bison \
     build-essential \
-    cmake \
+    cmake3 \
     debhelper \
     devscripts \
     flex \
@@ -33,5 +33,5 @@ RUN \
     libtool \
     pkg-config \
     zlib1g-dev && \
-  apt clean && \
+  apt-get clean && \
   rm -rf /var/lib/apt/lists/*
