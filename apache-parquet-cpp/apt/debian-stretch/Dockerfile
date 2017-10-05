@@ -9,13 +9,6 @@ RUN \
   apt update ${quiet} && \
   apt install -y -V ${quiet} \
     apt-transport-https \
-    lsb-release && \
-  echo "deb https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main" \
-    > /etc/apt/sources.list.d/red-data-tools.list && \
-  apt update ${quiet} --allow-insecure-repositories && \
-  apt install -y -V ${quiet} --allow-unauthenticated red-data-tools-keyring && \
-  apt update ${quiet} && \
-  apt install -y -V ${quiet} \
     bison \
     build-essential \
     cmake \
@@ -23,13 +16,13 @@ RUN \
     devscripts \
     flex \
     git \
-    libarrow-dev \
     libboost-dev \
     libboost-filesystem-dev \
     libboost-program-options-dev \
     libboost-regex-dev \
     libboost-system-dev \
     libssl-dev \
+    lsb-release \
     pkg-config \
     zlib1g-dev && \
   apt clean && \

@@ -26,6 +26,25 @@ case "${distribution}" in
 esac
 specific_debian_dir="debian.${distribution}-${code_name}"
 
+if [ "${DEBUG:-no}" = "yes" ]; then
+  apt_options=""
+else
+  apt_options="-qq"
+fi
+cat <<APT_LINE > /etc/apt/sources.list.d/red-data-tools.list
+deb https://packages.red-data-tools.org/${distribution}/ ${code_name} ${component}
+APT_LINE
+if [ "${code_name}" = "trusty" ]; then
+  apt_update_options=""
+else
+  apt_update_options="--allow-insecure-repositories"
+fi
+run apt update ${apt_options} ${apt_update_options}
+run apt install ${apt_options} -y -V --allow-unauthenticated \
+  red-data-tools-keyring
+run apt update ${apt_options}
+run apt install ${apt_options} -y -V libarrow-dev
+
 run mkdir -p build
 run cp /host/tmp/${PACKAGE}-${VERSION}.tar.gz \
   build/${PACKAGE}_${VERSION}.orig.tar.gz
