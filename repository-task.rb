@@ -69,8 +69,9 @@ class RepositoryTask
   end
 
   def products
-    products = (ENV["PRODUCTS"] || "").split(",")
-    if products.empty?
+    if ENV["PRODUCTS"]
+      products = ENV["PRODUCTS"].split(",")
+    else
       products = [
         "apache-arrow",
         "apache-parquet-cpp",
