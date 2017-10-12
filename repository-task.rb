@@ -74,7 +74,7 @@ class RepositoryTask
       products = [
         "apache-arrow",
         "apache-parquet-cpp",
-        # "parquet-glib",
+        "parquet-glib",
       ]
     end
     products
