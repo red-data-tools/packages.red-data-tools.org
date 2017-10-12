@@ -1,0 +1,20 @@
+/var/log/apache2/*.log {
+	daily
+	missingok
+	rotate 3650
+	compress
+	delaycompress
+	notifempty
+	create 640 root adm
+	sharedscripts
+	postrotate
+		if systemctl status apache2 > /dev/null; then \
+			systemctl reload apache2 > /dev/null; \
+		fi
+	endscript
+	prerotate
+		if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+			run-parts /etc/logrotate.d/httpd-prerotate; \
+		fi
+	endscript
+}

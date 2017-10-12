@@ -1,0 +1,228 @@
+- hosts: package-servers
+  become: yes
+  tasks:
+    # Base
+    - name: Upgrade packages
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        upgrade: safe
+    - name: Install base packages
+      apt:
+        name: "{{ item }}"
+      with_items:
+        - cron
+        - apt-listchanges
+        - vim
+        - zsh
+        - lv
+        - acpid
+        - apg
+        - logrotate
+        - fail2ban
+    - name: Use VIM as the default editor
+      command: update-alternatives --set editor /usr/bin/vim.basic
+    - name: Use e-mail for apt-listchanges
+      copy:
+        src: etc/apt/listchanges.conf
+        dest: /etc/apt/listchanges.conf
+
+    # User
+    - name: Create "packages" user
+      user:
+        name: packages
+    - name: Create directories
+      file:
+        path: ~packages/{{ item }}
+        state: directory
+        owner: packages
+        group: packages
+      with_items:
+        - bin/
+        - public/
+    - name: Put ~packages/.forward
+      copy:
+        content: "kou@cozmixng.org"
+        dest: ~packages/.forward
+        owner: packages
+        group: packages
+    - name: Create ~packages/.ssh/
+      file:
+        path: ~packages/.ssh
+        state: directory
+        owner: packages
+        group: packages
+        mode: 0700
+    - name: Put ~packages/.ssh/authorized_keys
+      copy:
+        src: home/packages/.ssh/authorized_keys
+        dest: ~packages/.ssh/authorized_keys
+        owner: packages
+        group: packages
+        mode: 0600
+    - name: Create ~packages/public/
+      file:
+        path: ~packages/public/
+        state: directory
+        owner: packages
+        group: packages
+        mode: 0755
+
+    # Let's encrypt
+    - name: Install python-certbot
+      apt:
+        name: python-certbot
+    - name: "packages: Check Let's Encrypt certificate"
+      stat:
+        path: /etc/letsencrypt/live/packages.red-data-tools.org/fullchain.pem
+      register: packages_certificate
+    - name: "mail: Check Let's Encrypt certificate"
+      stat:
+        path: /etc/letsencrypt/live/mail.red-data-tools.org/fullchain.pem
+      register: mail_certificate
+    - name: Check Apache is installed
+      command: systemctl status apache2
+      register: apache2_installed
+      ignore_errors: yes
+    - name: "Stop Apache before initializing Let's Encrypt certificate"
+      service:
+        name: apache2
+        state: stopped
+      when: apache2_installed.rc == 0 and
+            ((not packages_certificate.stat.exists) or
+             (not mail_certificate.stat.exists))
+    - name: "packages: Initialize Let's Encrypt certificate"
+      shell: |
+        certbot certonly \
+          --standalone \
+          --non-interactive \
+          --agree-tos \
+          --email packages@red-data-tools.org \
+          --domain packages.red-data-tools.org
+      when: not packages_certificate.stat.exists
+    - name: "mail: Initialize Let's Encrypt certificate"
+      shell: |
+        certbot certonly \
+          --standalone \
+          --non-interactive \
+          --agree-tos \
+          --email postmaster@red-data-tools.org \
+          --domain mail.red-data-tools.org
+      when: not mail_certificate.stat.exists
+    - name: "Put Let's Encrypt update script"
+      copy:
+        src: etc/cron.daily/letsencrypt
+        dest: /etc/cron.daily/letsencrypt
+        mode: 0700
+
+    # Apache
+    - name: Install Apache
+      apt:
+        name: apache2
+    - name: Put logrotate configuration
+      copy:
+        src: "{{ item }}"
+        dest: /{{ item }}
+      with_items:
+        - etc/logrotate.d/apache2
+    - name: Put Apache configuration
+      copy:
+        src: "{{ item }}"
+        dest: /{{ item }}
+      with_items:
+        - etc/apache2/sites-available/packages.red-data-tools.org.conf
+    - name: Enable our Apache configuration
+      command: a2ensite packages.red-data-tools.org
+    - name: Disable default Apache configuration
+      command: a2dissite 000-default
+      notify:
+        - Restart Apache
+    - name: Enable Apache modules
+      command: a2enmod {{ item }}
+      with_items:
+        - ssl
+      notify:
+        - Restart Apache
+
+    # Postfix
+    - name: Install Postfix
+      apt:
+        name: postfix
+    - name: Set /etc/aliases
+      copy:
+        src: etc/aliases
+        dest: /etc/aliases
+      notify:
+        - Update /etc/aliases
+    - name: Set /etc/mailname
+      copy:
+        content: "mail.red-data-tools.org"
+        dest: /etc/mailname
+    - name: Put Postfix configuration
+      copy:
+        src: etc/postfix/main.cf
+        dest: /etc/postfix/main.cf
+      notify:
+        - Restart Postfix
+
+    # milter manager
+    - name: Add APT repository for milter manager
+      apt_repository:
+        repo: ppa:milter-manager/ppa
+    - name: Install milters
+      apt:
+        name: "{{ item }}"
+      with_items:
+        - milter-manager
+        - milter-greylist
+    - name: Add milter-manager user to greylist group
+      user:
+        name: milter-manager
+        append: yes
+        groups:
+          - greylist
+          - postfix
+    - name: Configure milter-greylist
+      copy:
+        src: "{{ item }}"
+        dest: /{{ item }}
+      with_items:
+        - etc/milter-greylist/greylist.conf
+        - etc/default/milter-greylist
+      notify:
+        - Restart milter-greylist
+    - name: Create milter manager directory
+      file:
+        path: /var/spool/postfix/milter-manager/
+        state: directory
+        owner: milter-manager
+        group: postfix
+        mode: 0750
+    - name: Configure milter manager
+      copy:
+        src: "{{ item }}"
+        dest: /{{ item }}
+      with_items:
+        - etc/default/milter-manager
+      notify:
+        - Restart milter-manager
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+    - name: Update /etc/aliases
+      command: postalias /etc/aliases
+    - name: Restart Postfix
+      service:
+        name: postfix
+        state: restarted
+    - name: Restart milter-greylist
+      service:
+        name: milter-greylist
+        state: restarted
+    - name: Restart milter manager
+      service:
+        name: milter-manager
+        state: restarted

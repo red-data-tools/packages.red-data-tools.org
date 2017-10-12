@@ -1,0 +1,16 @@
+# Defaults for milter-greylist initscript
+# sourced by /etc/init.d/milter-greylist
+# installed at /etc/default/milter-greylist by the maintainer scripts
+# 2006-08-18 Herbert Straub
+
+# Change to one to enable milter-greylist
+# Don't forget to edit the configuration file 
+# /etc/milter-greylist/greylist.conf
+ENABLED=1
+
+# PIDFILE="/var/run/milter-greylist.pid"
+# SOCKET="/var/run/milter-greylist/greylist.sock"
+# USER="root"
+
+# Other options
+# OPTIONS=""

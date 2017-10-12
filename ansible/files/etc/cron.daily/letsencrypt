@@ -1,0 +1,5 @@
+#!/bin/sh
+
+systemctl stop apache2
+certbot renew > /var/log/letsencrypt/renew.log
+systemctl start apache2

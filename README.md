@@ -1,6 +1,7 @@
 # README
 
-Packages for Apache Arrow and related projects.
+https://packages.red-data-tools.org/ provides packages for Red Data
+Tools related projects including Apache Arrow and Apache Parquet.
 
 ## Supported packages
 
@@ -179,6 +180,15 @@ This section describes how to install
 
 ```text
 % sudo yum install -y --enablerepo=epel parquet-glib-devel
+```
+
+## For packages.red-data-tools.org administrator
+
+### How to deploy
+
+```console
+% sudo apt install -V ansible
+% rake deploy
 ```
 
 ## License
