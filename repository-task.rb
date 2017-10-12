@@ -70,15 +70,18 @@ class RepositoryTask
 
   def products
     if ENV["PRODUCTS"]
-      products = ENV["PRODUCTS"].split(",")
+      ENV["PRODUCTS"].split(",")
     else
-      products = [
-        "apache-arrow",
-        "apache-parquet-cpp",
-        "parquet-glib",
-      ]
+      all_products
     end
-    products
+  end
+
+  def all_products
+    [
+      "apache-arrow",
+      "apache-parquet-cpp",
+      "parquet-glib",
+    ]
   end
 
   def define_repository_task
@@ -153,11 +156,17 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       end
 
       desc "Build RPMs"
-      task :build => repositories_dir do
+      task :build do
         products.each do |product|
           cd(product) do
             ruby("-S", "rake", "yum")
           end
+        end
+      end
+
+      desc "Copy built RPMs"
+      task :copy => repositories_dir do
+        all_products.each do |product|
           sh("rsync", "-av",
              "#{product}/yum/repositories/",
              "#{repositories_dir}/")
@@ -243,6 +252,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
     yum_tasks = [
       "yum:download",
       "yum:build",
+      "yum:copy",
       "yum:release:build",
       "yum:sign",
       "yum:amazon_linux",
@@ -267,11 +277,17 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
 
     namespace :apt do
       desc "Build .deb"
-      task :build => repositories_dir do
+      task :build do
         products.each do |product|
           cd(product) do
             ruby("-S", "rake", "apt")
           end
+        end
+      end
+
+      desc "Copy built .deb"
+      task :copy => repositories_dir do
+        all_products.each do |product|
           distributions.each do |distribution|
             sh("rsync", "-av",
                "#{product}/apt/repositories/#{distribution}",
@@ -409,6 +425,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
     apt_tasks = [
       "apt:download",
       "apt:build",
+      "apt:copy",
       "apt:sign",
       "apt:repository:build",
       "apt:repository:update",
