@@ -1,3 +1,9 @@
+parquet-glib (1.0.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Kouhei Sutou <kou@clear-code.com>  Wed, 11 Oct 2017 06:21:30 -0000
+
 parquet-glib (1.0.0.20170505-1) unstable; urgency=low
 
   * New upstream release.

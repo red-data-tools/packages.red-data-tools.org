@@ -86,5 +86,8 @@ Documentation for Parquet GLib.
 %{_datadir}/gtk-doc/html/parquet-glib/
 
 %changelog
+* Wed Oct 11 2017 Kouhei Sutou <kou@clear-code.com> - 1.0.0-1
+- New upstream release.
+
 * Fri May 05 2017 Kouhei Sutou <kou@clear-code.com> - 1.0.0.2017050-1
 - new upstream release.

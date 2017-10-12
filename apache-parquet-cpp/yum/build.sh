@@ -29,6 +29,19 @@ case "${architecture}" in
     ;;
 esac
 
+
+if [ "${DEBUG:-no}" = "yes" ]; then
+  yum_options=""
+else
+  yum_options="--quiet"
+fi
+
+release_rpm=red-data-tools-release-1.0.0-1.noarch.rpm
+run yum install -y ${yum_options} \
+    https://packages.red-data-tools.org/${distribution}/${release_rpm}
+run yum install -y arrow-devel
+
+
 if [ -x /usr/bin/rpmdev-setuptree ]; then
   rm -rf .rpmmacros
   run rpmdev-setuptree

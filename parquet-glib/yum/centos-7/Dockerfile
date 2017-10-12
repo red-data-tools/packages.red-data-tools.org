@@ -8,10 +8,9 @@ RUN \
   yum install -y ${quiet} epel-release && \
   yum groupinstall -y ${quiet} "Development Tools" && \
   yum install -y ${quiet} \
-    boost-devel \
-    cmake3 \
-    git \
-    openssl-devel \
+    gtk-doc \
+    gobject-introspection-devel \
+    pkg-config \
     rpm-build \
     rpmdevtools && \
   yum clean ${quiet} all
