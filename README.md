@@ -191,6 +191,14 @@ This section describes how to install
 % rake deploy
 ```
 
+## For package creators
+
+```console
+% git submodule init
+% git submodule update
+% rake apt
+```
+
 ## License
 
 Apache-2.0
