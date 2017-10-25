@@ -31,14 +31,14 @@ enable the package repository before you install packages.
 
 Install `apt-transport-https` to support HTTPS APT repository:
 
-```text
+```console
 % sudo apt install -y -V apt-transport-https
 ```
 
 Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
-```text
+```console
 % sudo apt install -y -V lsb-release
 % cat <<APT_LINE | sudo tee /etc/apt/sources.list.d/red-data-tools.list
 deb https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main
@@ -49,7 +49,7 @@ APT_LINE
 Run the following command lines to enable APT repositories on
 packages.red-data-tools.org:
 
-```text
+```console
 % sudo apt update --allow-insecure-repositories
 % sudo apt install -y -V --allow-unauthenticated red-data-tools-keyring
 % sudo apt update
@@ -59,14 +59,14 @@ packages.red-data-tools.org:
 
 Install `apt-transport-https` to support HTTPS APT repository:
 
-```text
+```console
 % sudo apt install -y -V apt-transport-https
 ```
 
 Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
-```text
+```console
 % sudo apt install -y -V lsb-release
 % cat <<APT_LINE | sudo tee /etc/apt/sources.list.d/red-data-tools.list
 deb https://packages.red-data-tools.org/ubuntu/ $(lsb_release --codename --short) universe
@@ -77,7 +77,7 @@ APT_LINE
 Run the following command lines to enable APT repositories on
 packages.red-data-tools.org:
 
-```text
+```console
 % sudo apt update --allow-insecure-repositories || sudo apt update
 % sudo apt install -y -V --allow-unauthenticated red-data-tools-keyring
 % sudo apt update
@@ -85,7 +85,7 @@ packages.red-data-tools.org:
 
 ### CentOS
 
-```text
+```console
 % sudo yum install -y https://packages.red-data-tools.org/centos/red-data-tools-release-1.0.0-1.noarch.rpm
 ```
 
@@ -97,19 +97,19 @@ package.
 
 ### Debian GNU/Linux
 
-```text
+```console
 % sudo apt install -y -V libarrow-dev
 ```
 
 ### Ubuntu
 
-```text
+```console
 % sudo apt install -y -V libarrow-dev
 ```
 
 ### CentOS
 
-```text
+```console
 % sudo yum install -y --enablerepo=epel arrow-devel
 ```
 
@@ -121,19 +121,19 @@ package.
 
 ### Debian GNU/Linux
 
-```text
+```console
 % sudo apt install -y -V libarrow-glib-dev
 ```
 
 ### Ubuntu
 
-```text
+```console
 % sudo apt install -y -V libarrow-glib-dev
 ```
 
 ### CentOS 7
 
-```text
+```console
 % sudo yum install -y --enablerepo=epel arrow-glib-devel
 ```
 
@@ -144,19 +144,19 @@ This section describes how to install
 
 ### Debian GNU/Linux
 
-```text
+```console
 % sudo apt install -y -V libparquet-dev
 ```
 
 ### Ubuntu
 
-```text
+```console
 % sudo apt install -y -V libparquet-dev
 ```
 
 ### CentOS
 
-```text
+```console
 % sudo yum install -y --enablerepo=epel parquet-devel
 ```
 
@@ -167,19 +167,19 @@ This section describes how to install
 
 ### Debian GNU/Linux
 
-```text
+```console
 % sudo apt install -y -V libparquet-glib-dev
 ```
 
 ### Ubuntu
 
-```text
+```console
 % sudo apt install -y -V libparquet-glib-dev
 ```
 
 ### CentOS 7
 
-```text
+```console
 % sudo yum install -y --enablerepo=epel parquet-glib-devel
 ```
 
