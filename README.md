@@ -18,6 +18,7 @@ There are packages for the following platforms:
   * Ubuntu 14.04 LTS
   * Ubuntu 16.04 LTS
   * Ubuntu 17.04
+  * Ubuntu 17.10
   * CentOS 6
   * CentOS 7
 
