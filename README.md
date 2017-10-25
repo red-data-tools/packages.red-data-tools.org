@@ -194,17 +194,21 @@ This section describes how to install
 
 ## For package creators
 
-### Debian
+### Debian GNU/Linux and Ubuntu
+
+Here are command lines to build .deb files and update APT repository:
+
 ```console
-% git submodule init
-% git submodule update
+% git submodule update --init
 % rake apt
 ```
 
 ### CentOS
+
+Here are command lines to build .rpm files and update Yum repository:
+
 ```console
-% git submodule init
-% git submodule update
+% git submodule update --init
 % rake yum
 ```
 
