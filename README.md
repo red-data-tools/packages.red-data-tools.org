@@ -191,6 +191,22 @@ This section describes how to install
 % rake deploy
 ```
 
+## For package creators
+
+### Debian
+```console
+% git submodule init
+% git submodule update
+% rake apt
+```
+
+### CentOS
+```console
+% git submodule init
+% git submodule update
+% rake yum
+```
+
 ## License
 
 Apache-2.0
