@@ -193,10 +193,18 @@ This section describes how to install
 
 ## For package creators
 
+### Debian
 ```console
 % git submodule init
 % git submodule update
 % rake apt
+```
+
+### CentOS
+```console
+% git submodule init
+% git submodule update
+% rake yum
 ```
 
 ## License
