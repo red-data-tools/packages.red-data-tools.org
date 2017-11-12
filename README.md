@@ -131,7 +131,7 @@ package.
 % sudo apt install -y -V libarrow-glib-dev
 ```
 
-### CentOS 7
+### CentOS
 
 ```console
 % sudo yum install -y --enablerepo=epel arrow-glib-devel
@@ -177,7 +177,7 @@ This section describes how to install
 % sudo apt install -y -V libparquet-glib-dev
 ```
 
-### CentOS 7
+### CentOS
 
 ```console
 % sudo yum install -y --enablerepo=epel parquet-glib-devel
