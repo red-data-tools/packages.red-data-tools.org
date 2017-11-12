@@ -40,7 +40,7 @@ packages.red-data-tools.org:
 
 ```console
 % sudo apt install -y -V lsb-release
-% cat <<APT_LINE | sudo tee /etc/apt/sources.list.d/red-data-tools.list
+% sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
 deb https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main
 deb-src https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main
 APT_LINE
@@ -68,7 +68,7 @@ packages.red-data-tools.org:
 
 ```console
 % sudo apt install -y -V lsb-release
-% cat <<APT_LINE | sudo tee /etc/apt/sources.list.d/red-data-tools.list
+% sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
 deb https://packages.red-data-tools.org/ubuntu/ $(lsb_release --codename --short) universe
 deb-src https://packages.red-data-tools.org/ubuntu/ $(lsb_release --codename --short) universe
 APT_LINE
