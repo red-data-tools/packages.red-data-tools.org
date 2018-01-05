@@ -2,3 +2,4 @@ usr/include/parquet/
 usr/lib/*/*.a
 usr/lib/*/*.so
 usr/lib/*/pkgconfig/*.pc
+usr/share/parquet-cpp/cmake/*.cmake
