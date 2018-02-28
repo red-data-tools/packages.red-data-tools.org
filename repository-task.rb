@@ -267,7 +267,6 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       ["debian", "stretch", "main"],
       ["ubuntu", "trusty", "universe"],
       ["ubuntu", "xenial", "universe"],
-      ["ubuntu", "zesty", "universe"],
       ["ubuntu", "artful", "universe"],
     ]
     distributions = targets.collect(&:first).uniq
