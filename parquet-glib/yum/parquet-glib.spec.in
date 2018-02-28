@@ -40,7 +40,7 @@ Summary:	Runtime libraries for Parquet GLib
 Group:		System Environment/Libraries
 License:	Apache-2.0
 Requires:	parquet
-Requires:	arrow-glib
+Requires:	arrow-glib-libs
 
 %description libs
 This package contains the libraries for Parquet GLib
