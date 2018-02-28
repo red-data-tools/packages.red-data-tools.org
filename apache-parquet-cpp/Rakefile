@@ -19,7 +19,7 @@ class ApacheParquetCppPackageTask < PackageTask
 
   def detect_rc
     Dir.chdir(source_dir) do
-      if /(-rc\d+)\z/ =~ `git describe`.chomp
+      if /-(rc\d+)\z/ =~ `git describe`.chomp
         $1
       else
         nil
