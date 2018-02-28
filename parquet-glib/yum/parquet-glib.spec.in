@@ -39,7 +39,7 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 Summary:	Runtime libraries for Parquet GLib
 Group:		System Environment/Libraries
 License:	Apache-2.0
-Requires:	parquet
+Requires:	parquet-libs
 Requires:	arrow-glib-libs
 
 %description libs
