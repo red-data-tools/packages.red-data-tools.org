@@ -216,6 +216,6 @@ Here are command lines to build .rpm files and update Yum repository:
 
 Apache-2.0
 
-Copyright 2017 Kouhei Sutou \<kou@clear-code.com\>
+Copyright 2017-2018 Kouhei Sutou \<kou@clear-code.com\>
 
 See LICENSE and NOTICE for details.
