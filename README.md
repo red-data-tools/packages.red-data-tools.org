@@ -86,7 +86,7 @@ packages.red-data-tools.org:
 ### CentOS
 
 ```console
-% sudo yum install -y https://packages.red-data-tools.org/centos/red-data-tools-release-1.0.0-1.noarch.rpm
+% sudo yum install -y https://packages.red-data-tools.org/centos/red-data-tools-release-latest.noarch.rpm
 ```
 
 ## Apache Arrow C++

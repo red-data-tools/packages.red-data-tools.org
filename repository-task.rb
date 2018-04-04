@@ -99,6 +99,13 @@ class RepositoryTask
     end
   end
 
+  def rpm_version(spec)
+    content = File.read(spec)
+    version = content.scan(/^Version: (.+)$/)[0][0]
+    release = content.scan(/^Release: (.+)$/)[0][0]
+    "#{version}-#{release}"
+  end
+
   def define_yum_task
     yum_dir = "yum"
     repo_path = "#{yum_dir}/#{repository_name}.repo"
@@ -148,10 +155,16 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
              "--define=%_topdir #{rpm_dir}",
              "-ba",
              release_spec_path)
+          destination_base_dir = "#{repositories_dir}/#{distribution}/"
           cp(Dir.glob("#{rpm_dir}/{RPMS/**/*.rpm,SRPMS/**/*.src.rpm}"),
-             "#{repositories_dir}/#{distribution}/")
+             destination_base_dir)
+          release_rpm_version = rpm_version(release_spec_path)
+          release_rpm_base_name = "#{repository_name}-release"
+          ln_s("#{release_rpm_base_name}-#{release_rpm_version}.noarch.rpm",
+               "#{destination_base_dir}/#{release_rpm_base_name}-latest.noarch.rpm",
+               force: true)
           cp(gpg_key_path,
-             "#{repositories_dir}/#{distribution}/#{rpm_gpg_key_path}")
+             "#{destination_base_dir}/#{rpm_gpg_key_path}")
         end
       end
 
@@ -166,7 +179,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
 
       desc "Copy built RPMs"
       task :copy => repositories_dir do
-        all_products.each do |product|
+        products.each do |product|
           sh("rsync", "-av",
              "#{product}/yum/repositories/",
              "#{repositories_dir}/")
