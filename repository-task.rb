@@ -156,8 +156,16 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
              "-ba",
              release_spec_path)
           destination_base_dir = "#{repositories_dir}/#{distribution}/"
-          cp(Dir.glob("#{rpm_dir}/{RPMS/**/*.rpm,SRPMS/**/*.src.rpm}"),
-             destination_base_dir)
+          rpms = Dir.glob("#{rpm_dir}/RPMS/**/*.rpm")
+          srpms = Dir.glob("#{rpm_dir}/SRPMS/**/*.src.rpm")
+          cp(rpms, destination_base_dir)
+          cp(srpms, destination_base_dir)
+          Dir.glob("#{destination_base_dir}/**/Packages") do |packages_dir|
+            cp(rpms, packages_dir)
+          end
+          Dir.glob("#{destination_base_dir}/**/SRPMS") do |srpms_dir|
+            cp(srpms, srpms_dir)
+          end
           release_rpm_version = rpm_version(release_spec_path)
           release_rpm_base_name = "#{repository_name}-release"
           ln_s("#{release_rpm_base_name}-#{release_rpm_version}.noarch.rpm",
