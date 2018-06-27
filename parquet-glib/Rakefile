@@ -8,7 +8,6 @@ class ParquetGLibPackageTask < PackageTask
   def initialize
     release_time = latest_commit_time(source_dir)
     super("parquet-glib", detect_version(release_time), release_time)
-    @rpm_package = "parquet-glib"
   end
 
   private
