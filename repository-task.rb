@@ -38,11 +38,15 @@ class RepositoryTask
   end
 
   def gpg_uid
-    "f72898cb"
+    "50785E2340D629B2B9823F39807C619DF72898CB"
+  end
+
+  def short_gpg_uid
+    gpg_uid[-8..-1]
   end
 
   def gpg_key_path
-    "GPG-KEY-#{gpg_uid}"
+    "GPG-KEY-#{short_gpg_uid.downcase}"
   end
 
   def rpm_gpg_key_path
@@ -81,6 +85,7 @@ class RepositoryTask
       "apache-arrow",
       "apache-parquet-cpp",
       "parquet-glib",
+      "opencv-glib",
     ]
   end
 
@@ -289,6 +294,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       ["ubuntu", "trusty", "universe"],
       ["ubuntu", "xenial", "universe"],
       ["ubuntu", "artful", "universe"],
+      ["ubuntu", "bionic", "universe"],
     ]
     distributions = targets.collect(&:first).uniq
     architectures = [
@@ -310,9 +316,9 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       task :copy => repositories_dir do
         all_products.each do |product|
           distributions.each do |distribution|
-            sh("rsync", "-av",
-               "#{product}/apt/repositories/#{distribution}",
-               "#{repositories_dir}/")
+            from = "#{product}/apt/repositories/#{distribution}"
+            next unless File.exist?(from)
+            sh("rsync", "-av", from, "#{repositories_dir}/")
           end
         end
       end

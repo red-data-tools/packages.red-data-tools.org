@@ -9,6 +9,7 @@ Tools related projects including Apache Arrow and Apache Parquet.
   * Apache Arrow GLib (C API)
   * Apache Parquet C++
   * Parquet GLib (C API)
+  * OpenCV GLib (C API)
 
 ## Supported platforms
 
@@ -19,6 +20,7 @@ There are packages for the following platforms:
   * Ubuntu 16.04 LTS
   * Ubuntu 17.04
   * Ubuntu 17.10
+  * Ubuntu 18.04
   * CentOS 6
   * CentOS 7
 
@@ -181,6 +183,17 @@ This section describes how to install
 
 ```console
 % sudo yum install -y --enablerepo=epel parquet-glib-devel
+```
+
+## OpenCV GLib
+
+This section describes how to install
+[OpenCV GLib](https://github.com/red-data-tools/opencv-glib) package.
+
+### Ubuntu
+
+```console
+% sudo apt install -y -V libopencv-glib-dev
 ```
 
 ## For packages.red-data-tools.org administrator
