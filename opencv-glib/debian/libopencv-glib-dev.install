@@ -1,0 +1,4 @@
+usr/include/opencv-glib/
+usr/lib/*/libopencv-glib.so
+usr/lib/*/pkgconfig/opencv-glib.pc
+usr/share/gir-1.0/

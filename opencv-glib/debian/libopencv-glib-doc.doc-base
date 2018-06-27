@@ -1,0 +1,9 @@
+Document: opencv-glib
+Title: opencv-glib Reference Manual
+Author: Kouhei Sutou
+Abstract: OpenCV GLib is a wrapper library for Apache OpenCV
+Section: Programming
+
+Format: HTML
+Index: /usr/share/gtk-doc/html/opencv-glib/index.html
+Files: /usr/share/gtk-doc/html/opencv-glib/*.html

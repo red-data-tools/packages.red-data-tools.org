@@ -1,0 +1,65 @@
+# -*- ruby -*-
+
+ENV["APT_TARGETS"] ||= "ubuntu-bionic"
+ENV["CENTOS_VERSIONS"] ||= ""
+
+require_relative "../vendor/arrow-dist/cpp-linux/package-task"
+
+class OpenCVGLibPackageTask < PackageTask
+  def initialize
+    release_time = latest_commit_time(source_dir)
+    super("opencv-glib", detect_version(release_time), release_time)
+  end
+
+  private
+  def source_dir
+    File.join(__dir__, "..", "vendor", "opencv-glib")
+  end
+
+  def detect_version(release_time)
+    meson_build_path = File.join(source_dir, "meson.build")
+    version = File.open(meson_build_path) do |meson_build|
+      meson_build.gets
+      /version: '(.+?)'/ =~ meson_build.gets
+      $1
+    end
+    if git_describe == version
+      version
+    else
+      formatted_release_time = release_time.strftime("%Y%m%d")
+      "#{version}.#{formatted_release_time}"
+    end
+  end
+
+  def git_describe
+    cd(source_dir) do
+      return `git describe`.strip
+    end
+  end
+
+  def define_archive_task
+    file @archive_name do
+      if /\A\d+\.\d+\.\d+\z/ =~ @version
+        download_archive
+      else
+        build_archive
+      end
+    end
+  end
+
+  def download_archive
+    base_url = "https://github.com/red-data-tools/opencv-glib/archive"
+    download("#{base_url}/#{@version}.tar.gz", @archive_name)
+  end
+
+  def build_archive
+    cd("../vendor/opencv-glib") do
+      sh("git", "archive", "HEAD",
+         "--prefix", @archive_base_name,
+         "--output", @full_archive_name)
+    end
+  end
+end
+
+task = OpenCVGLibPackageTask.new
+task.define
