@@ -1,24 +1,62 @@
 # -*- ruby -*-
 
-base_dir = File.join(__dir__, "..", "vendor", "arrow-dist", "cpp-linux")
-base_dir = File.expand_path(base_dir)
+require "open-uri"
+
+pom_xml_path = File.join(__dir__, "..", "vendor", "arrow", "java", "pom.xml")
+arrow_version = File.read(pom_xml_path).scan(/^  <version>(.+?)<\/version>/)[0][0]
+
+def mirror_base_url
+  closer_cgi = "https://www.apache.org/dyn/closer.cgi"
+  closer_cgi = "/tmp/a"
+  @mirror_base_url ||= open(closer_cgi) do |response|
+    response.read.scan(/the following mirror.+?<a href="(.+?)"/m)[0][0]
+  end
+end
+
+def download_directory(path, output_directory)
+  mkdir_p(output_directory)
+  directory_url = URI.parse("#{mirror_base_url}#{path}")
+  open(directory_url) do |index|
+    index.read.scan(/<a href="(.+?)">(.+?)<\/a>/).each do |link, label|
+      next unless link == label
+      file_url = directory_url + link
+      rake_output_message("Downloading... #{file_url}")
+      open(file_url) do |downloaded_file|
+        File.open(File.join(output_directory, link), "wb") do |output_file|
+          IO.copy_stream(downloaded_file, output_file)
+        end
+      end
+    end
+  end
+end
 
 task :apt do
-  cd(base_dir) do
-    ruby("-S", "rake", "apt")
+  [
+    ["debian", "stretch", "main"],
+    ["ubuntu", "trusty", "universe"],
+    ["ubuntu", "xenial", "universe"],
+    ["ubuntu", "bionic", "universe"],
+  ].each do |distribution, code_name, component|
+    path = "arrow/arrow-#{arrow_version}/binaries/#{distribution}-#{code_name}/"
+    output_directory = "apt/repositories/#{distribution}/pool/#{code_name}/"
+    output_directory << "#{component}/a/apache-arrow/"
+    download_directory(path, output_directory)
   end
-  mkdir_p("apt/repositories")
-  sh("rsync", "-av", "--delete",
-     "#{base_dir}/apt/repositories/",
-     "apt/repositories/")
 end
 
 task :yum do
-  cd(base_dir) do
-    ruby("-S", "rake", "yum")
+  [
+    ["centos", "6"],
+    ["centos", "7"],
+  ].each do |distribution, version|
+    path = "arrow/arrow-#{arrow_version}/binaries/#{distribution}-#{version}/"
+    base_output_directory = "yum/repositories/#{distribution}/#{version}"
+    rpm_output_directory = "#{base_output_directory}/x86_64/Packages/"
+    srpm_output_directory = "#{base_output_directory}/Source/SPackages/"
+    download_directory(path, rpm_output_directory)
+    mkdir_p(srpm_output_directory)
+    Dir.glob(File.join(rpm_output_directory, "*.src.rpm")) do |src_rpm|
+      mv(src_rpm, srpm_output_directory)
+    end
   end
-  mkdir_p("yum/repositories")
-  sh("rsync", "-av", "--delete",
-     "#{base_dir}/yum/repositories/",
-     "yum/repositories/")
 end
