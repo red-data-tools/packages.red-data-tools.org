@@ -58,7 +58,7 @@ fi
 
 repository="/host/repositories/${distribution}/${distribution_version}"
 rpm_dir="${repository}/${architecture}/Packages"
-srpm_dir="${repository}/source/SRPMS"
+srpm_dir="${repository}/Source/SPackages"
 run mkdir -p "${rpm_dir}" "${srpm_dir}"
 
 # for debug

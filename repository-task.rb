@@ -168,7 +168,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
           Dir.glob("#{destination_base_dir}/**/Packages") do |packages_dir|
             cp(rpms, packages_dir)
           end
-          Dir.glob("#{destination_base_dir}/**/SRPMS") do |srpms_dir|
+          Dir.glob("#{destination_base_dir}/**/SPackages") do |srpms_dir|
             cp(srpms, srpms_dir)
           end
           release_rpm_version = rpm_version(release_spec_path)
