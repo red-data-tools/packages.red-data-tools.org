@@ -2,7 +2,7 @@
 
 ENV["CENTOS_VERSIONS"] ||= "7"
 
-require_relative "../vendor/arrow-dist/cpp-linux/package-task"
+require_relative "../vendor/arrow/dev/tasks/linux-packages/package-task"
 
 class ApacheParquetCppPackageTask < PackageTask
   def initialize

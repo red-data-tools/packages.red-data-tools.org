@@ -3,7 +3,7 @@
 ENV["APT_TARGETS"] ||= "ubuntu-bionic"
 ENV["CENTOS_VERSIONS"] ||= ""
 
-require_relative "../vendor/arrow-dist/cpp-linux/package-task"
+require_relative "../vendor/arrow/dev/tasks/linux-packages/package-task"
 
 class OpenCVGLibPackageTask < PackageTask
   def initialize
