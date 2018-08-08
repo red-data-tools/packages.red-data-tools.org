@@ -52,7 +52,7 @@ run cd build
 run tar xfz ${PACKAGE}_${VERSION}.orig.tar.gz
 case "${VERSION}" in
   *~dev*)
-    run mv ${PACKAGE}-$(echo $VERSION | sed -e 's/~dev.*$//') \
+    run mv ${PACKAGE}-$(echo $VERSION | sed -e 's/~dev/-dev/') \
         ${PACKAGE}-${VERSION}
     ;;
   *~rc*)
