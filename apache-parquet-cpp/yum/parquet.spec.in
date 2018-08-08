@@ -1,16 +1,14 @@
-# -*- rpm -*-
+# -*- sh-shell: rpm -*-
 
 Name:		@PACKAGE@
 Version:	@VERSION@
-Release:	1%{?dist}
+Release:	@RELEASE@%{?dist}
 Summary:	Apache Parquet is a columner storage format
 
-Group:		Development/Libraries
 License:	Apache-2.0
 URL:		https://parquet.apache.org/
-Source0:	https://dist.apache.org/repos/dist/release/parquet/apache-parquet-cpp-%{version}/apache-parquet-cpp-%{version}.tar.gz
+Source0:	https://dist.apache.org/repos/dist/release/@PACKAGE@/apache-@PACKAGE@-cpp-%{version}/apache-@PACKAGE@-cpp-%{version}.tar.gz
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 BuildRequires:	pkgconfig
 BuildRequires:	gcc-c++
 BuildRequires:	cmake3
@@ -21,11 +19,13 @@ BuildRequires:	openssl-devel
 BuildRequires:	boost-devel
 BuildRequires:	arrow-devel
 
+Requires:	%{name}-libs = %{version}-%{release}
+
 %description
 Apache Parquet is a columner storage format.
 
 %prep
-%setup -q -n apache-parquet-cpp-%{version}
+%setup -q -n apache-@PACKAGE@-cpp-%{version}
 
 %build
 %cmake3 . \
@@ -36,9 +36,12 @@ make %{?_smp_mflags}
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
 
+%files
+%defattr(-,root,root,-)
+%{_bindir}/parquet*
+
 %package libs
 Summary:	Runtime libraries for Apache Parquet
-Group:		System Environment/Libraries
 License:	Apache-2.0
 Requires:	boost-system
 Requires:	boost-filesystem
@@ -56,7 +59,6 @@ This package contains the libraries for Apache Parquet
 
 %package devel
 Summary:	Libraries and header files for Apache Parquet
-Group:		Development/Libraries
 License:	Apache-2.0
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	zlib-devel
@@ -74,6 +76,9 @@ Libraries and header files for Apache Parquet.
 %{_datadir}/parquet-cpp/cmake/*.cmake
 
 %changelog
+* Sat Aug 04 2018 Kouhei Sutou <kou@clear-code.com> - 1.4.1-0.dev20180804
+- New upstream release.
+
 * Tue Feb 27 2018 Kouhei Sutou <kou@clear-code.com> - 1.4.0-1
 - New upstream release.
 

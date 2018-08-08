@@ -5,6 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ARG DEBUG
 
 RUN \
+  sed -i'' -e 's,archive.ubuntu.com/ubuntu,ftp.iij.ad.jp/pub/linux/ubuntu/archive/,g' /etc/apt/sources.list && \
   quiet=$([ "${DEBUG}" = "yes" ] || echo "-qq") && \
   apt update ${quiet} && \
   apt install -y -V ${quiet} \

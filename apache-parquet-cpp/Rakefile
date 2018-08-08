@@ -10,6 +10,14 @@ class ApacheParquetCppPackageTask < PackageTask
     @rc = detect_rc
     super("apache-parquet-cpp", detect_version(release_time), release_time)
     @rpm_package = "parquet"
+    case @version
+    when /-(dev\d+)\z/
+      base_version = $PREMATCH
+      sub_version = $1
+      @deb_upstream_version = "#{base_version}~#{sub_version}"
+      @rpm_version = base_version
+      @rpm_release = "0.#{sub_version}"
+    end
   end
 
   private
@@ -31,7 +39,7 @@ class ApacheParquetCppPackageTask < PackageTask
     version_path = File.join(source_dir, ".parquetcppversion")
     version = File.read(version_path).strip
     formatted_release_time = release_time.strftime("%Y%m%d")
-    version.gsub(/-SNAPSHOT\z/) {".#{formatted_release_time}"}
+    version.gsub(/-SNAPSHOT\z/) {"-dev#{formatted_release_time}"}
   end
 
   def define_archive_task

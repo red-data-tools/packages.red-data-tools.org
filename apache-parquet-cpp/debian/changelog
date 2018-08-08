@@ -1,3 +1,9 @@
+apache-parquet-cpp (1.4.1~dev20180804-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Kouhei Sutou <kou@clear-code.com>  Sat, 04 Aug 2018 22:40:49 -0000
+
 apache-parquet-cpp (1.4.0-1) unstable; urgency=low
 
   * New upstream release.

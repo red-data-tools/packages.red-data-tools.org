@@ -26,11 +26,23 @@ Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Depends:
   ${misc:Depends},
-  ${shlibs:Depends},
-  libarrow0
+  ${shlibs:Depends}
 Description: Apache Parquet is a columner storage format
  .
  This package provides library files to process Apache Parquet format.
+
+Package: parquet
+Section: utils
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends:
+  ${misc:Depends},
+  ${shlibs:Depends},
+  libparquet1 (= ${binary:Version})
+Description: Apache Parquet is a columner storage format
+ .
+ This package provides utilities to process Apache Parquet format.
 
 Package: libparquet-dev
 Section: libdevel
