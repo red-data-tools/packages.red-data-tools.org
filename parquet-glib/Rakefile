@@ -23,7 +23,7 @@ class ParquetGLibPackageTask < PackageTask
     if git_describe == version
       version
     else
-      "#{version}.#{formatted_release_time}"
+      "#{version}-dev#{formatted_release_time}"
     end
   end
 
