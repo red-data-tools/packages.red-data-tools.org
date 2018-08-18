@@ -7,7 +7,6 @@ require_relative "../vendor/arrow/dev/tasks/linux-packages/package-task"
 class ApacheParquetCppPackageTask < PackageTask
   def initialize
     release_time = latest_commit_time(source_dir)
-    @rc = detect_rc
     super("apache-parquet-cpp", detect_version(release_time), release_time)
     @rpm_package = "parquet"
     case @version
@@ -26,6 +25,7 @@ class ApacheParquetCppPackageTask < PackageTask
   end
 
   def detect_rc
+    return nil unless git_directory?(source_dir)
     Dir.chdir(source_dir) do
       if /-(rc\d+)\z/ =~ `git describe`.chomp
         $1
@@ -45,8 +45,9 @@ class ApacheParquetCppPackageTask < PackageTask
   def define_archive_task
     file @archive_name do
       if /\A\d+\.\d+\.\d+\z/ =~ @version
-        if @rc
-          download_rc
+        rc = detect_rc
+        if rc
+          download_rc(rc)
         else
           download_archive
         end
@@ -56,10 +57,10 @@ class ApacheParquetCppPackageTask < PackageTask
     end
   end
 
-  def download_rc
+  def download_rc(rc)
     base_url = "https://dist.apache.org/repos/dist/dev/parquet"
     base_name = "apache-parquet-cpp-#{@version}"
-    download("#{base_ur}/#{base_name}-#{@rc}/#{base_name}.tar.gz",
+    download("#{base_ur}/#{base_name}-#{rc}/#{base_name}.tar.gz",
              ".")
   end
 

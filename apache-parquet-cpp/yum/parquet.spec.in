@@ -76,6 +76,9 @@ Libraries and header files for Apache Parquet.
 %{_datadir}/parquet-cpp/cmake/*.cmake
 
 %changelog
+* Fri Aug 17 2018 Kouhei Sutou <kou@clear-code.com> - 1.4.1-0.dev20180817
+- New upstream release.
+
 * Sat Aug 04 2018 Kouhei Sutou <kou@clear-code.com> - 1.4.1-0.dev20180804
 - New upstream release.
 
