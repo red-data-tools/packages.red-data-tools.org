@@ -27,7 +27,7 @@ There are packages for the following platforms:
 https://packages.red-data-tools.org/ provides packages. You need to
 enable the package repository before you install packages.
 
-### Debian GNU/Linux
+### Debian GNU/Linux and Ubuntu
 
 Install `apt-transport-https` to support HTTPS APT repository:
 
@@ -40,46 +40,11 @@ packages.red-data-tools.org:
 
 ```console
 % sudo apt install -y -V lsb-release
+% sudo wget -O /usr/share/keyrings/red-data-tools-keyring.gpg https://packages.groonga.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-keyring.gpg
 % sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
-deb https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main
-deb-src https://packages.red-data-tools.org/debian/ $(lsb_release --codename --short) main
+deb [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) main
+deb-src [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) main
 APT_LINE
-```
-
-Run the following command lines to enable APT repositories on
-packages.red-data-tools.org:
-
-```console
-% sudo apt update --allow-insecure-repositories
-% sudo apt install -y -V --allow-unauthenticated red-data-tools-keyring
-% sudo apt update
-```
-
-### Ubuntu
-
-Install `apt-transport-https` to support HTTPS APT repository:
-
-```console
-% sudo apt install -y -V apt-transport-https
-```
-
-Run the following command lines to add apt-lines for APT repository on
-packages.red-data-tools.org:
-
-```console
-% sudo apt install -y -V lsb-release
-% sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
-deb https://packages.red-data-tools.org/ubuntu/ $(lsb_release --codename --short) universe
-deb-src https://packages.red-data-tools.org/ubuntu/ $(lsb_release --codename --short) universe
-APT_LINE
-```
-
-Run the following command lines to enable APT repositories on
-packages.red-data-tools.org:
-
-```console
-% sudo apt update --allow-insecure-repositories || sudo apt update
-% sudo apt install -y -V --allow-unauthenticated red-data-tools-keyring
 % sudo apt update
 ```
 

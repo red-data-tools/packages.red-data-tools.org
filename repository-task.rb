@@ -53,6 +53,10 @@ class RepositoryTask
     "RPM-GPG-KEY-#{repository_name}"
   end
 
+  def keyring_path
+    "#{repository_name}-keyring.gpg"
+  end
+
   def repositories_dir
     "repositories"
   end
@@ -95,12 +99,21 @@ class RepositoryTask
 
   def define_gpg_task
     file gpg_key_path do |task|
-      unless system("gpg2", "--list-keys", gpg_uid, :out => IO::NULL)
-        sh("gpg2",
+      unless system("gpg", "--list-keys", gpg_uid, :out => IO::NULL)
+        sh("gpg",
            "--keyserver", "keyserver.ubuntu.com",
            "--recv-key", gpg_uid)
       end
-      sh("gpg2", "--armor", "--export", gpg_uid, :out => task.name)
+      sh("gpg", "--armor", "--export", gpg_uid, :out => task.name)
+    end
+
+    file keyring_path => gpg_key_path do |task|
+      rm_f(keyring_path)
+      touch(keyring_path)
+      sh("gpg",
+         "--no-default-keyring",
+         "--keyring", "./#{task.name}",
+         "--import", gpg_key_path)
     end
   end
 
@@ -436,7 +449,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       end
 
       desc "Upload repositories"
-      task :upload => repositories_dir do
+      task :upload => [repositories_dir, keyring_path] do
         distributions.each do |distribution|
           sh("rsync",
              "-avz",
@@ -444,6 +457,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
              "--delete",
              "#{repositories_dir}/#{distribution}/",
              "#{rsync_base_path}/#{distribution}")
+          sh("scp", keyring_path, "#{rsync_base_path}/#{distribution}/")
         end
       end
     end
