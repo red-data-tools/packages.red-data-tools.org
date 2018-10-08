@@ -7,7 +7,6 @@ arrow_version = File.read(pom_xml_path).scan(/^  <version>(.+?)<\/version>/)[0][
 
 def mirror_base_url
   closer_cgi = "https://www.apache.org/dyn/closer.cgi"
-  closer_cgi = "/tmp/a"
   @mirror_base_url ||= open(closer_cgi) do |response|
     response.read.scan(/the following mirror.+?<a href="(.+?)"/m)[0][0]
   end

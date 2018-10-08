@@ -87,8 +87,6 @@ class RepositoryTask
   def all_products
     [
       "apache-arrow",
-      "apache-parquet-cpp",
-      "parquet-glib",
       "opencv-glib",
     ]
   end
