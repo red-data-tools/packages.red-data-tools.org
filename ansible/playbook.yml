@@ -11,21 +11,25 @@
       apt:
         name: "{{ item }}"
       with_items:
-        - cron
-        - apt-listchanges
-        - vim
-        - zsh
-        - lv
         - acpid
         - apg
-        - logrotate
+        - apt-listchanges
+        - cron
         - fail2ban
+        - logrotate
+        - lv
+        - vim
+        - zsh
     - name: Use VIM as the default editor
       command: update-alternatives --set editor /usr/bin/vim.basic
     - name: Use e-mail for apt-listchanges
-      copy:
-        src: etc/apt/listchanges.conf
-        dest: /etc/apt/listchanges.conf
+      lineinfile:
+        path: /etc/apt/listchanges.conf
+        regexp: "^frontend="
+        line: "frontend=mail"
+    - name: Set hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
 
     # User
     - name: Create "packages" user
@@ -42,7 +46,7 @@
         - public/
     - name: Put ~packages/.forward
       copy:
-        content: "kou@cozmixng.org"
+        content: "root"
         dest: ~packages/.forward
         owner: packages
         group: packages
@@ -68,10 +72,40 @@
         group: packages
         mode: 0755
 
-    # Let's encrypt
-    - name: Install python-certbot
+    # Apache
+    - name: Install Apache
       apt:
-        name: python-certbot
+        name:
+          - apache2
+    - name: Keep more Apache logs
+      lineinfile:
+        path: /etc/logrotate.d/apache2
+        regexp: "^	rotate "
+        line: "	rotate 3650"
+    - name: Put Apache configuration
+      copy:
+        src: "{{ item }}"
+        dest: /{{ item }}
+      with_items:
+        - etc/apache2/sites-available/packages.red-data-tools.org.conf
+    - name: Enable our Apache configuration
+      command: a2ensite packages.red-data-tools.org
+    - name: Disable default Apache configuration
+      command: a2dissite 000-default
+      notify:
+        - Restart Apache
+    - name: Enable Apache modules
+      command: a2enmod {{ item }}
+      with_items:
+        - ssl
+      notify:
+        - Restart Apache
+
+    # Let's Encrypt
+    - name: "Install packages for Let's Encrypt"
+      apt:
+        name:
+          - certbot
     - name: "packages: Check Let's Encrypt certificate"
       stat:
         path: /etc/letsencrypt/live/packages.red-data-tools.org/fullchain.pem
@@ -115,39 +149,11 @@
         dest: /etc/cron.daily/letsencrypt
         mode: 0700
 
-    # Apache
-    - name: Install Apache
-      apt:
-        name: apache2
-    - name: Put logrotate configuration
-      copy:
-        src: "{{ item }}"
-        dest: /{{ item }}
-      with_items:
-        - etc/logrotate.d/apache2
-    - name: Put Apache configuration
-      copy:
-        src: "{{ item }}"
-        dest: /{{ item }}
-      with_items:
-        - etc/apache2/sites-available/packages.red-data-tools.org.conf
-    - name: Enable our Apache configuration
-      command: a2ensite packages.red-data-tools.org
-    - name: Disable default Apache configuration
-      command: a2dissite 000-default
-      notify:
-        - Restart Apache
-    - name: Enable Apache modules
-      command: a2enmod {{ item }}
-      with_items:
-        - ssl
-      notify:
-        - Restart Apache
-
     # Postfix
     - name: Install Postfix
       apt:
-        name: postfix
+        name:
+          - postfix
     - name: Set /etc/aliases
       copy:
         src: etc/aliases
@@ -171,10 +177,9 @@
         repo: ppa:milter-manager/ppa
     - name: Install milters
       apt:
-        name: "{{ item }}"
-      with_items:
-        - milter-manager
-        - milter-greylist
+        name:
+          - milter-manager
+          - milter-greylist
     - name: Add milter-manager user to greylist group
       user:
         name: milter-manager
@@ -205,7 +210,7 @@
       with_items:
         - etc/default/milter-manager
       notify:
-        - Restart milter-manager
+        - Restart milter manager
 
   handlers:
     - name: Restart Apache
