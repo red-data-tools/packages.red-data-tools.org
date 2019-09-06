@@ -302,10 +302,11 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
   def define_apt_task
     targets = [
       ["debian", "stretch", "main"],
-      ["ubuntu", "trusty", "universe"],
+      ["debian", "buster", "main"],
       ["ubuntu", "xenial", "universe"],
-      ["ubuntu", "artful", "universe"],
       ["ubuntu", "bionic", "universe"],
+      ["ubuntu", "cosmic", "universe"],
+      ["ubuntu", "dingo", "universe"],
     ]
     distributions = targets.collect(&:first).uniq
     architectures = [

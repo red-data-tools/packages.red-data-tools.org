@@ -5,10 +5,6 @@ Tools related projects including Apache Arrow and Apache Parquet.
 
 ## Supported packages
 
-  * Apache Arrow C++
-  * Apache Arrow GLib (C API)
-  * Apache Parquet C++
-  * Parquet GLib (C API)
   * OpenCV GLib (C API)
 
 ## Supported platforms
@@ -16,7 +12,7 @@ Tools related projects including Apache Arrow and Apache Parquet.
 There are packages for the following platforms:
 
   * Debian GNU/Linux stretch
-  * Ubuntu 14.04 LTS
+  * Debian GNU/Linux buster
   * Ubuntu 16.04 LTS
   * Ubuntu 18.04 LTS
   * CentOS 6

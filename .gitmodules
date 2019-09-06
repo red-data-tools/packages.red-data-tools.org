@@ -1,9 +1,3 @@
-[submodule "vendor/parquet-cpp"]
-	path = vendor/parquet-cpp
-	url = https://github.com/apache/parquet-cpp.git
-[submodule "vendor/parquet-glib"]
-	path = vendor/parquet-glib
-	url = https://github.com/red-data-tools/parquet-glib.git
 [submodule "vendor/opencv-glib"]
 	path = vendor/opencv-glib
 	url = git@github.com:red-data-tools/opencv-glib.git
