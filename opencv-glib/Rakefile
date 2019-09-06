@@ -1,6 +1,11 @@
 # -*- ruby -*-
 
-ENV["APT_TARGETS"] ||= "ubuntu-bionic"
+ENV["APT_TARGETS"] ||= [
+  "debian-buster",
+  "ubuntu-bionic",
+  "ubuntu-cosmic",
+  "ubuntu-disco",
+].join(",")
 ENV["CENTOS_VERSIONS"] ||= ""
 
 require_relative "../vendor/arrow/dev/tasks/linux-packages/package-task"
