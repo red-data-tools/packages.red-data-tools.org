@@ -3,7 +3,6 @@
 ENV["APT_TARGETS"] ||= [
   "debian-buster",
   "ubuntu-bionic",
-  "ubuntu-cosmic",
   "ubuntu-disco",
 ].join(",")
 ENV["CENTOS_VERSIONS"] ||= ""
