@@ -303,7 +303,6 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       ["debian", "buster", "main"],
       ["ubuntu", "xenial", "universe"],
       ["ubuntu", "bionic", "universe"],
-      ["ubuntu", "cosmic", "universe"],
       ["ubuntu", "dingo", "universe"],
     ]
     distributions = targets.collect(&:first).uniq
