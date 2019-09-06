@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM debian:buster
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \
