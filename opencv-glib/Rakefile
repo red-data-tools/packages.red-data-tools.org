@@ -7,12 +7,17 @@ ENV["APT_TARGETS"] ||= [
 ].join(",")
 ENV["CENTOS_VERSIONS"] ||= ""
 
-require_relative "../vendor/arrow/dev/tasks/linux-packages/package-task"
+require_relative "../vendor/apache-arrow/dev/tasks/linux-packages/package-task"
 
 class OpenCVGLibPackageTask < PackageTask
   def initialize
     release_time = latest_commit_time(source_dir)
     super("opencv-glib", detect_version(release_time), release_time)
+  end
+
+  def define
+    super
+    Rake::Task["yum"].clear
   end
 
   private

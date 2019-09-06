@@ -24,12 +24,10 @@ class RedDataToolsRepositoryTask < RepositoryTask
     "packages@packages.red-data-tools.org:public"
   end
 
-  def gpg_uid
-    "50785E2340D629B2B9823F39807C619DF72898CB"
-  end
-
-  def deb_keyring_version
-    "2017.10.01"
+  def gpg_uids
+    [
+      "50785E2340D629B2B9823F39807C619DF72898CB"
+    ]
   end
 
   def all_products

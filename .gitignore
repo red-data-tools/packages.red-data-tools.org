@@ -1,5 +1,6 @@
 /GPG-KEY-*
 /*.gpg
+/*.gpg~
 /ansible/playbook.retry
 /repositories/
 /rpm/

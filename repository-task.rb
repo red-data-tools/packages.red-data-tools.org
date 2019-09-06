@@ -17,16 +17,20 @@ class RepositoryTask
     value
   end
 
-  def short_gpg_uid
-    gpg_uid[-8..-1]
+  def primary_gpg_uid
+    gpg_uids.first
   end
 
-  def gpg_key_path
-    "GPG-KEY-#{short_gpg_uid.downcase}"
+  def shorten_gpg_uid(uid)
+    uid[-8..-1]
   end
 
-  def rpm_gpg_key_path
-    "RPM-GPG-KEY-#{repository_name}"
+  def gpg_key_path(uid)
+    "GPG-KEY-#{shorten_gpg_uid(uid).downcase}"
+  end
+
+  def rpm_gpg_key_path(uid)
+    "RPM-GPG-KEY-#{shorten_gpg_uid(uid).downcase}"
   end
 
   def keyring_path
@@ -41,7 +45,7 @@ class RepositoryTask
     text.gsub(/@(.+?)@/) do |matched|
       case $1
       when "GPG_UID"
-        gpg_uid
+        primary_gpg_uid
       else
         matched
       end
@@ -61,22 +65,28 @@ class RepositoryTask
   end
 
   def define_gpg_task
-    file gpg_key_path do |task|
-      unless system("gpg", "--list-keys", gpg_uid, :out => IO::NULL)
-        sh("gpg",
-           "--keyserver", "keyserver.ubuntu.com",
-           "--recv-key", gpg_uid)
+    paths = []
+    gpg_uids.each do |gpg_uid|
+      path = gpg_key_path(gpg_uid)
+      paths << path
+      file path do |task|
+        uid = gpg_uid
+        unless system("gpg", "--list-keys", uid, :out => IO::NULL)
+          sh("gpg",
+             "--keyserver", "keyserver.ubuntu.com",
+             "--recv-key", uid)
+        end
+        sh("gpg", "--armor", "--export", uid, :out => path)
       end
-      sh("gpg", "--armor", "--export", gpg_uid, :out => task.name)
     end
 
-    file keyring_path => gpg_key_path do |task|
+    file keyring_path => paths do |task|
       rm_f(keyring_path)
       touch(keyring_path)
       sh("gpg",
          "--no-default-keyring",
-         "--keyring", "./#{task.name}",
-         "--import", gpg_key_path)
+         "--keyring", "./#{keyring_path}",
+         "--import", *paths)
     end
   end
 
@@ -95,23 +105,54 @@ class RepositoryTask
 
     file repo_path => __FILE__ do |task|
       File.open(task.name, "w") do |repo|
-        repo.puts(<<-REPOSITORY)
-[#{repository_name}]
-name=#{repository_label} for CentOS $releasever - $basearch
-baseurl=#{repository_url}/centos/$releasever/$basearch/
+        targets = [
+          {
+            id: "centos",
+            label: "CentOS $releasever",
+            version: "$releasever",
+            enabled: "1",
+          },
+          {
+            id: "amazon-linux",
+            label: "Amazon Linux 2",
+            version: "7",
+            enabled: "0",
+          },
+        ]
+        targets.each do |target|
+          repo.puts(<<-REPOSITORY)
+[#{repository_name}-#{target[:id]}]
+name=#{repository_label} for #{target[:label]} - $basearch
+baseurl=#{repository_url}/centos/#{target[:version]}/$basearch/
 gpgcheck=1
-enabled=1
-gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
-        REPOSITORY
+enabled=#{target[:enabled]}
+          REPOSITORY
+          prefix = "gpgkey="
+          gpg_uids.each do |gpg_uid|
+            repo.puts(<<-REPOSITORY)
+#{prefix}file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path(gpg_uid)}
+            REPOSITORY
+            prefix = "       "
+          end
+          repo.puts
+        end
       end
     end
 
-    file release_source_path => [gpg_key_path, repo_path] do |task|
-      cp(gpg_key_path, "#{yum_dir}/#{rpm_gpg_key_path}")
+    gpg_key_paths = gpg_uids.collect do |uid|
+      gpg_key_path(uid)
+    end
+    file release_source_path => [*gpg_key_paths, repo_path] do |task|
+      rpm_gpg_key_paths = []
+      gpg_uids.each do |uid|
+        path = rpm_gpg_key_path(uid)
+        rpm_gpg_key_paths << path
+        cp(gpg_key_path(uid), "#{yum_dir}/#{path}")
+      end
       cd(yum_dir) do
         sh("tar", "czf",
            File.basename(task.name),
-           rpm_gpg_key_path,
+           *rpm_gpg_key_paths,
            File.basename(repo_path))
       end
     end
@@ -152,8 +193,10 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
           ln_s("#{release_rpm_base_name}-#{release_rpm_version}.noarch.rpm",
                "#{destination_base_dir}/#{release_rpm_base_name}-latest.noarch.rpm",
                force: true)
-          cp(gpg_key_path,
-             "#{destination_base_dir}/#{rpm_gpg_key_path}")
+          gpg_uids.each do |uid|
+            cp(gpg_key_path(uid),
+               "#{destination_base_dir}/#{rpm_gpg_key_path(uid)}")
+          end
         end
       end
 
@@ -176,10 +219,10 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       end
 
       desc "Sign packages"
-      task :sign => gpg_key_path do
-        unless system("rpm", "-q", "gpg-pubkey-#{gpg_uid}",
+      task :sign => gpg_key_path(primary_gpg_uid) do
+        unless system("rpm", "-q", "gpg-pubkey-#{primary_gpg_uid}",
                       :out => IO::NULL)
-          sh("rpm", "--import", gpg_key_path)
+          sh("rpm", "--import", gpg_key_path(primary_gpg_uid))
         end
 
         unsigned_rpms = []
@@ -193,7 +236,7 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
         end
         unless unsigned_rpms.empty?
           sh("rpm",
-             "-D", "_gpg_name #{gpg_uid}",
+             "-D", "_gpg_name #{primary_gpg_uid}",
              "-D", "_gpg_digest_algo sha256",
              "-D", "__gpg_check_password_cmd /bin/true true",
              "-D", "__gpg_sign_cmd %{__gpg} gpg --batch --no-verbose --no-armor %{?_gpg_digest_algo:--digest-algo %{_gpg_digest_algo}} --no-secmem-warning -u \"%{_gpg_name}\" -sbo %{__signature_filename} %{__plaintext_filename}",
@@ -214,8 +257,11 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
         end
       end
 
+      gpg_key_paths = gpg_uids.collect do |gpg_uid|
+        gpg_key_path(gpg_uid)
+      end
       desc "Update repositories"
-      task :update => gpg_key_path do
+      task :update => gpg_key_paths do
         Dir.glob("#{repositories_dir}/#{distribution}/*") do |version_dir|
           next if File.symlink?(version_dir)
           next unless File.directory?(version_dir)
@@ -224,8 +270,10 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
             sh("createrepo", arch_dir)
           end
         end
-        cp(gpg_key_path,
-           "#{repositories_dir}/#{distribution}/#{rpm_gpg_key_path}")
+        gpg_uids.each do |gpg_uid|
+          cp(gpg_key_path(gpg_uid),
+             "#{repositories_dir}/#{distribution}/#{rpm_gpg_key_path(gpg_uid)}")
+        end
       end
 
       desc "Download repositories"
@@ -299,52 +347,20 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       end
 
       desc "Sign packages"
-      task :sign => gpg_key_path do
+      task :sign => gpg_key_path(primary_gpg_uid) do
         sh("debsign",
            "--re-sign",
-           "-k#{gpg_uid}",
+           "-k#{primary_gpg_uid}",
            *Dir.glob("#{repositories_dir}/**/*.{dsc,changes}"))
       end
 
       namespace :repository do
-        desc "Build keyring deb"
-        task :build => [repositories_dir, gpg_key_path] do
-          tmp_dir = "tmp"
-          build_dir = "#{tmp_dir}/build"
-          rm_rf(tmp_dir)
-          mkdir_p(build_dir)
-          cp_r("debian", "#{build_dir}/")
-          Dir.glob("#{build_dir}/debian/**/*.in") do |in_path|
-            in_content = File.read(in_path)
-            out_content = expand_variables(in_content)
-            out_path = in_path.gsub(/\.in\z/, "")
-            File.open(out_path, "w") do |out|
-              out.print(out_content)
-            end
-            rm(in_path)
-          end
-          keyring_base_path = "#{repository_name}-keyring"
-          keyring_source_path = "#{keyring_base_path}-#{deb_keyring_version}"
-          cp(gpg_key_path, "#{build_dir}/#{keyring_base_path}.gpg")
-          cd(build_dir) do
-            sh("debuild", "--no-tgz-check")
-          end
-          targets.each do |distribution, code_name, component|
-            initial = keyring_base_path[0]
-            dir =
-              "#{repositories_dir}/#{distribution}/pool/" +
-              "#{code_name}/#{component}/#{initial}/#{keyring_base_path}"
-            mkdir_p(dir)
-            cp(Dir.glob("#{tmp_dir}/*.{deb,tar.*,dsc}"),
-               dir)
-          end
-          rm_rf(tmp_dir)
-        end
-
         desc "Update repositories"
         task :update do
           targets.each do |distribution, code_name, component|
             base_dir = "#{repositories_dir}/#{distribution}"
+            pool_dir = "#{base_dir}/pool/#{code_name}"
+            next unless File.exist?(pool_dir)
             dists_dir = "#{base_dir}/dists/#{code_name}"
             rm_rf(dists_dir)
             generate_apt_release(dists_dir, code_name, component, "source")
@@ -385,12 +401,12 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
                "--sign",
                "--detach-sign",
                "--armor",
-               "--local-user", gpg_uid,
+               "--local-user", primary_gpg_uid,
                "--output", signed_release_path,
                release_path)
             sh("gpg",
                "--clear-sign",
-               "--local-user", gpg_uid,
+               "--local-user", primary_gpg_uid,
                "--output", in_release_path,
                release_path)
           end
@@ -429,7 +445,6 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       "apt:build",
       "apt:copy",
       "apt:sign",
-      "apt:repository:build",
       "apt:repository:update",
       "apt:upload",
     ]

@@ -11,12 +11,9 @@ Tools related projects including Apache Arrow and Apache Parquet.
 
 There are packages for the following platforms:
 
-  * Debian GNU/Linux stretch
   * Debian GNU/Linux buster
-  * Ubuntu 16.04 LTS
   * Ubuntu 18.04 LTS
-  * CentOS 6
-  * CentOS 7
+  * Ubuntu 19.04
 
 ## Package repository
 
@@ -35,7 +32,7 @@ Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
 ```console
-% sudo apt install -y -V lsb-release
+% sudo apt install -y -V lsb-release wget
 % sudo wget -O /usr/share/keyrings/red-data-tools-keyring.gpg https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-keyring.gpg
 % sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
 deb [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) main
@@ -71,104 +68,16 @@ APT_LINE
 % sudo yum install -y https://packages.red-data-tools.org/centos/red-data-tools-release-latest.noarch.rpm
 ```
 
-## Apache Arrow C++
-
-This section describes how to install
-[Apache Arrow C++](https://github.com/apache/arrow/tree/master/cpp)
-package.
-
-### Debian GNU/Linux
-
-```console
-% sudo apt install -y -V libarrow-dev
-```
-
-### Ubuntu
-
-```console
-% sudo apt install -y -V libarrow-dev
-```
-
-### CentOS
-
-```console
-% sudo yum install -y --enablerepo=epel arrow-devel
-```
-
-## Apache Arrow GLib (C API)
-
-This section describes how to install
-[Apache Arrow GLib](https://github.com/apache/arrow/tree/master/c_glib)
-package.
-
-### Debian GNU/Linux
-
-```console
-% sudo apt install -y -V libarrow-glib-dev
-```
-
-### Ubuntu
-
-```console
-% sudo apt install -y -V libarrow-glib-dev
-```
-
-### CentOS
-
-```console
-% sudo yum install -y --enablerepo=epel arrow-glib-devel
-```
-
-## Apache Parquet C++
-
-This section describes how to install
-[Apache Parquet C++](https://github.com/apache/parquet-cpp) package.
-
-### Debian GNU/Linux
-
-```console
-% sudo apt install -y -V libparquet-dev
-```
-
-### Ubuntu
-
-```console
-% sudo apt install -y -V libparquet-dev
-```
-
-### CentOS
-
-```console
-% sudo yum install -y --enablerepo=epel parquet-devel
-```
-
-## Parquet GLib
-
-This section describes how to install
-[Parquet GLib](https://github.com/red-data-tools/parquet-glib) package.
-
-### Debian GNU/Linux
-
-```console
-% sudo apt install -y -V libparquet-glib-dev
-```
-
-### Ubuntu
-
-```console
-% sudo apt install -y -V libparquet-glib-dev
-```
-
-### CentOS
-
-```console
-% sudo yum install -y --enablerepo=epel parquet-glib-devel
-```
-
 ## OpenCV GLib
 
 This section describes how to install
 [OpenCV GLib](https://github.com/red-data-tools/opencv-glib) package.
+
+### Debian GNU/Linux
+
+```console
+% sudo apt install -y -V libopencv-glib-dev
+```
 
 ### Ubuntu
 
@@ -209,6 +118,6 @@ Here are command lines to build .rpm files and update Yum repository:
 
 Apache-2.0
 
-Copyright 2017-2018 Kouhei Sutou \<kou@clear-code.com\>
+Copyright 2017-2019 Kouhei Sutou \<kou@clear-code.com\>
 
 See LICENSE and NOTICE for details.
