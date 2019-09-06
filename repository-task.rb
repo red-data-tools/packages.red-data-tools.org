@@ -86,7 +86,6 @@ class RepositoryTask
 
   def all_products
     [
-      "apache-arrow",
       "opencv-glib",
     ]
   end
