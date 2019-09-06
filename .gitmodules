@@ -1,6 +1,6 @@
 [submodule "vendor/opencv-glib"]
 	path = vendor/opencv-glib
 	url = git@github.com:red-data-tools/opencv-glib.git
-[submodule "vendor/arrow"]
-	path = vendor/arrow
+[submodule "vendor/apache-arrow"]
+	path = vendor/apache-arrow
 	url = https://github.com/apache/arrow.git
