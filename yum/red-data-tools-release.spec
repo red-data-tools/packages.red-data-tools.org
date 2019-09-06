@@ -1,6 +1,6 @@
 Summary: Red Data Tools release files
 Name: red-data-tools-release
-Version: 1.0.1
+Version: 1.0.2
 Release: 1
 License: ASL-2.0
 URL: https://packages.red-data-tools.org/
@@ -23,7 +23,7 @@ Red Data Tools release files
 
 %{__install} -Dp -t %{buildroot}%{_sysconfdir}/pki/rpm-gpg/ -m0644 RPM-GPG-KEY-*
 
-%{__install} -Dp -m0644 red-data-tools.repo %{buildroot}%{_sysconfdir}/yum.repos.d/red-data-tools.repo
+%{__install} -Dp -t %{buildroot}%{_sysconfdir}/yum.repos.d/ -m0644 *.repo
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -33,7 +33,7 @@ Red Data Tools release files
 %doc *
 %pubkey RPM-GPG-KEY-f72898cb
 %dir %{_sysconfdir}/yum.repos.d/
-%config(noreplace) %{_sysconfdir}/yum.repos.d/red-data-tools.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/*.repo
 %dir %{_sysconfdir}/pki/rpm-gpg/
 %{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-*
 
@@ -47,6 +47,9 @@ else
 fi
 
 %changelog
+* Fri Sep 6 2019 Kouhei Sutou <kou@clear-code.com> - 1.0.1-1
+- Split .repo.
+
 * Fri Sep 6 2019 Kouhei Sutou <kou@clear-code.com> - 1.0.1-1
 - Add support for Amazon Linux 2.
 

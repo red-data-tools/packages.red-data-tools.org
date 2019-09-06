@@ -99,27 +99,29 @@ class RepositoryTask
 
   def define_yum_task
     yum_dir = "yum"
-    repo_path = "#{yum_dir}/#{repository_name}.repo"
     release_source_path = "#{yum_dir}/#{repository_name}-release.tar.gz"
     release_spec_path = "#{yum_dir}/#{repository_name}-release.spec"
 
-    file repo_path => __FILE__ do |task|
-      File.open(task.name, "w") do |repo|
-        targets = [
-          {
-            id: "centos",
-            label: "CentOS $releasever",
-            version: "$releasever",
-            enabled: "1",
-          },
-          {
-            id: "amazon-linux",
-            label: "Amazon Linux 2",
-            version: "7",
-            enabled: "0",
-          },
-        ]
-        targets.each do |target|
+    repo_paths = []
+    targets = [
+      {
+        id: "centos",
+        label: "CentOS $releasever",
+        version: "$releasever",
+        enabled: "1",
+      },
+      {
+        id: "amazon-linux",
+        label: "Amazon Linux 2",
+        version: "7",
+        enabled: "0",
+      },
+    ]
+    targets.each do |target|
+      repo_path = "#{yum_dir}/#{repository_name}-#{target[:id]}.repo"
+      repo_paths << repo_path
+      file repo_path => __FILE__ do |task|
+        File.open(task.name, "w") do |repo|
           repo.puts(<<-REPOSITORY)
 [#{repository_name}-#{target[:id]}]
 name=#{repository_label} for #{target[:label]} - $basearch
@@ -134,7 +136,6 @@ enabled=#{target[:enabled]}
             REPOSITORY
             prefix = "       "
           end
-          repo.puts
         end
       end
     end
@@ -142,7 +143,7 @@ enabled=#{target[:enabled]}
     gpg_key_paths = gpg_uids.collect do |uid|
       gpg_key_path(uid)
     end
-    file release_source_path => [*gpg_key_paths, repo_path] do |task|
+    file release_source_path => [*gpg_key_paths, *repo_paths] do |task|
       rpm_gpg_key_paths = []
       gpg_uids.each do |uid|
         path = rpm_gpg_key_path(uid)
@@ -153,7 +154,7 @@ enabled=#{target[:enabled]}
         sh("tar", "czf",
            File.basename(task.name),
            *rpm_gpg_key_paths,
-           File.basename(repo_path))
+           *(repo_paths.collect {|repo_path| File.basename(repo_path)}))
       end
     end
 
