@@ -230,7 +230,6 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
           sh("rpm",
              "-D", "_gpg_name #{gpg_uid}",
              "-D", "_gpg_digest_algo sha256",
-             "-D", "__gpg /usr/bin/gpg2",
              "-D", "__gpg_check_password_cmd /bin/true true",
              "-D", "__gpg_sign_cmd %{__gpg} gpg --batch --no-verbose --no-armor %{?_gpg_digest_algo:--digest-algo %{_gpg_digest_algo}} --no-secmem-warning -u \"%{_gpg_name}\" -sbo %{__signature_filename} %{__plaintext_filename}",
              "--resign",
@@ -338,7 +337,6 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
       desc "Sign packages"
       task :sign => gpg_key_path do
         sh("debsign",
-           "-pgpg2",
            "--re-sign",
            "-k#{gpg_uid}",
            *Dir.glob("#{repositories_dir}/**/*.{dsc,changes}"))
@@ -419,14 +417,14 @@ gpgkey=file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path}
             in_release_path = "#{dists_dir}/InRelease"
             mv(release_file.path, release_path)
             chmod(0644, release_path)
-            sh("gpg2",
+            sh("gpg",
                "--sign",
                "--detach-sign",
                "--armor",
                "--local-user", gpg_uid,
                "--output", signed_release_path,
                release_path)
-            sh("gpg2",
+            sh("gpg",
                "--clear-sign",
                "--local-user", gpg_uid,
                "--output", in_release_path,
