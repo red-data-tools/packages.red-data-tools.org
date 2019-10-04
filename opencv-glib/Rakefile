@@ -5,7 +5,7 @@ ENV["APT_TARGETS"] ||= [
   "ubuntu-bionic",
   "ubuntu-disco",
 ].join(",")
-ENV["CENTOS_VERSIONS"] ||= ""
+ENV["YUM_TARGETS"] ||= ""
 
 require_relative "../vendor/apache-arrow/dev/tasks/linux-packages/package-task"
 
