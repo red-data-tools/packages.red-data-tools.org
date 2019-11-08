@@ -20,45 +20,15 @@ There are packages for the following platforms:
 https://packages.red-data-tools.org/ provides packages. You need to
 enable the package repository before you install packages.
 
-### Debian GNU/Linux
-
-Install `apt-transport-https` to support HTTPS APT repository:
-
-```console
-% sudo apt install -y -V apt-transport-https
-```
+### Debian GNU/Linux and Ubuntu
 
 Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
 ```console
 % sudo apt install -y -V lsb-release wget
-% sudo wget -O /usr/share/keyrings/red-data-tools-keyring.gpg https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-keyring.gpg
-% sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
-deb [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) main
-deb-src [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) main
-APT_LINE
-% sudo apt update
-```
-
-### Ubuntu
-
-Install `apt-transport-https` to support HTTPS APT repository:
-
-```console
-% sudo apt install -y -V apt-transport-https
-```
-
-Run the following command lines to add apt-lines for APT repository on
-packages.red-data-tools.org:
-
-```console
-% sudo apt install -y -V lsb-release
-% sudo wget -O /usr/share/keyrings/red-data-tools-keyring.gpg https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-keyring.gpg
-% sudo tee /etc/apt/sources.list.d/red-data-tools.list <<APT_LINE
-deb [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) universe
-deb-src [signed-by=/usr/share/keyrings/red-data-tools-keyring.gpg] https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) universe
-APT_LINE
+% wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
+% sudo apt install -y -V ./red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
 % sudo apt update
 ```
 
@@ -73,13 +43,7 @@ APT_LINE
 This section describes how to install
 [OpenCV GLib](https://github.com/red-data-tools/opencv-glib) package.
 
-### Debian GNU/Linux
-
-```console
-% sudo apt install -y -V libopencv-glib-dev
-```
-
-### Ubuntu
+### Debian GNU/Linux and Ubuntu
 
 ```console
 % sudo apt install -y -V libopencv-glib-dev

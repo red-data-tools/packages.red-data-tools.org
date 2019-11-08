@@ -1,3 +1,5 @@
 root: kou@cozmixng.org
-postmaster: root
+
 gravatar: root
+packages: root
+postmaster: root

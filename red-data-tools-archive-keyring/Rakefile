@@ -1,0 +1,53 @@
+# -*- ruby -*-
+
+ENV["APT_TARGETS"] ||= [
+  "debian-buster",
+  "ubuntu-bionic",
+  "ubuntu-disco",
+  "ubuntu-eoan",
+].join(",")
+
+require_relative "../helper"
+require_relative "../vendor/apache-arrow/dev/tasks/linux-packages/package-task"
+
+class RedDataToolsArchiveKeyringPackageTask < PackageTask
+  include Helper::Repository
+
+  def initialize
+    super("red-data-tools-archive-keyring",
+          repository_version,
+          latest_commit_time(File.join(__dir__, "..")))
+  end
+
+  private
+  def define_archive_task
+    file @archive_name do
+      rm_rf(@archive_base_name)
+      mkdir(@archive_base_name)
+      repository_gpg_uids.each do |gpg_uid|
+        unless system("gpg", "--list-keys", gpg_uid, out: IO::NULL)
+          sh("gpg",
+             "--keyserver", "keyserver.ubuntu.com",
+             "--recv-key", gpg_uid)
+        end
+      end
+      sh("gpg", "--armor", "--export", *repository_gpg_uids,
+         out: "#{@archive_base_name}/keys")
+      sh("tar", "czf", @archive_name, @archive_base_name)
+      rm_rf(@archive_base_name)
+    end
+
+    if deb_archive_name != @archive_name
+      file deb_archive_name => @archive_name do
+        cp(@archive_name, deb_archive_name)
+      end
+    end
+  end
+
+  def enable_yum?
+    false
+  end
+end
+
+task = RedDataToolsArchiveKeyringPackageTask.new
+task.define

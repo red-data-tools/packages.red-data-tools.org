@@ -33,10 +33,6 @@ class RepositoryTask
     "RPM-GPG-KEY-#{shorten_gpg_uid(uid).downcase}"
   end
 
-  def keyring_path
-    "#{repository_name}-keyring.gpg"
-  end
-
   def repositories_dir
     "repositories"
   end
@@ -78,15 +74,6 @@ class RepositoryTask
         end
         sh("gpg", "--armor", "--export", uid, :out => path)
       end
-    end
-
-    file keyring_path => paths do |task|
-      rm_f(keyring_path)
-      touch(keyring_path)
-      sh("gpg",
-         "--no-default-keyring",
-         "--keyring", "./#{keyring_path}",
-         "--import", *paths)
     end
   end
 
@@ -427,7 +414,7 @@ enabled=#{target[:enabled]}
       end
 
       desc "Upload repositories"
-      task :upload => [repositories_dir, keyring_path] do
+      task :upload => [repositories_dir] do
         distributions.each do |distribution|
           sh("rsync",
              "-avz",
@@ -435,7 +422,17 @@ enabled=#{target[:enabled]}
              "--delete",
              "#{repositories_dir}/#{distribution}/",
              "#{rsync_base_path}/#{distribution}")
-          sh("scp", keyring_path, "#{rsync_base_path}/#{distribution}/")
+          keyring_glob = "#{repositories_dir}/#{distribution}"
+          keyring_glob << "/pool/*/*/*/*-archive-keyring"
+          keyring_glob << "/*-archive-keyring_#{repository_version}-*_all*.deb"
+          Dir.glob(keyring_glob) do |path|
+            path_components = path.split("/")
+            code_name = path_components[-5]
+            keyring_deb = "#{path_components[-2]}-latest-#{code_name}.deb"
+            sh("scp",
+               path,
+               "#{rsync_base_path}/#{distribution}/#{keyring_deb}")
+          end
         end
       end
     end

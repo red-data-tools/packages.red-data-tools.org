@@ -7,10 +7,10 @@
 /yum/RPM-GPG-KEY-*
 /yum/*.repo
 /*/*.tar.gz
-/*/apt/.vagrant/
+/*/apt/build.sh
+/*/apt/env.sh
 /*/apt/repositories/
 /*/apt/tmp/
-/*/apt/env.sh
 /*/source/
 /*/yum/.vagrant/
 /*/yum/repositories/

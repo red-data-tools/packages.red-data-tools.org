@@ -1,8 +1,11 @@
 # -*- ruby -*-
 
+require_relative "helper"
 require_relative "repository-task"
 
 class RedDataToolsRepositoryTask < RepositoryTask
+  include Helper::Repository
+
   private
   def repository_name
     "red-data-tools"
@@ -25,14 +28,13 @@ class RedDataToolsRepositoryTask < RepositoryTask
   end
 
   def gpg_uids
-    [
-      "50785E2340D629B2B9823F39807C619DF72898CB"
-    ]
+    repository_gpg_uids
   end
 
   def all_products
     [
       "opencv-glib",
+      "red-data-tools-archive-keyring",
     ]
   end
 end
@@ -45,4 +47,11 @@ task :deploy do
   sh("ansible-playbook",
      "--inventory-file", "ansible/hosts",
      "ansible/playbook.yml")
+end
+
+desc "Tag"
+task :tag do
+  version = repository_task.repository_version
+  sh("git", "tag", "-a", version, "-m", "Publish #{version}")
+  sh("git", "push", "--tags")
 end
