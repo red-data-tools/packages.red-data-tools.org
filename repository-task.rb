@@ -255,7 +255,9 @@ enabled=#{target[:enabled]}
           next unless File.directory?(version_dir)
           Dir.glob("#{version_dir}/*") do |arch_dir|
             next unless File.directory?(arch_dir)
-            sh("createrepo", arch_dir)
+            sh("createrepo",
+               "--update",
+               arch_dir)
           end
         end
         gpg_uids.each do |gpg_uid|
