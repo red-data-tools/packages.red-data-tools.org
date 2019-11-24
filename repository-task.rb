@@ -48,14 +48,6 @@ class RepositoryTask
     end
   end
 
-  def products
-    if ENV["PRODUCTS"]
-      ENV["PRODUCTS"].split(",")
-    else
-      all_products
-    end
-  end
-
   def define_repository_task
     directory repositories_dir
   end
@@ -188,24 +180,6 @@ enabled=#{target[:enabled]}
         end
       end
 
-      desc "Build RPMs"
-      task :build do
-        products.each do |product|
-          cd(product) do
-            ruby("-S", "rake", "yum")
-          end
-        end
-      end
-
-      desc "Copy built RPMs"
-      task :copy => repositories_dir do
-        products.each do |product|
-          sh("rsync", "-av",
-             "#{product}/yum/repositories/",
-             "#{repositories_dir}/")
-        end
-      end
-
       desc "Sign packages"
       task :sign => gpg_key_path(primary_gpg_uid) do
         unless system("rpm", "-q", "gpg-pubkey-#{primary_gpg_uid}",
@@ -290,8 +264,6 @@ enabled=#{target[:enabled]}
     desc "Release Yum packages"
     yum_tasks = [
       "yum:download",
-      "yum:build",
-      "yum:copy",
       "yum:release:build",
       "yum:sign",
       "yum:amazon_linux",
@@ -316,26 +288,6 @@ enabled=#{target[:enabled]}
     ]
 
     namespace :apt do
-      desc "Build .deb"
-      task :build do
-        products.each do |product|
-          cd(product) do
-            ruby("-S", "rake", "apt")
-          end
-        end
-      end
-
-      desc "Copy built .deb"
-      task :copy => repositories_dir do
-        all_products.each do |product|
-          distributions.each do |distribution|
-            from = "#{product}/apt/repositories/#{distribution}"
-            next unless File.exist?(from)
-            sh("rsync", "-av", from, "#{repositories_dir}/")
-          end
-        end
-      end
-
       desc "Sign packages"
       task :sign => gpg_key_path(primary_gpg_uid) do
         sh("debsign",
@@ -442,8 +394,6 @@ enabled=#{target[:enabled]}
     desc "Release APT repositories"
     apt_tasks = [
       "apt:download",
-      "apt:build",
-      "apt:copy",
       "apt:sign",
       "apt:repository:update",
       "apt:upload",
