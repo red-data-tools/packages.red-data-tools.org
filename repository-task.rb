@@ -1,7 +1,45 @@
 require "tempfile"
+require "thread"
 
 class RepositoryTask
   include Rake::DSL
+
+  class ThreadPool
+    def initialize(n_workers=nil, &worker)
+      @n_workers = n_workers || detect_n_processors
+      @worker = worker
+      @jobs = Thread::Queue.new
+      @workers = @n_workers.times.collect do
+        Thread.new do
+          loop do
+            job = @jobs.pop
+            break if job.nil?
+            @worker.call(job)
+          end
+        end
+      end
+    end
+
+    def <<(job)
+      @jobs << job
+    end
+
+    def join
+      @n_workers.times do
+        @jobs << nil
+      end
+      @workers.each(&:join)
+    end
+
+    private
+    def detect_n_processors
+      if File.exist?("/proc/cpuinfo")
+        File.readlines("/proc/cpuinfo").grep(/^processor/).size
+      else
+        8
+      end
+    end
+  end
 
   def define
     define_repository_task
@@ -74,6 +112,31 @@ class RepositoryTask
     version = content.scan(/^Version: (.+)$/)[0][0]
     release = content.scan(/^Release: (.+)$/)[0][0]
     "#{version}-#{release}"
+  end
+
+  def signed_rpm?(rpm)
+    IO.pipe do |input, output|
+      system("rpm", "--checksig", rpm, :out => output)
+      signature = input.gets.sub(/\A#{Regexp.escape(rpm)}: /, "")
+      signature.split.include?("signatures")
+    end
+  end
+
+  def detect_unsigned_rpms(directory)
+    unsigned_rpms = []
+    mutex = Thread::Mutex.new
+    thread_pool = ThreadPool.new do |rpm|
+      unless signed_rpm?(rpm)
+        mutex.synchronize do
+          unsigned_rpms << rpm
+        end
+      end
+    end
+    Dir.glob("#{directory}/**/*.rpm") do |rpm|
+      thread_pool << rpm
+    end
+    thread_pool.join
+    unsigned_rpms
   end
 
   def define_yum_task
@@ -157,7 +220,7 @@ enabled=#{target[:enabled]}
              "--define=%_topdir #{rpm_dir}",
              "-ba",
              release_spec_path)
-          destination_base_dir = "#{repositories_dir}/#{distribution}/"
+          destination_base_dir = "#{repositories_dir}/#{distribution}"
           rpms = Dir.glob("#{rpm_dir}/RPMS/**/*.rpm")
           srpms = Dir.glob("#{rpm_dir}/SRPMS/**/*.src.rpm")
           cp(rpms, destination_base_dir)
@@ -187,15 +250,8 @@ enabled=#{target[:enabled]}
           sh("rpm", "--import", gpg_key_path(primary_gpg_uid))
         end
 
-        unsigned_rpms = []
-        Dir.glob("#{repositories_dir}/#{distribution}/**/*.rpm") do |rpm|
-          IO.pipe do |input, output|
-            system("rpm", "--checksig", rpm, :out => output)
-            signature = input.gets.sub(/\A#{Regexp.escape(rpm)}: /, "")
-            next if /\b(?:gpg|pgp)\b/ =~ signature
-            unsigned_rpms << rpm
-          end
-        end
+        repository_directory = "#{repositories_dir}/#{distribution}"
+        unsigned_rpms = detect_unsigned_rpms(repository_directory)
         unless unsigned_rpms.empty?
           sh("rpm",
              "-D", "_gpg_name #{primary_gpg_uid}",
