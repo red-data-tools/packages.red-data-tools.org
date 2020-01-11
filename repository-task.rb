@@ -75,17 +75,6 @@ class RepositoryTask
     "repositories"
   end
 
-  def expand_variables(text)
-    text.gsub(/@(.+?)@/) do |matched|
-      case $1
-      when "GPG_UID"
-        primary_gpg_uid
-      else
-        matched
-      end
-    end
-  end
-
   def define_repository_task
     directory repositories_dir
   end
