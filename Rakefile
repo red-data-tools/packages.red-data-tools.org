@@ -30,13 +30,6 @@ class RedDataToolsRepositoryTask < RepositoryTask
   def gpg_uids
     repository_gpg_uids
   end
-
-  def all_products
-    [
-      "opencv-glib",
-      "red-data-tools-archive-keyring",
-    ]
-  end
 end
 
 repository_task = RedDataToolsRepositoryTask.new
