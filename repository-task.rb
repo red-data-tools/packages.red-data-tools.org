@@ -80,10 +80,8 @@ class RepositoryTask
   end
 
   def define_gpg_task
-    paths = []
     gpg_uids.each do |gpg_uid|
       path = gpg_key_path(gpg_uid)
-      paths << path
       file path do |task|
         uid = gpg_uid
         unless system("gpg", "--list-keys", uid, :out => IO::NULL)
