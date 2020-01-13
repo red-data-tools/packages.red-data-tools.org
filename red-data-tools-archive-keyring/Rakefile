@@ -1,22 +1,17 @@
 # -*- ruby -*-
 
-ENV["APT_TARGETS"] ||= [
-  "debian-buster",
-  "ubuntu-bionic",
-  "ubuntu-disco",
-  "ubuntu-eoan",
-].join(",")
+require_relative "../packages-red-data-tools-org-package-task"
 
-require_relative "../helper"
-require_relative "../vendor/apache-arrow/dev/tasks/linux-packages/package-task"
-
-class RedDataToolsArchiveKeyringPackageTask < PackageTask
-  include Helper::Repository
-
+class RedDataToolsArchiveKeyringPackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
     super("red-data-tools-archive-keyring",
           repository_version,
           latest_commit_time(File.join(__dir__, "..")))
+  end
+
+  def define
+    super
+    define_apt_latest_task
   end
 
   private
@@ -35,6 +30,50 @@ class RedDataToolsArchiveKeyringPackageTask < PackageTask
          out: "#{@archive_base_name}/keys")
       sh("tar", "czf", @archive_name, @archive_base_name)
       rm_rf(@archive_base_name)
+    end
+  end
+
+  def apt_targets_default
+    [
+      "debian-buster",
+      "ubuntu-bionic",
+      "ubuntu-disco",
+      "ubuntu-eoan",
+    ]
+  end
+
+  def define_apt_latest_task
+    namespace :apt do
+      apt_targets.each do |target|
+        distribution, code_name = target.split("-", 2)
+        if distribution == "debian"
+          component = "main"
+        else
+          component = "universe"
+        end
+        deb = [
+          apt_dir,
+          "repositories",
+          distribution,
+          "pool",
+          code_name,
+          component,
+          @package[0],
+          @package,
+          "#{@package}_#{@version}-#{@deb_release}_all.deb",
+        ].join("/")
+        latest_deb = [
+          apt_dir,
+          "repositories",
+          distribution,
+          "#{@package}-latest-#{code_name}.deb",
+        ].join("/")
+        file latest_deb => deb do
+          cp(deb, latest_deb)
+        end
+        task :latest => latest_deb
+      end
+      task :release => :latest
     end
   end
 
