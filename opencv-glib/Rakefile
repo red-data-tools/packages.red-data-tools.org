@@ -1,23 +1,11 @@
 # -*- ruby -*-
 
-ENV["APT_TARGETS"] ||= [
-  "debian-buster",
-  "ubuntu-bionic",
-  "ubuntu-disco",
-].join(",")
-ENV["YUM_TARGETS"] ||= ""
+require_relative "../packages-red-data-tools-org-package-task"
 
-require_relative "../vendor/apache-arrow/dev/tasks/linux-packages/package-task"
-
-class OpenCVGLibPackageTask < PackageTask
+class OpenCVGLibPackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
     release_time = latest_commit_time(source_dir)
     super("opencv-glib", detect_version(release_time), release_time)
-  end
-
-  def define
-    super
-    Rake::Task["yum"].clear
   end
 
   private
@@ -67,6 +55,19 @@ class OpenCVGLibPackageTask < PackageTask
          "--prefix", @archive_base_name,
          "--output", @full_archive_name)
     end
+  end
+
+  def apt_targets_default
+    [
+      "debian-buster",
+      "ubuntu-bionic",
+      "ubuntu-disco",
+      "ubuntu-eoan",
+    ]
+  end
+
+  def enable_yum?
+    false
   end
 end
 
