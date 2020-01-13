@@ -3,9 +3,6 @@
 /*.gpg~
 /ansible/playbook.retry
 /repositories/
-/rpm/
-/yum/RPM-GPG-KEY-*
-/yum/*.repo
 /*/*.tar.gz
 /*/apt/build.sh
 /*/apt/env.sh

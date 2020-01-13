@@ -7,24 +7,8 @@ class RedDataToolsRepositoryTask < RepositoryTask
   include Helper::Repository
 
   private
-  def repository_name
-    "red-data-tools"
-  end
-
-  def repository_label
-    "Red Data Tools"
-  end
-
-  def repository_description
-    "Red Data Tools related packages"
-  end
-
-  def repository_url
-    "https://packages.red-data-tools.org"
-  end
-
   def rsync_base_path
-    "packages@packages.red-data-tools.org:public"
+    repository_rsync_base_path
   end
 
   def gpg_uids

@@ -128,107 +128,9 @@ class RepositoryTask
 
   def define_yum_task
     yum_dir = "yum"
-    release_source_path = "#{yum_dir}/#{repository_name}-release.tar.gz"
-    release_spec_path = "#{yum_dir}/#{repository_name}-release.spec"
-
-    repo_paths = []
-    targets = [
-      {
-        id: "centos",
-        label: "CentOS $releasever",
-        version: "$releasever",
-        enabled: "1",
-      },
-      {
-        id: "amazon-linux",
-        label: "Amazon Linux 2",
-        version: "7",
-        enabled: "0",
-      },
-    ]
-    targets.each do |target|
-      repo_path = "#{yum_dir}/#{repository_name}-#{target[:id]}.repo"
-      repo_paths << repo_path
-      file repo_path => __FILE__ do |task|
-        File.open(task.name, "w") do |repo|
-          repo.puts(<<-REPOSITORY)
-[#{repository_name}-#{target[:id]}]
-name=#{repository_label} for #{target[:label]} - $basearch
-baseurl=#{repository_url}/centos/#{target[:version]}/$basearch/
-gpgcheck=1
-enabled=#{target[:enabled]}
-          REPOSITORY
-          prefix = "gpgkey="
-          gpg_uids.each do |gpg_uid|
-            repo.puts(<<-REPOSITORY)
-#{prefix}file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path(gpg_uid)}
-            REPOSITORY
-            prefix = "       "
-          end
-        end
-      end
-    end
-
-    gpg_key_paths = gpg_uids.collect do |uid|
-      gpg_key_path(uid)
-    end
-    file release_source_path => [*gpg_key_paths, *repo_paths] do |task|
-      rpm_gpg_key_paths = []
-      gpg_uids.each do |uid|
-        path = rpm_gpg_key_path(uid)
-        rpm_gpg_key_paths << path
-        cp(gpg_key_path(uid), "#{yum_dir}/#{path}")
-      end
-      cd(yum_dir) do
-        sh("tar", "czf",
-           File.basename(task.name),
-           *rpm_gpg_key_paths,
-           *(repo_paths.collect {|repo_path| File.basename(repo_path)}))
-      end
-    end
-
     namespace :yum do
       distribution = "centos"
       rsync_path = rsync_base_path
-
-      namespace :release do
-        desc "Build release RPM"
-        task :build => [release_source_path, release_spec_path] do
-          rpm_dir = "#{Dir.pwd}/rpm"
-          rm_rf(rpm_dir)
-          mkdir_p(rpm_dir)
-          mkdir_p("#{rpm_dir}/SOURCES")
-          mkdir_p("#{rpm_dir}/SPECS")
-          mkdir_p("#{rpm_dir}/BUILD")
-          mkdir_p("#{rpm_dir}/RPMS")
-          mkdir_p("#{rpm_dir}/SRPMS")
-          cp(release_source_path, "#{rpm_dir}/SOURCES")
-          sh("rpmbuild",
-             "--define=%_topdir #{rpm_dir}",
-             "-ba",
-             release_spec_path)
-          destination_base_dir = "#{repositories_dir}/#{distribution}"
-          rpms = Dir.glob("#{rpm_dir}/RPMS/**/*.rpm")
-          srpms = Dir.glob("#{rpm_dir}/SRPMS/**/*.src.rpm")
-          cp(rpms, destination_base_dir)
-          cp(srpms, destination_base_dir)
-          Dir.glob("#{destination_base_dir}/**/Packages") do |packages_dir|
-            cp(rpms, packages_dir)
-          end
-          Dir.glob("#{destination_base_dir}/**/SPackages") do |srpms_dir|
-            cp(srpms, srpms_dir)
-          end
-          release_rpm_version = rpm_version(release_spec_path)
-          release_rpm_base_name = "#{repository_name}-release"
-          ln_s("#{release_rpm_base_name}-#{release_rpm_version}.noarch.rpm",
-               "#{destination_base_dir}/#{release_rpm_base_name}-latest.noarch.rpm",
-               force: true)
-          gpg_uids.each do |uid|
-            cp(gpg_key_path(uid),
-               "#{destination_base_dir}/#{rpm_gpg_key_path(uid)}")
-          end
-        end
-      end
 
       desc "Sign packages"
       task :sign => gpg_key_path(primary_gpg_uid) do
@@ -307,7 +209,6 @@ enabled=#{target[:enabled]}
     desc "Release Yum packages"
     yum_tasks = [
       "yum:download",
-      "yum:release:build",
       "yum:sign",
       "yum:amazon_linux",
       "yum:update",
