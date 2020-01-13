@@ -94,7 +94,6 @@ enabled=#{target[:enabled]}
 
   def define_yum_latest_task
     namespace :yum do
-      latest_rpms = []
       yum_targets.each do |target|
         distribution, version = target.split("-", 2)
         rpm = [
@@ -113,12 +112,11 @@ enabled=#{target[:enabled]}
           version,
           "#{@package}-latest.noarch.rpm",
         ].join("/")
-        latest_rpms << latest_rpm
         file latest_rpm => rpm do
           cp(rpm, latest_rpm)
         end
+        task :latest => latest_rpm
       end
-      task :latest => latest_rpms
       task :release => :latest
     end
   end
