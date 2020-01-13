@@ -36,12 +36,6 @@ class RedDataToolsArchiveKeyringPackageTask < PackageTask
       sh("tar", "czf", @archive_name, @archive_base_name)
       rm_rf(@archive_base_name)
     end
-
-    if deb_archive_name != @archive_name
-      file deb_archive_name => @archive_name do
-        cp(@archive_name, deb_archive_name)
-      end
-    end
   end
 
   def enable_yum?
