@@ -23,7 +23,7 @@ class PackagesRedDataToolsOrgPackageTask < PackageTask
     [:apt, :yum].each do |target_namespace|
       namespace target_namespace do
         desc "Release #{target_namespace} packages"
-        task :release => "#{target_namespace}:build" do
+        task :release do
           release(target_namespace) if __send__("enable_#{target_namespace}?")
         end
       end
