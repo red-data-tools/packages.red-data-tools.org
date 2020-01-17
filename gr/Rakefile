@@ -1,0 +1,37 @@
+# -*- ruby -*-
+
+require_relative "../packages-red-data-tools-org-package-task"
+
+class GRPackageTask < PackagesRedDataToolsOrgPackageTask
+  def initialize
+    super("gr",
+          "0.44.1",
+          Time.parse("2019-11-28"))
+  end
+
+  private
+  def define_archive_task
+    file @archive_name do
+      base_url = "https://github.com/sciapp/gr/archive"
+      download("#{base_url}/v#{@version}.tar.gz", @archive_name)
+    end
+  end
+
+  def apt_targets_default
+    [
+      "debian-buster",
+      "ubuntu-bionic",
+      "ubuntu-eoan",
+    ]
+  end
+
+  def yum_targets_default
+    [
+      # qt5-devel is broken
+      # "centos-8",
+    ]
+  end
+end
+
+task = GRPackageTask.new
+task.define

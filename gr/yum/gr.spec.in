@@ -1,0 +1,59 @@
+# -*- sh-shell: rpm -*-
+
+Name: @PACKAGE@
+Version: @VERSION@
+Release: 1
+Summary: GR framework is a graphics library for visualisation applications
+License: MIT
+URL: https://gr-framework.org/
+Source: %{name}-%{version}.tar.gz
+Group: Development/Libraries
+
+BuildRequires: cairo-devel \
+BuildRequires: fontconfig-devel \
+BuildRequires: freetype-devel
+BuildRequires: gcc
+BuildRequires: gcc-c++
+BuildRequires: libXt-devel
+BuildRequires: libgs-devel
+BuildRequires: libtiff-devel
+BuildRequires: make
+BuildRequires: mesa-libGL-devel
+BuildRequires: ncurses
+BuildRequires: qt5-devel
+BuildRequires: rpm-build
+BuildRequires: texlive-dvipng
+BuildRequires: texlive-latex
+BuildRequires: which
+
+# TODO
+# Requires: ...
+
+%description
+GR is a universal framework for cross-platform visualization
+applications. It offers developers a compact, portable and consistent
+graphics library for their programs. Applications range from
+publication quality 2D graphs to the representation of complex 3D
+scenes.
+
+%prep
+%setup -c
+
+%build
+cd %{name}-%{version}
+make %{?_smp_mflags} GRDIR=/usr
+
+%install
+cd %{name}-%{version}
+make install %{?_smp_mflags} GRDIR=/usr
+
+%clean
+%{__rm} -rf %{buildroot}
+
+%files
+%defattr(-, root, root, 0755)
+# TODO
+
+%changelog
+* Thu Nov 28 2019 Sutou Kouhei <kou@clear-code.com> - 0.44.1-1
+- New upstream release.

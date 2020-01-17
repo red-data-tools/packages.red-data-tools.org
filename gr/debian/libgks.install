@@ -1,0 +1,4 @@
+usr/bin/gks*
+usr/lib/libGKS.so
+usr/lib/*plugin.so
+usr/fonts/
