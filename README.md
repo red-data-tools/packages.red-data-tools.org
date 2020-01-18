@@ -6,6 +6,7 @@ Tools related projects including Apache Arrow and Apache Parquet.
 ## Supported packages
 
   * OpenCV GLib (C API)
+  * GR framework
 
 ## Supported platforms
 
@@ -14,6 +15,7 @@ There are packages for the following platforms:
   * Debian GNU/Linux buster
   * Ubuntu 18.04 LTS
   * Ubuntu 19.04
+  * CentOS 8
 
 ## Package repository
 
@@ -35,7 +37,7 @@ packages.red-data-tools.org:
 ### CentOS
 
 ```console
-% sudo yum install -y https://packages.red-data-tools.org/centos/red-data-tools-release-latest.noarch.rpm
+% (. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
 ```
 
 ## OpenCV GLib
@@ -47,6 +49,23 @@ This section describes how to install
 
 ```console
 % sudo apt install -y -V libopencv-glib-dev
+```
+
+## GR framework
+
+This section describes how to install
+[GR framework](https://gr-framework.org/) package.
+
+### Debian GNU/Linux and Ubuntu
+
+```console
+% sudo apt install -y -V libgr3-dev
+```
+
+### CentOS
+
+```console
+% sudo dnf install -y gr
 ```
 
 ## For packages.red-data-tools.org administrator
