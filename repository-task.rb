@@ -223,7 +223,7 @@ class RepositoryTask
       ["debian", "buster", "main"],
       ["ubuntu", "xenial", "universe"],
       ["ubuntu", "bionic", "universe"],
-      ["ubuntu", "dingo", "universe"],
+      ["ubuntu", "eoan", "universe"],
     ]
     distributions = targets.collect(&:first).uniq
     architectures = [
