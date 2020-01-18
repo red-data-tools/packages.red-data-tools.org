@@ -1,5 +1,7 @@
 # -*- sh-shell: rpm -*-
 
+%global debug_package %{nil}
+
 Name: @PACKAGE@
 Version: @VERSION@
 Release: 1
@@ -9,8 +11,8 @@ URL: https://gr-framework.org/
 Source: %{name}-%{version}.tar.gz
 Group: Development/Libraries
 
-BuildRequires: cairo-devel \
-BuildRequires: fontconfig-devel \
+BuildRequires: cairo-devel
+BuildRequires: fontconfig-devel
 BuildRequires: freetype-devel
 BuildRequires: gcc
 BuildRequires: gcc-c++
@@ -26,9 +28,6 @@ BuildRequires: texlive-dvipng
 BuildRequires: texlive-latex
 BuildRequires: which
 
-# TODO
-# Requires: ...
-
 %description
 GR is a universal framework for cross-platform visualization
 applications. It offers developers a compact, portable and consistent
@@ -41,18 +40,24 @@ scenes.
 
 %build
 cd %{name}-%{version}
-make %{?_smp_mflags} GRDIR=/usr
+make GRDIR=/usr
 
 %install
 cd %{name}-%{version}
-make install %{?_smp_mflags} GRDIR=/usr
+make install GRDIR=/usr DESTDIR=${RPM_BUILD_ROOT}
+mkdir -p ${RPM_BUILD_ROOT}%{_pkgdocdir}
+cp README.md LICENSE.md ${RPM_BUILD_ROOT}%{_pkgdocdir}/
 
 %clean
 %{__rm} -rf %{buildroot}
 
 %files
-%defattr(-, root, root, 0755)
-# TODO
+%defattr(-, root, root, -)
+%doc README.md LICENSE.md
+%{_bindir}/*
+%{_exec_prefix}/fonts/*
+%{_exec_prefix}/lib/*
+%{_includedir}/*
 
 %changelog
 * Thu Nov 28 2019 Sutou Kouhei <kou@clear-code.com> - 0.44.1-1
