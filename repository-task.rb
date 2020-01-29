@@ -217,10 +217,20 @@ class RepositoryTask
       desc "Sign packages"
       task :sign do
         Dir.glob("#{repositories_dir}/**/*.{dsc,changes}") do |target|
-          sh("debsign",
-             "--re-sign",
-             "-k#{repository_gpg_key_id}",
-             target)
+          begin
+            sh({"LANG" => "C"},
+               "gpg",
+               "--verify",
+               target,
+               out: IO::NULL,
+               err: IO::NULL,
+               verbose: false)
+          rescue
+            sh("debsign",
+               "--no-re-sign",
+               "-k#{repository_gpg_key_id}",
+               target)
+          end
         end
       end
 
