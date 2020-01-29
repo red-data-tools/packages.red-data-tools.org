@@ -19,14 +19,14 @@ class RedDataToolsArchiveKeyringPackageTask < PackagesRedDataToolsOrgPackageTask
     file @archive_name do
       rm_rf(@archive_base_name)
       mkdir(@archive_base_name)
-      repository_gpg_uids.each do |gpg_uid|
-        unless system("gpg", "--list-keys", gpg_uid, out: IO::NULL)
+      repository_gpg_key_ids.each do |gpg_key_id|
+        unless system("gpg", "--list-keys", gpg_key_id, out: IO::NULL)
           sh("gpg",
              "--keyserver", "keyserver.ubuntu.com",
-             "--recv-key", gpg_uid)
+             "--recv-key", gpg_key_id)
         end
       end
-      sh("gpg", "--armor", "--export", *repository_gpg_uids,
+      sh("gpg", "--armor", "--export", *repository_gpg_key_ids,
          out: "#{@archive_base_name}/keys")
       sh("tar", "czf", @archive_name, @archive_base_name)
       rm_rf(@archive_base_name)

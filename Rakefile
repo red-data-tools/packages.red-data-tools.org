@@ -11,8 +11,8 @@ class RedDataToolsRepositoryTask < RepositoryTask
     repository_rsync_base_path
   end
 
-  def gpg_uids
-    repository_gpg_uids
+  def repository_gpg_key_id
+    repository_gpg_key_ids.first
   end
 end
 

@@ -24,7 +24,7 @@ module Helper
       "2019.11.8"
     end
 
-    def repository_gpg_uids
+    def repository_gpg_key_ids
       [
         "50785E2340D629B2B9823F39807C619DF72898CB"
       ]

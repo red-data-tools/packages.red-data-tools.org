@@ -5,8 +5,8 @@ class RepositoryTask
   include Rake::DSL
 
   class ThreadPool
-    def initialize(n_workers=nil, &worker)
-      @n_workers = n_workers || detect_n_processors
+    def initialize(n_workers, &worker)
+      @n_workers = n_workers
       @worker = worker
       @jobs = Thread::Queue.new
       @workers = @n_workers.times.collect do
@@ -30,20 +30,10 @@ class RepositoryTask
       end
       @workers.each(&:join)
     end
-
-    private
-    def detect_n_processors
-      if File.exist?("/proc/cpuinfo")
-        File.readlines("/proc/cpuinfo").grep(/^processor/).size
-      else
-        8
-      end
-    end
   end
 
   def define
     define_repository_task
-    define_gpg_task
     define_yum_task
     define_apt_task
   end
@@ -55,20 +45,12 @@ class RepositoryTask
     value
   end
 
-  def primary_gpg_uid
-    gpg_uids.first
+  def shorten_gpg_key_id(id)
+    id[-8..-1]
   end
 
-  def shorten_gpg_uid(uid)
-    uid[-8..-1]
-  end
-
-  def gpg_key_path(uid)
-    "GPG-KEY-#{shorten_gpg_uid(uid).downcase}"
-  end
-
-  def rpm_gpg_key_path(uid)
-    "RPM-GPG-KEY-#{shorten_gpg_uid(uid).downcase}"
+  def rpm_gpg_key_package_name(id)
+    "gpg-pubkey-#{shorten_gpg_key_id(id).downcase}"
   end
 
   def repositories_dir
@@ -77,28 +59,6 @@ class RepositoryTask
 
   def define_repository_task
     directory repositories_dir
-  end
-
-  def define_gpg_task
-    gpg_uids.each do |gpg_uid|
-      path = gpg_key_path(gpg_uid)
-      file path do |task|
-        uid = gpg_uid
-        unless system("gpg", "--list-keys", uid, :out => IO::NULL)
-          sh("gpg",
-             "--keyserver", "keyserver.ubuntu.com",
-             "--recv-key", uid)
-        end
-        sh("gpg", "--armor", "--export", uid, :out => path)
-      end
-    end
-  end
-
-  def rpm_version(spec)
-    content = File.read(spec)
-    version = content.scan(/^Version: (.+)$/)[0][0]
-    release = content.scan(/^Release: (.+)$/)[0][0]
-    "#{version}-#{release}"
   end
 
   def signed_rpm?(rpm)
@@ -133,23 +93,33 @@ class RepositoryTask
       rsync_path = rsync_base_path
 
       desc "Sign packages"
-      task :sign => gpg_key_path(primary_gpg_uid) do
-        unless system("rpm", "-q", "gpg-pubkey-#{primary_gpg_uid}",
-                      :out => IO::NULL)
-          sh("rpm", "--import", gpg_key_path(primary_gpg_uid))
+      task :sign do
+        unless system("rpm",
+                      "-q", rpm_gpg_key_package_name(repository_gpg_key_id),
+                      out: IO::NULL)
+          gpg_key = Tempfile.new(["repository", ".asc"])
+          sh("gpg",
+             "--armor",
+             "--export", repository_gpg_key_id,
+             out: gpg_key.path)
+          sh("rpm", "--import", gpg_key.path)
+          gpg_key.close!
         end
 
-        repository_directory = "#{repositories_dir}/#{distribution}"
-        unsigned_rpms = detect_unsigned_rpms(repository_directory)
-        unless unsigned_rpms.empty?
-          sh("rpm",
-             "-D", "_gpg_name #{primary_gpg_uid}",
-             "-D", "_gpg_digest_algo sha256",
-             "-D", "__gpg_check_password_cmd /bin/true true",
-             "-D", "__gpg_sign_cmd %{__gpg} gpg --batch --no-verbose --no-armor %{?_gpg_digest_algo:--digest-algo %{_gpg_digest_algo}} --no-secmem-warning -u \"%{_gpg_name}\" -sbo %{__signature_filename} %{__plaintext_filename}",
-             "--resign",
-             *unsigned_rpms)
+        thread_pool = ThreadPool.new(2) do |rpm|
+          unless signed_rpm?(rpm)
+            sh("rpm",
+               "-D", "_gpg_name #{repository_gpg_key_id}",
+               "-D", "__gpg_check_password_cmd /bin/true true",
+               "--resign",
+               *rpm)
+          end
         end
+        repository_directory = "#{repositories_dir}/#{distribution}"
+        Dir.glob("#{repository_directory}/**/*.rpm") do |rpm|
+          thread_pool << rpm
+        end
+        thread_pool.join
       end
 
       desc "Create symbolic links for Amazon Linux"
@@ -164,11 +134,8 @@ class RepositoryTask
         end
       end
 
-      gpg_key_paths = gpg_uids.collect do |gpg_uid|
-        gpg_key_path(gpg_uid)
-      end
       desc "Update repositories"
-      task :update => gpg_key_paths do
+      task :update do
         Dir.glob("#{repositories_dir}/#{distribution}/*") do |version_dir|
           next if File.symlink?(version_dir)
           next unless File.directory?(version_dir)
@@ -178,10 +145,6 @@ class RepositoryTask
                "--update",
                arch_dir)
           end
-        end
-        gpg_uids.each do |gpg_uid|
-          cp(gpg_key_path(gpg_uid),
-             "#{repositories_dir}/#{distribution}/#{rpm_gpg_key_path(gpg_uid)}")
         end
       end
 
@@ -217,48 +180,69 @@ class RepositoryTask
     task :yum => yum_tasks
   end
 
-  def define_apt_task
-    targets = [
+  def apt_targets
+    [
       ["debian", "stretch", "main"],
       ["debian", "buster", "main"],
       ["ubuntu", "xenial", "universe"],
       ["ubuntu", "bionic", "universe"],
       ["ubuntu", "eoan", "universe"],
     ]
-    distributions = targets.collect(&:first).uniq
-    architectures = [
+  end
+
+  def apt_distributions
+    apt_targets.collect(&:first).uniq
+  end
+
+  def apt_architectures
+    [
       "i386",
       "amd64",
     ]
+  end
 
+  def define_apt_task
     namespace :apt do
+      desc "Download repositories"
+      task :download => repositories_dir do
+        apt_distributions.each do |distribution|
+          sh("rsync",
+             "-avz",
+             "--progress",
+             "--delete",
+             "#{rsync_base_path}/#{distribution}/",
+             "#{repositories_dir}/#{distribution}")
+        end
+      end
+
       desc "Sign packages"
-      task :sign => gpg_key_path(primary_gpg_uid) do
-        sh("debsign",
-           "--re-sign",
-           "-k#{primary_gpg_uid}",
-           *Dir.glob("#{repositories_dir}/**/*.{dsc,changes}"))
+      task :sign do
+        Dir.glob("#{repositories_dir}/**/*.{dsc,changes}") do |target|
+          sh("debsign",
+             "--re-sign",
+             "-k#{repository_gpg_key_id}",
+             target)
+        end
       end
 
       namespace :repository do
         desc "Update repositories"
         task :update do
-          targets.each do |distribution, code_name, component|
+          apt_targets.each do |distribution, code_name, component|
             base_dir = "#{repositories_dir}/#{distribution}"
             pool_dir = "#{base_dir}/pool/#{code_name}"
             next unless File.exist?(pool_dir)
             dists_dir = "#{base_dir}/dists/#{code_name}"
             rm_rf(dists_dir)
             generate_apt_release(dists_dir, code_name, component, "source")
-            architectures.each do |architecture|
+            apt_architectures.each do |architecture|
               generate_apt_release(dists_dir, code_name, component, architecture)
             end
 
             generate_conf_file = Tempfile.new("apt-ftparchive-generate.conf")
             File.open(generate_conf_file.path, "w") do |conf|
               conf.puts(generate_apt_ftp_archive_generate_conf(code_name,
-                                                               component,
-                                                               architectures))
+                                                               component))
             end
             cd(base_dir) do
               sh("apt-ftparchive", "generate", generate_conf_file.path)
@@ -269,8 +253,7 @@ class RepositoryTask
             release_conf_file = Tempfile.new("apt-ftparchive-release.conf")
             File.open(release_conf_file.path, "w") do |conf|
               conf.puts(generate_apt_ftp_archive_release_conf(code_name,
-                                                              component,
-                                                              architectures))
+                                                              component))
             end
             release_file = Tempfile.new("apt-ftparchive-release")
             sh("apt-ftparchive",
@@ -287,33 +270,21 @@ class RepositoryTask
                "--sign",
                "--detach-sign",
                "--armor",
-               "--local-user", primary_gpg_uid,
+               "--local-user", repository_gpg_key_id,
                "--output", signed_release_path,
                release_path)
             sh("gpg",
                "--clear-sign",
-               "--local-user", primary_gpg_uid,
+               "--local-user", repository_gpg_key_id,
                "--output", in_release_path,
                release_path)
           end
         end
       end
 
-      desc "Download repositories"
-      task :download => repositories_dir do
-        distributions.each do |distribution|
-          sh("rsync",
-             "-avz",
-             "--progress",
-             "--delete",
-             "#{rsync_base_path}/#{distribution}/",
-             "#{repositories_dir}/#{distribution}")
-        end
-      end
-
       desc "Upload repositories"
       task :upload => [repositories_dir] do
-        distributions.each do |distribution|
+        apt_distributions.each do |distribution|
           sh("rsync",
              "-avz",
              "--progress",
@@ -365,7 +336,7 @@ Architecture: #{architecture}
     end
   end
 
-  def generate_apt_ftp_archive_generate_conf(code_name, component, architectures)
+  def generate_apt_ftp_archive_generate_conf(code_name, component)
     conf = <<-CONF
 Dir::ArchiveDir ".";
 Dir::CacheDir ".";
@@ -377,7 +348,7 @@ Default::Sources::Compress ". gzip xz";
 Default::Contents::Compress "gzip";
     CONF
 
-    architectures.each do |architecture|
+    apt_architectures.each do |architecture|
       conf << <<-CONF
 
 BinDirectory "dists/#{code_name}/#{component}/binary-#{architecture}" {
@@ -392,18 +363,18 @@ BinDirectory "dists/#{code_name}/#{component}/binary-#{architecture}" {
 
 Tree "dists/#{code_name}" {
   Sections "#{component}";
-  Architectures "#{architectures.join(" ")} source";
+  Architectures "#{apt_architectures.join(" ")} source";
 };
     CONF
 
     conf
   end
 
-  def generate_apt_ftp_archive_release_conf(code_name, component, architectures)
+  def generate_apt_ftp_archive_release_conf(code_name, component)
     <<-CONF
 APT::FTPArchive::Release::Origin "#{repository_label}";
 APT::FTPArchive::Release::Label "#{repository_label}";
-APT::FTPArchive::Release::Architectures "#{architectures.join(" ")}";
+APT::FTPArchive::Release::Architectures "#{apt_architectures.join(" ")}";
 APT::FTPArchive::Release::Codename "#{code_name}";
 APT::FTPArchive::Release::Suite "#{code_name}";
 APT::FTPArchive::Release::Components "#{component}";

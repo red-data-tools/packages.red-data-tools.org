@@ -15,23 +15,23 @@ class RedDataToolsReleasePackageTask < PackagesRedDataToolsOrgPackageTask
   end
 
   private
-  def shorten_gpg_uid(uid)
-    uid[-8..-1]
+  def shorten_gpg_key_id(id)
+    id[-8..-1]
   end
 
-  def rpm_gpg_key_path(uid)
-    "RPM-GPG-KEY-#{shorten_gpg_uid(uid).downcase}"
+  def rpm_gpg_key_path(id)
+    "RPM-GPG-KEY-#{shorten_gpg_key_id(id).downcase}"
   end
 
   def generate_gpg_keys
-    repository_gpg_uids.each do |gpg_uid|
-      path = "#{@archive_base_name}/#{rpm_gpg_key_path(gpg_uid)}"
-      unless system("gpg", "--list-keys", gpg_uid, :out => IO::NULL)
+    repository_gpg_key_ids.each do |gpg_key_id|
+      path = "#{@archive_base_name}/#{rpm_gpg_key_path(gpg_key_id)}"
+      unless system("gpg", "--list-keys", gpg_key_id, :out => IO::NULL)
         sh("gpg",
            "--keyserver", "keyserver.ubuntu.com",
-           "--recv-key", gpg_uid)
+           "--recv-key", gpg_key_id)
       end
-      sh("gpg", "--armor", "--export", gpg_uid, :out => path)
+      sh("gpg", "--armor", "--export", gpg_key_id, :out => path)
     end
   end
 
@@ -61,9 +61,9 @@ gpgcheck=1
 enabled=#{target[:enabled]}
         REPOSITORY
         prefix = "gpgkey="
-        repository_gpg_uids.each do |gpg_uid|
+        repository_gpg_key_ids.each do |gpg_key_id|
           repo.puts(<<-REPOSITORY)
-#{prefix}file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path(gpg_uid)}
+#{prefix}file:///etc/pki/rpm-gpg/#{rpm_gpg_key_path(gpg_key_id)}
           REPOSITORY
           prefix = "       "
         end
