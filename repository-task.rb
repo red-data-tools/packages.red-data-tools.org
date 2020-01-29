@@ -88,7 +88,7 @@ class RepositoryTask
           gpg_key.close!
         end
 
-        thread_pool = ThreadPool.new(2) do |rpm|
+        thread_pool = ThreadPool.new(4) do |rpm|
           unless signed_rpm?(rpm)
             sh("rpm",
                "-D", "_gpg_name #{repository_gpg_key_id}",
