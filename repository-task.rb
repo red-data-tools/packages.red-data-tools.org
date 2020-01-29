@@ -299,7 +299,7 @@ class RepositoryTask
              "--progress",
              "--delete",
              "#{repositories_dir}/#{distribution}/",
-             "#{rsync_base_path}/#{distribution}")
+             "#{repository_rsync_base_path}/#{distribution}")
           keyring_glob = "#{repositories_dir}/#{distribution}"
           keyring_glob << "/pool/*/*/*/*-archive-keyring"
           keyring_glob << "/*-archive-keyring_#{repository_version}-*_all*.deb"
@@ -309,7 +309,7 @@ class RepositoryTask
             keyring_deb = "#{path_components[-2]}-latest-#{code_name}.deb"
             sh("scp",
                path,
-               "#{rsync_base_path}/#{distribution}/#{keyring_deb}")
+               "#{repository_rsync_base_path}/#{distribution}/#{keyring_deb}")
           end
         end
       end
