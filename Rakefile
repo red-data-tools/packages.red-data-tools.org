@@ -7,10 +7,6 @@ class RedDataToolsRepositoryTask < RepositoryTask
   include Helper::Repository
 
   private
-  def rsync_base_path
-    repository_rsync_base_path
-  end
-
   def repository_gpg_key_id
     repository_gpg_key_ids.first
   end

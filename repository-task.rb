@@ -90,7 +90,6 @@ class RepositoryTask
     yum_dir = "yum"
     namespace :yum do
       distribution = "centos"
-      rsync_path = rsync_base_path
 
       desc "Sign packages"
       task :sign do
@@ -154,7 +153,7 @@ class RepositoryTask
            "-avz",
            "--progress",
            "--delete",
-           "#{rsync_path}/#{distribution}/",
+           "#{repository_rsync_base_path}/#{distribution}/",
            "#{repositories_dir}/#{distribution}")
       end
 
@@ -165,7 +164,7 @@ class RepositoryTask
            "--progress",
            "--delete",
            "#{repositories_dir}/#{distribution}/",
-           "#{rsync_path}/#{distribution}")
+           "#{repository_rsync_base_path}/#{distribution}")
       end
     end
 
@@ -210,7 +209,7 @@ class RepositoryTask
              "-avz",
              "--progress",
              "--delete",
-             "#{rsync_base_path}/#{distribution}/",
+             "#{repository_rsync_base_path}/#{distribution}/",
              "#{repositories_dir}/#{distribution}")
         end
       end
