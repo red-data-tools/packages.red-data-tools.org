@@ -69,23 +69,6 @@ class RepositoryTask
     end
   end
 
-  def detect_unsigned_rpms(directory)
-    unsigned_rpms = []
-    mutex = Thread::Mutex.new
-    thread_pool = ThreadPool.new do |rpm|
-      unless signed_rpm?(rpm)
-        mutex.synchronize do
-          unsigned_rpms << rpm
-        end
-      end
-    end
-    Dir.glob("#{directory}/**/*.rpm") do |rpm|
-      thread_pool << rpm
-    end
-    thread_pool.join
-    unsigned_rpms
-  end
-
   def define_yum_task
     yum_dir = "yum"
     namespace :yum do
