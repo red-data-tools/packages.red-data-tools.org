@@ -60,5 +60,8 @@ cp README.md LICENSE.md ${RPM_BUILD_ROOT}%{_pkgdocdir}/
 %{_includedir}/*
 
 %changelog
+* Sat Mar 14 2020 Sutou Kouhei <kou@clear-code.com> - 0.48.0-1
+- New upstream release.
+
 * Thu Nov 28 2019 Sutou Kouhei <kou@clear-code.com> - 0.44.1-1
 - New upstream release.
