@@ -1,4 +1,4 @@
-FROM ubuntu:19.04
+FROM ubuntu:focal
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \
