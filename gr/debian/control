@@ -28,7 +28,7 @@ Build-Depends:
   libxinerama-dev,
   libxt-dev,
   libzmq3-dev,
-  python,
+#  python,
   qt5-default,
   texlive-latex-base,
   zlib1g-dev

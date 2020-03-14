@@ -22,6 +22,7 @@ class GRPackageTask < PackagesRedDataToolsOrgPackageTask
       "debian-buster",
       "ubuntu-bionic",
       "ubuntu-eoan",
+      "ubuntu-focal",
     ]
   end
 
