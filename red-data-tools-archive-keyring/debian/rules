@@ -18,10 +18,15 @@ override_dh_auto_build:
 	( \
 	  distribution=$$(lsb_release --id --short | tr 'A-Z' 'a-z'); \
 	  code_name=$$(lsb_release --codename --short); \
+	  if [ $${code_name} == "debian" ]; then \
+	    component=main; \
+	  else \
+	    component=universe; \
+	  fi; \
 	  echo "Types: deb deb-src"; \
 	  echo "URIs: https://packages.red-data-tools.org/$${distribution}/"; \
 	  echo "Suites: $${code_name}"; \
-	  echo "Components: main"; \
+	  echo "Components: $${component}"; \
 	  echo "Signed-By: /usr/share/keyrings/red-data-tools-archive-keyring.gpg"; \
 	) > red-data-tools.sources
 
