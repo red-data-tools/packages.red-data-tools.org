@@ -1,4 +1,4 @@
-FROM ubuntu:disco
+FROM ubuntu:focal
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \

@@ -37,8 +37,8 @@ class RedDataToolsArchiveKeyringPackageTask < PackagesRedDataToolsOrgPackageTask
     [
       "debian-buster",
       "ubuntu-bionic",
-      "ubuntu-disco",
       "ubuntu-eoan",
+      "ubuntu-focal",
     ]
   end
 
