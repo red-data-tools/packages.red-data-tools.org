@@ -123,7 +123,7 @@ class RepositoryTask
           next unless File.directory?(version_dir)
           Dir.glob("#{version_dir}/*") do |arch_dir|
             next unless File.directory?(arch_dir)
-            sh("createrepo",
+            sh("createrepo_c",
                "--update",
                arch_dir)
           end
