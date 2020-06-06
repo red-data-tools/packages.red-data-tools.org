@@ -1,7 +1,5 @@
 # -*- sh-shell: rpm -*-
 
-%global debug_package %{nil}
-
 Name: @PACKAGE@
 Version: @VERSION@
 Release: 1
@@ -12,16 +10,20 @@ Source: %{name}-%{version}.tar.gz
 Group: Development/Libraries
 
 BuildRequires: cairo-devel
+BuildRequires: cmake
 BuildRequires: fontconfig-devel
 BuildRequires: freetype-devel
 BuildRequires: gcc
 BuildRequires: gcc-c++
+BuildRequires: libXft-devel
 BuildRequires: libXt-devel
 BuildRequires: libgs-devel
+BuildRequires: libjpeg-devel
 BuildRequires: libtiff-devel
 BuildRequires: make
 BuildRequires: mesa-libGL-devel
 BuildRequires: ncurses
+BuildRequires: qhull-devel
 BuildRequires: qt5-devel
 BuildRequires: rpm-build
 BuildRequires: texlive-dvipng
@@ -36,30 +38,41 @@ publication quality 2D graphs to the representation of complex 3D
 scenes.
 
 %prep
-%setup -c
+%autosetup
 
 %build
-cd %{name}-%{version}
-make GRDIR=/usr
+%cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_SKIP_RPATH=ON
+%make_build
 
 %install
-cd %{name}-%{version}
-make install GRDIR=/usr DESTDIR=${RPM_BUILD_ROOT}
-mkdir -p ${RPM_BUILD_ROOT}%{_pkgdocdir}
-cp README.md LICENSE.md ${RPM_BUILD_ROOT}%{_pkgdocdir}/
-
-%clean
-%{__rm} -rf %{buildroot}
+%make_install
+%ldconfig_scriptlets
 
 %files
-%defattr(-, root, root, -)
-%doc README.md LICENSE.md
+%license LICENSE.md
+%doc README.md
 %{_bindir}/*
 %{_exec_prefix}/fonts/*
-%{_exec_prefix}/lib/*
+%{_libdir}/*.so
+
+%package devel
+Summary:	Libraries and header files for %{name}
+Requires:	%{name} = %{version}-%{release}
+
+%description devel
+Libraries and header files for %{name}
+
+%files devel
 %{_includedir}/*
+%{_libdir}/*.a
+%{_libdir}/cmake/*
 
 %changelog
+* Fri Jun 05 2020 Sutou Kouhei <kou@clear-code.com> - 0.50.0-1
+- New upstream release.
+
 * Fri May 01 2020 Sutou Kouhei <kou@clear-code.com> - 0.49.0-1
 - New upstream release.
 

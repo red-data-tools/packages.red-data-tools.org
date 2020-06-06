@@ -3,12 +3,14 @@ Section: devel
 Priority: optional
 Maintainer: Sutou Kouhei <kou@clear-code.com>
 Build-Depends:
+  cmake,
   debhelper (>= 11),
   devscripts,
   dvipng,
   libavcodec-dev,
   libavformat-dev,
   libavutil-dev,
+  libbz2-dev,
   libcairo2-dev,
   libfreetype6-dev,
   libgl-dev,
@@ -17,6 +19,7 @@ Build-Depends:
   libjpeg-dev,
   libogg-dev,
   libpng-dev,
+  libqhull-dev,
   libswscale-dev,
   libtheora-dev,
   libtiff-dev,
@@ -110,3 +113,28 @@ Depends:
 Description: GR framework is a graphics library for visualisation applications
  .
  This package provides header files for GR3.
+
+Package: libgrm
+Section: libs
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends:
+  ${misc:Depends},
+  ${shlibs:Depends},
+  libgr3 (= ${binary:Version})
+Description: GR framework is a graphics library for visualisation applications
+ .
+ This package provides library files for GRM.
+
+Package: libgrm-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends:
+  ${misc:Depends},
+  libgrm (= ${binary:Version}),
+  libgr3-dev (= ${binary:Version})
+Description: GR framework is a graphics library for visualisation applications
+ .
+ This package provides header files for GRM.

@@ -1,2 +1,2 @@
 usr/include/gks.h
-usr/lib/libGKS.a
+usr/lib/*/libGKS.a

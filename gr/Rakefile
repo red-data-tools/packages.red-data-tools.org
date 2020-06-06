@@ -13,7 +13,15 @@ class GRPackageTask < PackagesRedDataToolsOrgPackageTask
   def define_archive_task
     file @archive_name do
       base_url = "https://github.com/sciapp/gr/archive"
-      download("#{base_url}/v#{@version}.tar.gz", @archive_name)
+      original_archive_name = "v#{@version}.tar.gz"
+      download("#{base_url}/#{original_archive_name}", original_archive_name)
+      sh("tar", "xf", original_archive_name)
+      version_txt_path = File.join(@archive_base_name, "version.txt")
+      File.open(version_txt_path, "w") do |version_txt|
+        version_txt.puts(@version)
+      end
+      sh("tar", "czf", @archive_name, @archive_base_name)
+      rm_rf(@archive_base_name)
     end
   end
 

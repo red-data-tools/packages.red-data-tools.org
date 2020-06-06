@@ -9,13 +9,21 @@ export DH_OPTIONS
 %:
 	dh $@ --no-parallel
 
+override_dh_auto_clean:
+	dh_auto_clean --buildsystem=cmake
+
 override_dh_auto_configure:
+	dh_auto_configure \
+	  --buildsystem=cmake \
+	  -- \
+	  -DCMAKE_BUILD_TYPE=Release \
+	  -DCMAKE_SKIP_RPATH=ON
 
 override_dh_auto_build:
-	dh_auto_build -- GRDIR=/usr
+	dh_auto_build --buildsystem=cmake
 
 override_dh_auto_install:
-	dh_auto_install -- GRDIR=/usr
+	dh_auto_install --buildsystem=cmake
 
 # Disable test.
 override_dh_auto_test:

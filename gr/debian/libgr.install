@@ -1,2 +1,2 @@
-usr/lib/libGR.so
-usr/lib/libqt5gr.so
+usr/lib/*/libGR.so
+usr/lib/*/libqt5gr.so
