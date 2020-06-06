@@ -14,7 +14,8 @@ There are packages for the following platforms:
 
   * Debian GNU/Linux buster
   * Ubuntu 18.04 LTS
-  * Ubuntu 19.04
+  * Ubuntu 19.10
+  * Ubuntu 20.04 LTS
   * CentOS 8
 
 ## Package repository
@@ -28,16 +29,16 @@ Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
 ```console
-% sudo apt install -y -V lsb-release wget
-% wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
-% sudo apt install -y -V ./red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
-% sudo apt update
+$ sudo apt install -y -V ca-certificates lsb-release wget
+$ wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
+$ sudo apt install -y -V ./red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
+$ sudo apt update
 ```
 
 ### CentOS
 
 ```console
-% (. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
+$ (. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
 ```
 
 ## OpenCV GLib
@@ -48,7 +49,7 @@ This section describes how to install
 ### Debian GNU/Linux and Ubuntu
 
 ```console
-% sudo apt install -y -V libopencv-glib-dev
+$ sudo apt install -y -V libopencv-glib-dev
 ```
 
 ## GR framework
@@ -59,13 +60,13 @@ This section describes how to install
 ### Debian GNU/Linux and Ubuntu
 
 ```console
-% sudo apt install -y -V libgr3-dev
+$ sudo apt install -y -V libgrm-dev
 ```
 
 ### CentOS
 
 ```console
-% sudo dnf install -y gr
+$ sudo dnf install -y gr-devel
 ```
 
 ## For packages.red-data-tools.org administrator
@@ -73,8 +74,8 @@ This section describes how to install
 ### How to deploy
 
 ```console
-% sudo apt install -V ansible
-% rake deploy
+$ sudo apt install -V ansible
+$ rake deploy
 ```
 
 ## For package creators
@@ -84,8 +85,8 @@ This section describes how to install
 Here are command lines to build .deb files and update APT repository:
 
 ```console
-% git submodule update --init
-% rake apt
+$ git submodule update --init
+$ rake apt
 ```
 
 ### CentOS
@@ -93,14 +94,14 @@ Here are command lines to build .deb files and update APT repository:
 Here are command lines to build .rpm files and update Yum repository:
 
 ```console
-% git submodule update --init
-% rake yum
+$ git submodule update --init
+$ rake yum
 ```
 
 ## License
 
 Apache-2.0
 
-Copyright 2017-2019 Kouhei Sutou \<kou@clear-code.com\>
+Copyright 2017-2020 Kouhei Sutou \<kou@clear-code.com\>
 
 See LICENSE and NOTICE for details.
