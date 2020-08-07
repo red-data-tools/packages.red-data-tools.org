@@ -8,7 +8,7 @@ Standards-Version: 3.9.7
 Homepage: https://red-data-tools.github.io/
 
 Package: red-data-tools-archive-keyring
-Section: misc
+Section: oldlibs
 Architecture: all
 Depends:
   ${misc:Depends},
