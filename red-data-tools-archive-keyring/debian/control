@@ -9,6 +9,7 @@ Homepage: https://red-data-tools.github.io/
 
 Package: red-data-tools-archive-keyring
 Section: oldlibs
+Priority: optional
 Architecture: all
 Depends:
   ${misc:Depends},
