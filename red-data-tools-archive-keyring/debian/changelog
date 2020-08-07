@@ -1,3 +1,9 @@
+red-data-tools-archive-keyring (2020.8.7-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Sutou Kouhei <kou@clear-code.com>  Sat, 06 Jun 2020 05:58:02 -0000
+
 red-data-tools-archive-keyring (2020.6.6-1) unstable; urgency=low
 
   * New upstream release.
