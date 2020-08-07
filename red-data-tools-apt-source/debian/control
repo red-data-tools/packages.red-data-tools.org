@@ -12,8 +12,8 @@ Homepage: https://red-data-tools.github.io/
 Package: red-data-tools-apt-source
 Section: misc
 Architecture: all
-Replaces: red-data-tools-archive-keyring (<< 2020.8.7-1~)
-Breaks: red-data-tools-archive-keyring (<< 2020.8.7-1~)
+Replaces: red-data-tools-archive-keyring (<< 2020.8.7-1)
+Breaks: red-data-tools-archive-keyring (<< 2020.8.7-1)
 Depends:
   ${misc:Depends},
   apt-transport-https,
