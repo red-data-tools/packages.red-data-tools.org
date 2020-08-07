@@ -14,7 +14,6 @@ There are packages for the following platforms:
 
   * Debian GNU/Linux buster
   * Ubuntu 18.04 LTS
-  * Ubuntu 19.10
   * Ubuntu 20.04 LTS
   * CentOS 8
 
@@ -30,8 +29,8 @@ packages.red-data-tools.org:
 
 ```console
 $ sudo apt install -y -V ca-certificates lsb-release wget
-$ wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
-$ sudo apt install -y -V ./red-data-tools-archive-keyring-latest-$(lsb_release --codename --short).deb
+$ wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
+$ sudo apt install -y -V ./red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
 $ sudo apt update
 ```
 
