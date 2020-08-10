@@ -1,2 +1,3 @@
 usr/include/gks.h
 usr/lib/*/libGKS.a
+usr/lib/*/pkgconfig/gks.pc

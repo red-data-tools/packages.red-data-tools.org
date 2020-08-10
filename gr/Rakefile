@@ -5,8 +5,8 @@ require_relative "../packages-red-data-tools-org-package-task"
 class GRPackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
     super("gr",
-          "0.50.0",
-          Time.parse("2020-06-05"))
+          "0.51.2",
+          Time.parse("2020-07-28"))
   end
 
   private
@@ -29,7 +29,6 @@ class GRPackageTask < PackagesRedDataToolsOrgPackageTask
     [
       "debian-buster",
       "ubuntu-bionic",
-      "ubuntu-eoan",
       "ubuntu-focal",
     ]
   end

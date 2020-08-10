@@ -48,6 +48,8 @@ scenes.
 
 %install
 %make_install
+# Installed by %license manually
+rm ${RPM_BUILD_ROOT}%{_docdir}/GR/LICENSE.md
 %ldconfig_scriptlets
 
 %files
@@ -68,8 +70,12 @@ Libraries and header files for %{name}
 %{_includedir}/*
 %{_libdir}/*.a
 %{_libdir}/cmake/*
+%{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jul 28 2020 Sutou Kouhei <kou@clear-code.com> - 0.51.2-1
+- New upstream release.
+
 * Fri Jun 05 2020 Sutou Kouhei <kou@clear-code.com> - 0.50.0-1
 - New upstream release.
 
