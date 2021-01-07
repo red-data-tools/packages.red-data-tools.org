@@ -145,9 +145,12 @@
       when: not mail_certificate.stat.exists
     - name: "Put Let's Encrypt update script"
       copy:
-        src: etc/cron.daily/letsencrypt
-        dest: /etc/cron.daily/letsencrypt
-        mode: 0700
+        src: etc/letsencrypt/renewal-hooks/{{ item }}
+        dest: /etc/letsencrypt/renewal-hooks/{{ item }}
+        mode: 0755
+      with_items:
+        - pre/stop-apache2
+        - post/start-apache2
 
     # Postfix
     - name: Install Postfix
