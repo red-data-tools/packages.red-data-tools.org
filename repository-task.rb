@@ -69,11 +69,20 @@ class RepositoryTask
     end
   end
 
+  def yum_targets
+    [
+      ["centos", "7"],
+      ["centos", "8"],
+    ]
+  end
+
+  def yum_distributions
+    yum_targets.collect(&:first).uniq
+  end
+
   def define_yum_task
     yum_dir = "yum"
     namespace :yum do
-      distribution = "centos"
-
       desc "Sign packages"
       task :sign do
         unless system("rpm",
@@ -97,9 +106,11 @@ class RepositoryTask
                *rpm)
           end
         end
-        repository_directory = "#{repositories_dir}/#{distribution}"
-        Dir.glob("#{repository_directory}/**/*.rpm") do |rpm|
-          thread_pool << rpm
+        yum_targets.each do |distribution, version|
+          repository_directory = "#{repositories_dir}/#{distribution}/#{version}"
+          Dir.glob("#{repository_directory}/**/*.rpm") do |rpm|
+            thread_pool << rpm
+          end
         end
         thread_pool.join
       end
@@ -118,7 +129,8 @@ class RepositoryTask
 
       desc "Update repositories"
       task :update do
-        Dir.glob("#{repositories_dir}/#{distribution}/*") do |version_dir|
+        yum_targets.each do |distribution, version|
+          version_dir = "#{repositories_dir}/#{distribution}/#{version}"
           next if File.symlink?(version_dir)
           next unless File.directory?(version_dir)
           Dir.glob("#{version_dir}/*") do |arch_dir|
@@ -132,22 +144,26 @@ class RepositoryTask
 
       desc "Download repositories"
       task :download => repositories_dir do
-        sh("rsync",
-           "-avz",
-           "--progress",
-           "--delete",
-           "#{repository_rsync_base_path}/#{distribution}/",
-           "#{repositories_dir}/#{distribution}")
+        yum_distributions.each do |distribution|
+          sh("rsync",
+             "-avz",
+             "--progress",
+             "--delete",
+             "#{repository_rsync_base_path}/#{distribution}/",
+             "#{repositories_dir}/#{distribution}")
+        end
       end
 
       desc "Upload repositories"
       task :upload => repositories_dir do
-        sh("rsync",
-           "-avz",
-           "--progress",
-           "--delete",
-           "#{repositories_dir}/#{distribution}/",
-           "#{repository_rsync_base_path}/#{distribution}")
+        yum_distributions.each do |distribution|
+          sh("rsync",
+             "-avz",
+             "--progress",
+             "--delete",
+             "#{repositories_dir}/#{distribution}/",
+             "#{repository_rsync_base_path}/#{distribution}")
+        end
       end
     end
 
