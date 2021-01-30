@@ -5,7 +5,7 @@ ARG DEBUG
 RUN \
   quiet=$([ "${DEBUG}" = "yes" ] || echo "--quiet") && \
   dnf install -y ${quiet} epel-release && \
-  dnf install -y --enablerepo=PowerTools ${quiet} \
+  dnf install -y --enablerepo=powertools ${quiet} \
     cairo-devel \
     cmake \
     fontconfig-devel \
