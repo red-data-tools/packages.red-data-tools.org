@@ -5,8 +5,8 @@ require_relative "../packages-red-data-tools-org-package-task"
 class GRPackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
     super("gr",
-          "0.54.0",
-          Time.parse("2021-01-27"))
+          "0.56.1",
+          Time.parse("2021-03-19"))
   end
 
   private
