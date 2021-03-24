@@ -38,6 +38,7 @@ class RedDataToolsAptSourcePackageTask < PackagesRedDataToolsOrgPackageTask
       "debian-buster",
       "ubuntu-bionic",
       "ubuntu-focal",
+      "ubuntu-groovy",
     ]
   end
 
