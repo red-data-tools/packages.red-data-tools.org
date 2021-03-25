@@ -194,8 +194,9 @@ class RepositoryTask
 
   def apt_architectures
     [
-      "i386",
       "amd64",
+      "arm64",
+      "i386",
     ]
   end
 
