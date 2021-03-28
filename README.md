@@ -67,7 +67,7 @@ $ sudo apt install ansible
 $ rake deploy
 ```
 
-### Debian GNU/Linux and Ubuntu
+### How to create packages
 
 Here are command lines to build .deb files and update APT repository:
 
@@ -75,8 +75,6 @@ Here are command lines to build .deb files and update APT repository:
 $ git submodule update --init
 $ rake apt
 ```
-
-### CentOS
 
 Here are command lines to build .rpm files and update Yum repository:
 
