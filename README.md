@@ -1,7 +1,10 @@
 # README
 
-https://packages.red-data-tools.org/ provides packages for Red Data
-Tools related projects including Apache Arrow and Apache Parquet.
+https://packages.red-data-tools.org/
+
+Package repository for Red Data Tools related projects including
+[Apache Arrow](https://github.com/apache/arrow) and
+[Apache Parquet](https://github.com/apache/parquet-format).
 
 ## Supported packages
 
