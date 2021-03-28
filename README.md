@@ -5,8 +5,8 @@ Tools related projects including Apache Arrow and Apache Parquet.
 
 ## Supported packages
 
-  * OpenCV GLib (C API)
-  * GR framework
+  * [OpenCV GLib (C API)](https://github.com/red-data-tools/opencv-glib)
+  * [GR framework](https://github.com/sciapp/gr)
 
 ## Supported platforms
 
