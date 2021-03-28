@@ -17,7 +17,7 @@ There are packages for the following platforms:
   * Ubuntu 20.04 LTS
   * CentOS 8
 
-## Package repository
+## How to add the package repository
 
 https://packages.red-data-tools.org/ provides packages. You need to
 enable the package repository before you install packages.
@@ -40,35 +40,25 @@ $ sudo apt update
 $ (. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
 ```
 
-## OpenCV GLib
+## How to install packages
 
-This section describes how to install
-[OpenCV GLib](https://github.com/red-data-tools/opencv-glib) package.
-
-### Debian GNU/Linux and Ubuntu
+### OpenCV GLib
 
 ```console
 $ sudo apt install -y -V libopencv-glib-dev
 ```
 
-## GR framework
-
-This section describes how to install
-[GR framework](https://gr-framework.org/) package.
-
-### Debian GNU/Linux and Ubuntu
+### GR framework
 
 ```console
 $ sudo apt install -y -V libgrm-dev
 ```
 
-### CentOS
-
 ```console
 $ sudo dnf install -y gr-devel
 ```
 
-## For packages.red-data-tools.org administrator
+## Development
 
 ### How to deploy
 
@@ -76,8 +66,6 @@ $ sudo dnf install -y gr-devel
 $ sudo apt install -V ansible
 $ rake deploy
 ```
-
-## For package creators
 
 ### Debian GNU/Linux and Ubuntu
 
