@@ -31,9 +31,9 @@ Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
 ```console
-$ sudo apt install ca-certificates lsb-release wget
+$ sudo apt install -y -V  ca-certificates lsb-release wget
 $ wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
-$ sudo apt install ./red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
+$ sudo apt install -y -V  ./red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
 $ sudo apt update
 ```
 
