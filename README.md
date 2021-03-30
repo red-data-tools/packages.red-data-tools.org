@@ -1,12 +1,15 @@
 # README
 
-https://packages.red-data-tools.org/ provides packages for Red Data
-Tools related projects including Apache Arrow and Apache Parquet.
+https://packages.red-data-tools.org/
+
+Package repository for Red Data Tools related projects including
+[Apache Arrow](https://github.com/apache/arrow) and
+[Apache Parquet](https://github.com/apache/parquet-format).
 
 ## Supported packages
 
-  * OpenCV GLib (C API)
-  * GR framework
+  * [OpenCV GLib (C API)](https://github.com/red-data-tools/opencv-glib)
+  * [GR framework](https://github.com/sciapp/gr)
 
 ## Supported platforms
 
@@ -17,7 +20,7 @@ There are packages for the following platforms:
   * Ubuntu 20.04 LTS
   * CentOS 8
 
-## Package repository
+## How to add the package repository
 
 https://packages.red-data-tools.org/ provides packages. You need to
 enable the package repository before you install packages.
@@ -40,46 +43,34 @@ $ sudo apt update
 $ (. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
 ```
 
-## OpenCV GLib
+## How to install packages
 
-This section describes how to install
-[OpenCV GLib](https://github.com/red-data-tools/opencv-glib) package.
-
-### Debian GNU/Linux and Ubuntu
+### OpenCV GLib
 
 ```console
-$ sudo apt install -y -V libopencv-glib-dev
+$ sudo apt install libopencv-glib-dev
 ```
 
-## GR framework
-
-This section describes how to install
-[GR framework](https://gr-framework.org/) package.
-
-### Debian GNU/Linux and Ubuntu
+### GR framework
 
 ```console
-$ sudo apt install -y -V libgrm-dev
+$ sudo apt install libgrm-dev
 ```
-
-### CentOS
 
 ```console
-$ sudo dnf install -y gr-devel
+$ sudo dnf install gr-devel
 ```
 
-## For packages.red-data-tools.org administrator
+## Development
 
 ### How to deploy
 
 ```console
-$ sudo apt install -V ansible
+$ sudo apt install ansible
 $ rake deploy
 ```
 
-## For package creators
-
-### Debian GNU/Linux and Ubuntu
+### How to create packages
 
 Here are command lines to build .deb files and update APT repository:
 
@@ -87,8 +78,6 @@ Here are command lines to build .deb files and update APT repository:
 $ git submodule update --init
 $ rake apt
 ```
-
-### CentOS
 
 Here are command lines to build .rpm files and update Yum repository:
 
