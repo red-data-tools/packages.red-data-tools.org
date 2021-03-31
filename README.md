@@ -30,60 +30,60 @@ enable the package repository before you install packages.
 Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
-```console
-$ sudo apt install -y -V ca-certificates lsb-release wget
-$ wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
-$ sudo apt install -y -V ./red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
-$ sudo apt update
+```bash
+sudo apt install -y -V ca-certificates lsb-release wget
+wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
+sudo apt install -y -V ./red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
+sudo apt update
 ```
 
 ### CentOS
 
-```console
-$ (. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
+```bash
+(. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
 ```
 
 ## How to install packages
 
 ### OpenCV GLib
 
-```console
-$ sudo apt install libopencv-glib-dev
+```bash
+sudo apt install libopencv-glib-dev
 ```
 
 ### GR framework
 
-```console
-$ sudo apt install libgrm-dev
+```bash
+sudo apt install libgrm-dev
 ```
 
-```console
-$ sudo dnf install gr-devel
+```bash
+sudo dnf install gr-devel
 ```
 
 ## Development
 
 ### How to deploy
 
-```console
-$ sudo apt install ansible
-$ rake deploy
+```bash
+sudo apt install ansible
+rake deploy
 ```
 
 ### How to create packages
 
 Here are command lines to build .deb files and update APT repository:
 
-```console
-$ git submodule update --init
-$ rake apt
+```bash
+git submodule update --init
+rake apt
 ```
 
 Here are command lines to build .rpm files and update Yum repository:
 
-```console
-$ git submodule update --init
-$ rake yum
+```bash
+git submodule update --init
+rake yum
 ```
 
 ## License
