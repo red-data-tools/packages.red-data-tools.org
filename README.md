@@ -30,7 +30,7 @@ enable the package repository before you install packages.
 Run the following command lines to add apt-lines for APT repository on
 packages.red-data-tools.org:
 
-```console
+```bash
 sudo apt install -y -V ca-certificates lsb-release wget
 wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
 sudo apt install -y -V ./red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
@@ -39,7 +39,7 @@ sudo apt update
 
 ### CentOS
 
-```console
+```bash
 (. /etc/os-release && sudo dnf install -y https://packages.red-data-tools.org/centos/${VERSION_ID}/red-data-tools-release-latest.noarch.rpm)
 ```
 
@@ -47,17 +47,17 @@ sudo apt update
 
 ### OpenCV GLib
 
-```console
+```bash
 sudo apt install libopencv-glib-dev
 ```
 
 ### GR framework
 
-```console
+```bash
 sudo apt install libgrm-dev
 ```
 
-```console
+```bash
 sudo dnf install gr-devel
 ```
 
@@ -65,7 +65,7 @@ sudo dnf install gr-devel
 
 ### How to deploy
 
-```console
+```bash
 sudo apt install ansible
 rake deploy
 ```
@@ -74,14 +74,14 @@ rake deploy
 
 Here are command lines to build .deb files and update APT repository:
 
-```console
+```bash
 git submodule update --init
 rake apt
 ```
 
 Here are command lines to build .rpm files and update Yum repository:
 
-```console
+```bash
 git submodule update --init
 rake yum
 ```
