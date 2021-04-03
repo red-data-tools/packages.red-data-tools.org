@@ -75,14 +75,14 @@ rake deploy
 Here are command lines to build .deb files and update APT repository:
 
 ```bash
-git submodule update --init
+git submodule update --init --recursive
 rake apt
 ```
 
 Here are command lines to build .rpm files and update Yum repository:
 
 ```bash
-git submodule update --init
+git submodule update --init --recursive
 rake yum
 ```
 
