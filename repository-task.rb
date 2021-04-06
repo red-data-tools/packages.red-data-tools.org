@@ -181,6 +181,7 @@ class RepositoryTask
   def apt_targets
     [
       ["debian", "buster", "main"],
+      ["debian", "bullseye", "main"],
       ["ubuntu", "xenial", "universe"],
       ["ubuntu", "bionic", "universe"],
       ["ubuntu", "focal", "universe"],
