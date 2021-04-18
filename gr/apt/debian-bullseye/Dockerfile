@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM debian:bullseye
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \
@@ -42,5 +42,4 @@ RUN \
     qtbase5-dev \
     texlive-latex-base \
     zlib1g-dev && \
-  apt clean && \
-  rm -rf /var/lib/apt/lists/*
+  apt clean

@@ -39,7 +39,7 @@ RUN \
     libxt-dev \
     libzmq3-dev \
     python3 \
-    qt5-default \
+    qtbase5-dev \
     texlive-latex-base \
     zlib1g-dev && \
   apt clean && \
