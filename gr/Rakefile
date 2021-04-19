@@ -5,8 +5,8 @@ require_relative "../packages-red-data-tools-org-package-task"
 class GRPackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
     super("gr",
-          "0.57.1",
-          Time.parse("2021-04-05"))
+          "0.57.2",
+          Time.parse("2021-04-19"))
   end
 
   private
@@ -28,6 +28,7 @@ class GRPackageTask < PackagesRedDataToolsOrgPackageTask
   def apt_targets_default
     [
       "debian-buster",
+      "debian-bullseye",
       "ubuntu-bionic",
       "ubuntu-focal",
       "ubuntu-groovy",

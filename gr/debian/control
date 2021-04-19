@@ -32,7 +32,7 @@ Build-Depends:
   libxt-dev,
   libzmq3-dev,
 #  python,
-  qt5-default,
+  qtbase5-dev,
   texlive-latex-base,
   zlib1g-dev
 Standards-Version: 4.1.4
