@@ -32,7 +32,8 @@ packages.red-data-tools.org:
 
 ```bash
 sudo apt install -y -V ca-certificates lsb-release wget
-wget https://packages.red-data-tools.org/$(lsb_release --id --short | tr 'A-Z' 'a-z')/red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
+wget https://packages.red-data-tools.org/$(lsb_release --id --short \
+  | tr 'A-Z' 'a-z')/red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
 sudo apt install -y -V ./red-data-tools-apt-source-latest-$(lsb_release --codename --short).deb
 sudo apt update
 ```
