@@ -73,6 +73,9 @@ Libraries and header files for %{name}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Jul 24 2021 Sutou Kouhei <kou@clear-code.com> - 0.58.0-1
+- New upstream release.
+
 * Sun May 30 2021 Sutou Kouhei <kou@clear-code.com> - 0.57.3-1
 - New upstream release.
 

@@ -1,3 +1,9 @@
+gr (0.58.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Sutou Kouhei <kou@clear-code.com>  Sat, 24 Jul 2021 00:00:00 +0900
+
 gr (0.57.3-1) unstable; urgency=low
 
   * New upstream release.
