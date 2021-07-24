@@ -40,6 +40,7 @@ class RedDataToolsAptSourcePackageTask < PackagesRedDataToolsOrgPackageTask
       "ubuntu-bionic",
       "ubuntu-focal",
       "ubuntu-groovy",
+      "ubuntu-hirsute",
     ]
   end
 
