@@ -31,7 +31,6 @@ class GRPackageTask < PackagesRedDataToolsOrgPackageTask
       "debian-bullseye",
       "ubuntu-bionic",
       "ubuntu-focal",
-      "ubuntu-groovy",
       "ubuntu-hirsute",
     ]
   end
