@@ -186,6 +186,7 @@ class RepositoryTask
       ["ubuntu", "bionic", "universe"],
       ["ubuntu", "focal", "universe"],
       ["ubuntu", "groovy", "universe"],
+      ["ubuntu", "hirsute", "universe"],
     ]
   end
 
