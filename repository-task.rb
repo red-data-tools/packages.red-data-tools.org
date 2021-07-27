@@ -182,7 +182,6 @@ class RepositoryTask
     [
       ["debian", "buster", "main"],
       ["debian", "bullseye", "main"],
-      ["ubuntu", "xenial", "universe"],
       ["ubuntu", "bionic", "universe"],
       ["ubuntu", "focal", "universe"],
       ["ubuntu", "hirsute", "universe"],
