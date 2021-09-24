@@ -1,0 +1,57 @@
+# -*- sh-shell: rpm -*-
+
+Name: @PACKAGE@
+Version: @VERSION@
+Release: 1
+Summary: DuckDB is an in-process SQL OLAP database management system
+License: MIT
+URL: https://duckdb.org/
+Source: %{name}-%{version}.tar.gz
+
+BuildRequires: cmake
+BuildRequires: gcc-c++
+BuildRequires: make
+BuildRequires: python3
+BuildRequires: rpm-build
+
+%description
+DuckDB is an in-process SQL OLAP database management system.
+
+%prep
+%autosetup
+
+%build
+%cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DINSTALL_LIB_DIR=%{_libdir}
+%make_build
+
+%install
+%make_install
+mv ${RPM_BUILD_ROOT}/usr/lib/cmake ${RPM_BUILD_ROOT}%{_libdir}/
+%ldconfig_scriptlets
+
+%files
+%license LICENSE
+%doc README.md
+%{_bindir}/*
+
+%package devel
+Summary:	Libraries and header files for %{name}
+Requires:	%{name} = %{version}-%{release}
+
+%description devel
+Libraries and header files for %{name}
+
+%files devel
+%{_includedir}/*
+%{_libdir}/*.a
+%{_libdir}/*.so
+%{_libdir}/cmake/*
+
+%changelog
+* Mon Sep 06 2021 Sutou Kouhei <kou@clear-code.com> - 0.2.9-1
+- New upstream release.
+
+* Mon Aug 02 2021 Sutou Kouhei <kou@clear-code.com> - 0.2.8-1
+- New upstream release.

@@ -1,0 +1,45 @@
+Source: duckdb
+Section: database
+Priority: optional
+Maintainer: Sutou Kouhei <kou@clear-code.com>
+Build-Depends:
+  cmake,
+  debhelper (>= 11),
+  devscripts,
+  python3
+Standards-Version: 4.1.4
+Homepage: https://duckdb.org/
+
+Package: duckdb
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends:
+  ${misc:Depends},
+  ${shlibs:Depends}
+Description: DuckDB is an in-process SQL OLAP database management system
+ .
+ This package provides command line tools.
+
+Package: libduckdb
+Section: libs
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends:
+  ${misc:Depends},
+  ${shlibs:Depends}
+Description: DuckDB is an in-process SQL OLAP database management system
+ .
+ This package provides library files.
+
+Package: libduckdb-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends:
+  ${misc:Depends},
+  libduckdb (= ${binary:Version})
+Description: DuckDB is an in-process SQL OLAP database management system
+ .
+ This package provides header files.

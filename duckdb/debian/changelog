@@ -1,0 +1,11 @@
+duckdb (0.2.9-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Sutou Kouhei <kou@clear-code.com>  Mon, 06 Sep 2021 00:00:00 +0900
+
+duckdb (0.2.8-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Sutou Kouhei <kou@clear-code.com>  Mon, 02 Aug 2021 00:00:00 +0900
