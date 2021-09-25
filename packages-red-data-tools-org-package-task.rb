@@ -20,7 +20,7 @@ class PackagesRedDataToolsOrgPackageTask < PackageTask
     sh("rsync",
        "-av",
        "#{repositories_dir(target_namespace)}/",
-       "packages@packages.red-data-tools.org:public/")
+       "packages@packages.red-data-tools.org:public/incoming/")
   end
 
   def define_clean_tasks

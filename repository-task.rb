@@ -1,6 +1,8 @@
 require "tempfile"
 require "thread"
 
+require "apt-dists-merge"
+
 class RepositoryTask
   include Rake::DSL
 
@@ -202,34 +204,54 @@ class RepositoryTask
 
   def define_apt_task
     namespace :apt do
-      desc "Download repositories"
-      task :download => repositories_dir do
-        apt_distributions.each do |distribution|
-          sh("rsync",
-             "-avz",
-             "--progress",
-             "--delete",
-             "#{repository_rsync_base_path}/#{distribution}/",
-             "#{repositories_dir}/#{distribution}")
+      namespace :base do
+        desc "Download base dists"
+        task :download => repositories_dir do
+          apt_distributions.each do |distribution|
+            base_dists_dir = "#{repositories_dir}/base/#{distribution}/dists"
+            mkdir_p(base_dists_dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "#{repository_rsync_base_path}/#{distribution}/dists/",
+               base_dists_dir)
+          end
         end
       end
 
-      desc "Sign packages"
-      task :sign do
-        Dir.glob("#{repositories_dir}/**/*.{dsc,changes}") do |target|
-          begin
-            sh({"LANG" => "C"},
-               "gpg",
-               "--verify",
-               target,
-               out: IO::NULL,
-               err: IO::NULL,
-               verbose: false)
-          rescue
-            sh("debsign",
-               "--no-re-sign",
-               "-k#{repository_gpg_key_id}",
-               target)
+      namespace :incoming do
+        desc "Download incoming packages"
+        task :download => repositories_dir do
+          apt_distributions.each do |distribution|
+            incoming_dir = "#{repositories_dir}/incoming/#{distribution}"
+            mkdir_p(incoming_dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "#{repository_rsync_base_path}/incoming/#{distribution}/",
+               incoming_dir)
+          end
+        end
+
+        desc "Sign packages"
+        task :sign do
+          Dir.glob("#{repositories_dir}/incoming/**/*.{dsc,changes}") do |target|
+            begin
+              sh({"LANG" => "C"},
+                 "gpg",
+                 "--verify",
+                 target,
+                 out: IO::NULL,
+                 err: IO::NULL,
+                 verbose: false)
+            rescue
+              sh("debsign",
+                 "--no-re-sign",
+                 "-k#{repository_gpg_key_id}",
+                 target)
+            end
           end
         end
       end
@@ -238,7 +260,7 @@ class RepositoryTask
         desc "Update repositories"
         task :update do
           apt_targets.each do |distribution, code_name, component|
-            base_dir = "#{repositories_dir}/#{distribution}"
+            base_dir = "#{repositories_dir}/incoming/#{distribution}"
             pool_dir = "#{base_dir}/pool/#{code_name}"
             next unless File.exist?(pool_dir)
             dists_dir = "#{base_dir}/dists/#{code_name}"
@@ -270,11 +292,20 @@ class RepositoryTask
                "release",
                dists_dir,
                :out => release_file.path)
-            release_path = "#{dists_dir}/Release"
+            mv(release_file.path, "#{dists_dir}/Release")
+
+            base_dists_dir =
+              "#{repositories_dir}/base/#{distribution}/dists/#{code_name}"
+            merged_dists_dir =
+              "#{repositories_dir}/merged/#{distribution}/dists/#{code_name}"
+            merger = APTDistsMerge::Merger.new(base_dists_dir,
+                                               dists_dir,
+                                               merged_dists_dir)
+            merger.merge
+
+            in_release_path = "#{merged_dists_dir}/InRelease"
+            release_path = "#{merged_dists_dir}/Release"
             signed_release_path = "#{release_path}.gpg"
-            in_release_path = "#{dists_dir}/InRelease"
-            mv(release_file.path, release_path)
-            chmod(0644, release_path)
             sh("gpg",
                "--sign",
                "--detach-sign",
@@ -297,19 +328,43 @@ class RepositoryTask
           sh("rsync",
              "-avz",
              "--progress",
+             "#{repositories_dir}/incoming/#{distribution}/pool/",
+             "#{repository_rsync_base_path}/#{distribution}/pool")
+          sh("rsync",
+             "-avz",
+             "--progress",
              "--delete",
-             "#{repositories_dir}/#{distribution}/",
-             "#{repository_rsync_base_path}/#{distribution}")
+             "#{repositories_dir}/merged/#{distribution}/dists/",
+             "#{repository_rsync_base_path}/#{distribution}/dists")
+        end
+      end
+
+      namespace :incoming do
+        desc "Remove incoming packages"
+        task :remove => [repositories_dir] do
+          apt_distributions.each do |distribution|
+            dir = "#{repositories_dir}/incoming/#{distribution}"
+            rm_rf(dir)
+            mkdir_p(dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "#{dir}/",
+               "#{repository_rsync_base_path}/incoming/#{distribution}/")
+          end
         end
       end
     end
 
     desc "Release APT repositories"
     apt_tasks = [
-      "apt:download",
-      "apt:sign",
+      "apt:base:download",
+      "apt:incoming:download",
+      "apt:incoming:sign",
       "apt:repository:update",
       "apt:upload",
+      "apt:incoming:remove",
     ]
     task :apt => apt_tasks
   end
