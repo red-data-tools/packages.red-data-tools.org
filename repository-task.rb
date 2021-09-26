@@ -117,6 +117,8 @@ class RepositoryTask
           ]
           yum_distributions.each do |distribution|
             command_line << "--include=#{distribution}/"
+            command_line << "--include=#{distribution}/*"
+            command_line << "--include=#{distribution}/**/*"
           end
           command_line << "--exclude=*"
           command_line << "#{repository_rsync_base_path}/incoming/"
@@ -297,6 +299,9 @@ class RepositoryTask
           ]
           apt_distributions.each do |distribution|
             command_line << "--include=#{distribution}/"
+            command_line << "--include=#{distribution}/pool/"
+            command_line << "--include=#{distribution}/pool/*"
+            command_line << "--include=#{distribution}/pool/**/*"
           end
           command_line << "--exclude=*"
           command_line << "#{repository_rsync_base_path}/incoming/"
@@ -459,17 +464,33 @@ class RepositoryTask
       desc "Upload repositories"
       task :upload => [repositories_dir] do
         apt_distributions.each do |distribution|
-          sh("rsync",
-             "-avz",
-             "--progress",
-             "#{repositories_dir}/incoming/#{distribution}/pool/",
-             "#{repository_rsync_base_path}/#{distribution}/pool")
-          sh("rsync",
-             "-avz",
-             "--progress",
-             "--delete",
-             "#{repositories_dir}/merged/#{distribution}/dists/",
-             "#{repository_rsync_base_path}/#{distribution}/dists")
+          pool_dir = "#{repositories_dir}/incoming/#{distribution}/pool/"
+          if File.exist?(pool_dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               pool_dir,
+               "#{repository_rsync_base_path}/#{distribution}/pool")
+          end
+          dists_dir = "#{repositories_dir}/merged/#{distribution}/dists/"
+          if File.exist?(dists_dir)
+            command_line = [
+              "rsync",
+              "-avz",
+              "--progress",
+              "--delete",
+            ]
+            Dir.glob("#{dists_dir}/*") do |dists_code_name_dir|
+              code_name = File.basename(dists_code_name_dir)
+              command_line << "--include=#{code_name}/"
+              command_line << "--include=#{code_name}/*"
+              command_line << "--include=#{code_name}/**/*"
+            end
+            command_line << "--exclude=*"
+            command_line << dists_dir
+            command_line << "#{repository_rsync_base_path}/#{distribution}/dists"
+            sh(*command_line)
+          end
         end
       end
 
