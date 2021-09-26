@@ -1,3 +1,4 @@
+require "pathname"
 require "tempfile"
 require "thread"
 
@@ -85,97 +86,159 @@ class RepositoryTask
   def define_yum_task
     yum_dir = "yum"
     namespace :yum do
-      desc "Sign packages"
-      task :sign do
-        unless system("rpm",
-                      "-q", rpm_gpg_key_package_name(repository_gpg_key_id),
-                      out: IO::NULL)
-          gpg_key = Tempfile.new(["repository", ".asc"])
-          sh("gpg",
-             "--armor",
-             "--export", repository_gpg_key_id,
-             out: gpg_key.path)
-          sh("rpm", "--import", gpg_key.path)
-          gpg_key.close!
-        end
-
-        thread_pool = ThreadPool.new(4) do |rpm|
-          unless signed_rpm?(rpm)
-            sh("rpm",
-               "-D", "_gpg_name #{repository_gpg_key_id}",
-               "-D", "__gpg_check_password_cmd /bin/true true",
-               "--resign",
-               *rpm)
+      namespace :base do
+        desc "Download base repodata"
+        task :download => repositories_dir do
+          yum_distributions.each do |distribution|
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "--include=*/",
+               "--include=*/*/",
+               "--include=*/*/repodata/",
+               "--include=*/*/repodata/*",
+               "--include=*/*/repodata/*/*",
+               "--exclude=*",
+               "#{repository_rsync_base_path}/#{distribution}/",
+               "#{repositories_dir}/base/#{distribution}")
           end
         end
-        yum_targets.each do |distribution, version|
-          repository_directory = "#{repositories_dir}/#{distribution}/#{version}"
-          Dir.glob("#{repository_directory}/**/*.rpm") do |rpm|
-            thread_pool << rpm
-          end
-        end
-        thread_pool.join
       end
 
-      desc "Create symbolic links for Amazon Linux"
-      task :amazon_linux do
-        cd("#{repositories_dir}/centos") do
-          Dir.glob("*") do |path|
-            next unless File.directory?(path)
-            next unless /\A\d+\z/ =~ path
-            next if File.symlink?("#{path}Server")
-            ln_s(path, "#{path}Server")
+      namespace :incoming do
+        desc "Download incoming packages"
+        task :download => repositories_dir do
+          yum_distributions.each do |distribution|
+            incoming_dir = "#{repositories_dir}/incoming/#{distribution}"
+            mkdir_p(incoming_dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "#{repository_rsync_base_path}/incoming/#{distribution}/",
+               incoming_dir)
           end
+        end
+
+        desc "Sign packages"
+        task :sign do
+          unless system("rpm",
+                        "-q", rpm_gpg_key_package_name(repository_gpg_key_id),
+                        out: IO::NULL)
+            gpg_key = Tempfile.new(["repository", ".asc"])
+            sh("gpg",
+               "--armor",
+               "--export", repository_gpg_key_id,
+               out: gpg_key.path)
+            sh("rpm", "--import", gpg_key.path)
+            gpg_key.close!
+          end
+
+          thread_pool = ThreadPool.new(4) do |rpm|
+            unless signed_rpm?(rpm)
+              sh("rpm",
+                 "-D", "_gpg_name #{repository_gpg_key_id}",
+                 "-D", "__gpg_check_password_cmd /bin/true true",
+                 "--resign",
+                 *rpm)
+            end
+          end
+          yum_targets.each do |distribution, version|
+            repository_directory =
+              "#{repositories_dir}/incoming/#{distribution}/#{version}"
+            Dir.glob("#{repository_directory}/**/*.rpm") do |rpm|
+              thread_pool << rpm
+            end
+          end
+          thread_pool.join
         end
       end
 
       desc "Update repositories"
       task :update do
         yum_targets.each do |distribution, version|
-          version_dir = "#{repositories_dir}/#{distribution}/#{version}"
-          next if File.symlink?(version_dir)
-          next unless File.directory?(version_dir)
-          Dir.glob("#{version_dir}/*") do |arch_dir|
-            next unless File.directory?(arch_dir)
+          base_version_dir =
+            File.expand_path("#{repositories_dir}/base/#{distribution}/#{version}")
+          incoming_version_dir =
+            "#{repositories_dir}/incoming/#{distribution}/#{version}"
+          next unless File.directory?(incoming_version_dir)
+          Dir.glob("#{incoming_version_dir}/*") do |incoming_arch_dir|
+            next unless File.directory?(incoming_arch_dir)
+            base_arch_dir =
+              "#{base_version_dir}/#{File.basename(incoming_arch_dir)}"
+            rm_rf("#{incoming_arch_dir}/repodata")
+            cp_r("#{base_arch_dir}/repodata", incoming_arch_dir)
+            packages = Tempfile.new("createrepo-c-packages")
+            Pathname.glob("#{incoming_arch_dir}/*/*.rpm") do |rpm|
+              relative_rpm = rpm.relative_path_from(incoming_arch_dir)
+              packages.puts(relative_rpm.to_s)
+            end
+            packages.close
             sh("createrepo_c",
+               "--recycle-pkglist",
+               "--skip-stat",
                "--update",
-               arch_dir)
+               "--pkglist", packages.path,
+               incoming_arch_dir)
           end
-        end
-      end
-
-      desc "Download repositories"
-      task :download => repositories_dir do
-        yum_distributions.each do |distribution|
-          sh("rsync",
-             "-avz",
-             "--progress",
-             "--delete",
-             "#{repository_rsync_base_path}/#{distribution}/",
-             "#{repositories_dir}/#{distribution}")
         end
       end
 
       desc "Upload repositories"
       task :upload => repositories_dir do
+        yum_targets.each do |distribution, version|
+          incoming_version_dir =
+            "#{repositories_dir}/incoming/#{distribution}/#{version}"
+          next unless File.directory?(incoming_version_dir)
+          Dir.glob("#{incoming_version_dir}/*") do |incoming_arch_dir|
+            next unless File.directory?(incoming_arch_dir)
+            arch = File.basename(incoming_arch_dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "#{incoming_arch_dir}/repodata",
+               "#{repository_rsync_base_path}/#{distribution}/#{version}/#{arch}")
+          end
+        end
+
         yum_distributions.each do |distribution|
           sh("rsync",
              "-avz",
              "--progress",
-             "--delete",
-             "#{repositories_dir}/#{distribution}/",
-             "#{repository_rsync_base_path}/#{distribution}")
+             "--exclude=*/*/repodata/",
+             "#{repositories_dir}/incoming/#{distribution}/",
+             "#{repository_rsync_base_path}/#{distribution}/")
+        end
+      end
+
+      namespace :incoming do
+        desc "Remove incoming packages"
+        task :remove => [repositories_dir] do
+          yum_distributions.each do |distribution|
+            dir = "#{repositories_dir}/incoming/#{distribution}"
+            rm_rf(dir)
+            mkdir_p(dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "#{dir}/",
+               "#{repository_rsync_base_path}/incoming/#{distribution}/")
+          end
         end
       end
     end
 
     desc "Release Yum packages"
     yum_tasks = [
-      "yum:download",
-      "yum:sign",
-      "yum:amazon_linux",
+      "yum:base:download",
+      "yum:incoming:download",
+      "yum:incoming:sign",
       "yum:update",
       "yum:upload",
+      "yum:incoming:remove",
     ]
     task :yum => yum_tasks
   end
