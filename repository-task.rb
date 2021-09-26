@@ -181,10 +181,10 @@ class RepositoryTask
             end
             packages.close
             sh("createrepo_c",
+               "--pkglist", packages.path,
                "--recycle-pkglist",
                "--skip-stat",
                "--update",
-               "--pkglist", packages.path,
                incoming_arch_dir)
           end
         end
