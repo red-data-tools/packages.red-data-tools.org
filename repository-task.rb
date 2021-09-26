@@ -109,16 +109,19 @@ class RepositoryTask
       namespace :incoming do
         desc "Download incoming packages"
         task :download => repositories_dir do
+          command_line = [
+            "rsync",
+            "-avz",
+            "--progress",
+            "--delete",
+          ]
           yum_distributions.each do |distribution|
-            incoming_dir = "#{repositories_dir}/incoming/#{distribution}"
-            mkdir_p(incoming_dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{repository_rsync_base_path}/incoming/#{distribution}/",
-               incoming_dir)
+            command_line << "--include=#{distribution}/"
           end
+          command_line << "--exclude=*"
+          command_line << "#{repository_rsync_base_path}/incoming/"
+          command_line << "#{repositories_dir}/incoming"
+          sh(*command_line)
         end
 
         desc "Sign packages"
@@ -286,16 +289,19 @@ class RepositoryTask
       namespace :incoming do
         desc "Download incoming packages"
         task :download => repositories_dir do
+          command_line = [
+            "rsync",
+            "-avz",
+            "--progress",
+            "--delete",
+          ]
           apt_distributions.each do |distribution|
-            incoming_dir = "#{repositories_dir}/incoming/#{distribution}"
-            mkdir_p(incoming_dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{repository_rsync_base_path}/incoming/#{distribution}/",
-               incoming_dir)
+            command_line << "--include=#{distribution}/"
           end
+          command_line << "--exclude=*"
+          command_line << "#{repository_rsync_base_path}/incoming/"
+          command_line << "#{repositories_dir}/incoming"
+          sh(*command_line)
         end
 
         desc "Sign packages"
