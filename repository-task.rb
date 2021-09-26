@@ -367,6 +367,7 @@ class RepositoryTask
               "#{repositories_dir}/base/#{distribution}/dists/#{code_name}"
             merged_dists_dir =
               "#{repositories_dir}/merged/#{distribution}/dists/#{code_name}"
+            rm_rf(merged_dists_dir)
             merger = APTDistsMerge::Merger.new(base_dists_dir,
                                                dists_dir,
                                                merged_dists_dir)
