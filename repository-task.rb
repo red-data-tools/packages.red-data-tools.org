@@ -390,6 +390,70 @@ class RepositoryTask
                release_path)
           end
         end
+
+        namespace :full do
+          desc "Update repositories with full packages (only for recovery)"
+          task :update do
+            apt_distributions.each do |distribution|
+              base_dir = "#{repositories_dir}/#{distribution}"
+              next unless File.exist?(base_dir)
+              Dir.glob("#{base_dir}/pool/*") do |pool_dir|
+                code_name = File.basename(pool_dir)
+                component_env_name = "#{distribution.upcase}_COMPONENT"
+                component = ENV[component_env_name]
+                raise "#{component_env_name} env is missing" if component.nil?
+                dists_dir = "#{base_dir}/dists/#{code_name}"
+                rm_rf(dists_dir)
+                generate_apt_release(dists_dir, code_name, component, "source")
+                apt_architectures.each do |architecture|
+                  generate_apt_release(dists_dir,
+                                       code_name,
+                                       component,
+                                       architecture)
+                end
+
+                generate_conf_file = Tempfile.new("apt-ftparchive-generate.conf")
+                File.open(generate_conf_file.path, "w") do |conf|
+                  conf.puts(generate_apt_ftp_archive_generate_conf(code_name,
+                                                                   component))
+                end
+                cd(base_dir) do
+                  sh("apt-ftparchive", "generate", generate_conf_file.path)
+                end
+
+                rm_r(Dir.glob("#{dists_dir}/Release*"))
+                rm_r(Dir.glob("#{base_dir}/*.db"))
+                release_conf_file = Tempfile.new("apt-ftparchive-release.conf")
+                File.open(release_conf_file.path, "w") do |conf|
+                  conf.puts(generate_apt_ftp_archive_release_conf(code_name,
+                                                                  component))
+                end
+                release_file = Tempfile.new("apt-ftparchive-release")
+                release_path = "#{dists_dir}/Release"
+                sh("apt-ftparchive",
+                   "-c", release_conf_file.path,
+                   "release",
+                   dists_dir,
+                   :out => release_file.path)
+                mv(release_file.path, "#{dists_dir}/Release")
+                signed_release_path = "#{release_path}.gpg"
+                sh("gpg",
+                   "--sign",
+                   "--detach-sign",
+                   "--armor",
+                   "--local-user", repository_gpg_key_id,
+                   "--output", signed_release_path,
+                   release_path)
+                in_release_path = "#{dists_dir}/InRelease"
+                sh("gpg",
+                   "--clear-sign",
+                   "--local-user", repository_gpg_key_id,
+                   "--output", in_release_path,
+                   release_path)
+              end
+            end
+          end
+        end
       end
 
       desc "Upload repositories"
