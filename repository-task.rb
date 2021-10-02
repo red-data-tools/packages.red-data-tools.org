@@ -114,6 +114,7 @@ class RepositoryTask
             "-avz",
             "--progress",
             "--delete",
+            "--delete-excluded",
           ]
           yum_distributions.each do |distribution|
             command_line << "--include=#{distribution}/"
@@ -296,9 +297,11 @@ class RepositoryTask
             "-avz",
             "--progress",
             "--delete",
+            "--delete-excluded",
           ]
           apt_distributions.each do |distribution|
             command_line << "--include=#{distribution}/"
+            command_line << "--include=#{distribution}/*.*"
             command_line << "--include=#{distribution}/pool/"
             command_line << "--include=#{distribution}/pool/*"
             command_line << "--include=#{distribution}/pool/**/*"
