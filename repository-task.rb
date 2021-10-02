@@ -467,13 +467,14 @@ class RepositoryTask
       desc "Upload repositories"
       task :upload => [repositories_dir] do
         apt_distributions.each do |distribution|
-          pool_dir = "#{repositories_dir}/incoming/#{distribution}/pool/"
-          if File.exist?(pool_dir)
+          distribution_dir = "#{repositories_dir}/incoming/#{distribution}/"
+          if File.exist?(distribution_dir)
             sh("rsync",
                "-avz",
                "--progress",
-               pool_dir,
-               "#{repository_rsync_base_path}/#{distribution}/pool")
+               "--exclude=dists/",
+               distribution_dir,
+               "#{repository_rsync_base_path}/#{distribution}")
           end
           dists_dir = "#{repositories_dir}/merged/#{distribution}/dists/"
           if File.exist?(dists_dir)
