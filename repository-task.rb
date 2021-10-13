@@ -174,7 +174,9 @@ class RepositoryTask
             base_arch_dir =
               "#{base_version_dir}/#{File.basename(incoming_arch_dir)}"
             rm_rf("#{incoming_arch_dir}/repodata")
-            cp_r("#{base_arch_dir}/repodata", incoming_arch_dir)
+            cp_r("#{base_arch_dir}/repodata",
+                 incoming_arch_dir,
+                 preserve: true)
             packages = Tempfile.new("createrepo-c-packages")
             Pathname.glob("#{incoming_arch_dir}/*/*.rpm") do |rpm|
               relative_rpm = rpm.relative_path_from(incoming_arch_dir)
@@ -184,6 +186,7 @@ class RepositoryTask
             sh("createrepo_c",
                "--pkglist", packages.path,
                "--recycle-pkglist",
+               "--retain-old-md-by-age=0",
                "--skip-stat",
                "--update",
                incoming_arch_dir)
