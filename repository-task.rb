@@ -91,6 +91,17 @@ class RepositoryTask
         desc "Download base repodata"
         task :download => repositories_dir do
           yum_distributions.each do |distribution|
+            dir = "#{repositories_dir}/base/#{distribution}"
+
+            # Ensure directory on server.
+            empty_dir = "#{dir}.empty"
+            rm_rf(empty_dir)
+            mkdir_p(empty_dir)
+            sh("rsync",
+               "-av",
+               "#{empty_dir}/",
+               "#{repository_rsync_base_path}/#{distribution}/")
+
             sh("rsync",
                "-avz",
                "--progress",
@@ -102,7 +113,7 @@ class RepositoryTask
                "--include=*/*/repodata/*/*",
                "--exclude=*",
                "#{repository_rsync_base_path}/#{distribution}/",
-               "#{repositories_dir}/base/#{distribution}")
+               dir)
           end
         end
       end
@@ -175,9 +186,12 @@ class RepositoryTask
             base_arch_dir =
               "#{base_version_dir}/#{File.basename(incoming_arch_dir)}"
             rm_rf("#{incoming_arch_dir}/repodata")
-            cp_r("#{base_arch_dir}/repodata",
-                 incoming_arch_dir,
-                 preserve: true)
+            base_repodata_dir = "#{base_arch_dir}/repodata"
+            if File.exist?(base_repodata_dir)
+              cp_r(base_repodata_dir,
+                   incoming_arch_dir,
+                   preserve: true)
+            end
             packages = Tempfile.new("createrepo-c-packages")
             Pathname.glob("#{incoming_arch_dir}/*/*.rpm") do |rpm|
               relative_rpm = rpm.relative_path_from(incoming_arch_dir)
@@ -197,6 +211,15 @@ class RepositoryTask
 
       desc "Upload repositories"
       task :upload => repositories_dir do
+        yum_distributions.each do |distribution|
+          sh("rsync",
+             "-avz",
+             "--progress",
+             "--exclude=*/*/repodata/",
+             "#{repositories_dir}/incoming/#{distribution}/",
+             "#{repository_rsync_base_path}/#{distribution}/")
+        end
+
         yum_targets.each do |distribution, version|
           incoming_version_dir =
             "#{repositories_dir}/incoming/#{distribution}/#{version}"
@@ -211,15 +234,6 @@ class RepositoryTask
                "#{incoming_arch_dir}/repodata",
                "#{repository_rsync_base_path}/#{distribution}/#{version}/#{arch}")
           end
-        end
-
-        yum_distributions.each do |distribution|
-          sh("rsync",
-             "-avz",
-             "--progress",
-             "--exclude=*/*/repodata/",
-             "#{repositories_dir}/incoming/#{distribution}/",
-             "#{repository_rsync_base_path}/#{distribution}/")
         end
       end
 
