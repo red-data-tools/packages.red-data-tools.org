@@ -74,6 +74,7 @@ class RepositoryTask
 
   def yum_targets
     [
+      ["almalinux", "8"],
       ["centos", "7"],
       ["centos", "8"],
     ]
