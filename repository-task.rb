@@ -65,10 +65,18 @@ class RepositoryTask
   end
 
   def signed_rpm?(rpm)
+    gpg_key_id = shorten_gpg_key_id(repository_gpg_key_id).downcase
     IO.pipe do |input, output|
-      system("rpm", "--checksig", rpm, :out => output)
-      signature = input.gets.sub(/\A#{Regexp.escape(rpm)}: /, "")
-      signature.split.include?("signatures")
+      result = ""
+      read_thread = Thread.new do
+        input.each_line do |line|
+          result << line
+        end
+      end
+      system("rpm", "--checksig", "--verbose", rpm, out: output)
+      output.close
+      read_thread.join
+      result.include?("key ID #{gpg_key_id}: OK")
     end
   end
 
