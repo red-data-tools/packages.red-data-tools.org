@@ -261,6 +261,63 @@ class RepositoryTask
           end
         end
       end
+
+      namespace :recovery do
+        recovery_dir = "#{repositories_dir}/recovery"
+
+        desc "Download repositories"
+        task :download => repositories_dir do
+          yum_targets.each do |distribution, version|
+            relative_path = "#{distribution}/#{version}"
+            destination_dir = "#{recovery_dir}/#{relative_path}"
+            mkdir_p(destination_dir)
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "#{repository_rsync_base_path}/#{relative_path}/",
+               destination_dir)
+          end
+        end
+
+        namespace :repository do
+          desc "Update repositories with full packages"
+          task :update do
+            yum_targets.each do |distribution, version|
+              version_dir = "#{recovery_dir}/#{distribution}/#{version}"
+              next if File.symlink?(version_dir)
+              next unless File.directory?(version_dir)
+              Dir.glob("#{version_dir}/*") do |arch_dir|
+                next unless File.directory?(arch_dir)
+                sh("createrepo_c",
+                   "--update",
+                   arch_dir)
+              end
+            end
+          end
+        end
+
+        desc "Upload repositories"
+        task :upload => repositories_dir do
+          yum_distributions.each do |distribution|
+            sh("rsync",
+               "-avz",
+               "--progress",
+               "--delete",
+               "--dry-run",
+               "#{recovery_dir}/#{distribution}/",
+               "#{repository_rsync_base_path}/#{distribution}")
+          end
+        end
+      end
+
+      desc "Recover Yum repositories"
+      recover_tasks = [
+        "yum:recovery:download",
+        "yum:recovery:repository:update",
+        "yum:recovery:upload",
+      ]
+      task :recover => recover_tasks
     end
 
     desc "Release Yum packages"
