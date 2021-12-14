@@ -299,14 +299,26 @@ class RepositoryTask
 
         desc "Upload repositories"
         task :upload => repositories_dir do
-          yum_distributions.each do |distribution|
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "--dry-run",
-               "#{recovery_dir}/#{distribution}/",
-               "#{repository_rsync_base_path}/#{distribution}")
+          yum_targets.each do |distribution, version|
+            version_dir = "#{recovery_dir}/#{distribution}/#{version}"
+            next if File.symlink?(version_dir)
+            next unless File.directory?(version_dir)
+            Dir.glob("#{version_dir}/*/repodata") do |repodata_dir|
+              arch_dir = File.dirname(repodata_dir)
+              destination = [
+                repository_rsync_base_path,
+                distribution,
+                version,
+                File.basename(arch_dir),
+                File.basename(repodata_dir),
+              ].join("/")
+              sh("rsync",
+                 "-avz",
+                 "--progress",
+                 "--delete",
+                 "#{repodata_dir}/",
+                 destination)
+            end
           end
         end
       end
