@@ -9,6 +9,7 @@ Package repository for Red Data Tools related projects including
 ## Supported packages
 
   * [OpenCV GLib (C API)](https://github.com/red-data-tools/opencv-glib)
+  * [DuckDB](https://duckdb.org/)
 
 ## Supported platforms
 
@@ -49,6 +50,16 @@ sudo apt update
 
 ```bash
 sudo apt install libopencv-glib-dev
+```
+
+### DuckDB
+
+```bash
+sudo apt install duckdb
+```
+
+```bash
+sudo dnf install duckdb
 ```
 
 ## Development
