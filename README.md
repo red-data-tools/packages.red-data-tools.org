@@ -9,7 +9,6 @@ Package repository for Red Data Tools related projects including
 ## Supported packages
 
   * [OpenCV GLib (C API)](https://github.com/red-data-tools/opencv-glib)
-  * [GR framework](https://github.com/sciapp/gr)
 
 ## Supported platforms
 
@@ -50,16 +49,6 @@ sudo apt update
 
 ```bash
 sudo apt install libopencv-glib-dev
-```
-
-### GR framework
-
-```bash
-sudo apt install libgrm-dev
-```
-
-```bash
-sudo dnf install gr-devel
 ```
 
 ## Development
