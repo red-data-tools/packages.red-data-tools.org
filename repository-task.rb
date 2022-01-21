@@ -84,7 +84,6 @@ class RepositoryTask
     [
       ["almalinux", "8"],
       ["centos", "7"],
-      ["centos", "8"],
     ]
   end
 
