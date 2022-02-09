@@ -60,6 +60,7 @@ class OpenCVGLibPackageTask < PackagesRedDataToolsOrgPackageTask
   def apt_targets_default
     [
       "debian-buster",
+      "debian-bullseye",
       "ubuntu-bionic",
       "ubuntu-focal",
     ]
