@@ -349,7 +349,7 @@ class RepositoryTask
       ["debian", "bullseye", "main"],
       ["ubuntu", "bionic", "universe"],
       ["ubuntu", "focal", "universe"],
-      ["ubuntu", "hirsute", "universe"],
+      ["ubuntu", "impish", "universe"],
     ]
   end
 
