@@ -350,6 +350,7 @@ class RepositoryTask
       ["ubuntu", "bionic", "universe"],
       ["ubuntu", "focal", "universe"],
       ["ubuntu", "impish", "universe"],
+      ["ubuntu", "jammy", "universe"],
     ]
   end
 
