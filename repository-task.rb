@@ -82,6 +82,7 @@ class RepositoryTask
 
   def yum_targets
     [
+      ["almalinux", "9"],
       ["almalinux", "8"],
       ["centos", "7"],
     ]
@@ -345,12 +346,11 @@ class RepositoryTask
 
   def apt_targets_default
     [
-      ["debian", "buster", "main"],
       ["debian", "bullseye", "main"],
-      ["ubuntu", "bionic", "universe"],
+      ["debian", "bookworm", "main"],
       ["ubuntu", "focal", "universe"],
-      ["ubuntu", "impish", "universe"],
       ["ubuntu", "jammy", "universe"],
+      ["ubuntu", "lunar", "universe"],
     ]
   end
 
