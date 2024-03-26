@@ -441,6 +441,11 @@ class RepositoryTask
       namespace :repository do
         desc "Update repositories"
         task :update do
+          apt_distributions.each do |distribution|
+            merged_dists_dir = "#{repositories_dir}/merged/#{distribution}/dists"
+            rm_rf(merged_dists_dir)
+          end
+
           apt_targets.each do |distribution, code_name, component|
             base_dir = "#{repositories_dir}/incoming/#{distribution}"
             pool_dir = "#{base_dir}/pool/#{code_name}"
@@ -480,7 +485,6 @@ class RepositoryTask
               "#{repositories_dir}/base/#{distribution}/dists/#{code_name}"
             merged_dists_dir =
               "#{repositories_dir}/merged/#{distribution}/dists/#{code_name}"
-            rm_rf(merged_dists_dir)
             merger = APTDistsMerge::Merger.new(base_dists_dir,
                                                dists_dir,
                                                merged_dists_dir)
