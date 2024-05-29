@@ -352,6 +352,7 @@ class RepositoryTask
       ["ubuntu", "focal", "universe"],
       ["ubuntu", "jammy", "universe"],
       ["ubuntu", "lunar", "universe"],
+      ["ubuntu", "noble", "universe"],
     ]
   end
 
