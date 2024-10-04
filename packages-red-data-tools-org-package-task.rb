@@ -1,5 +1,9 @@
 require_relative "helper"
-require_relative "vendor/apache-arrow/dev/tasks/linux-packages/package-task"
+apache_arrow_repository = ENV["APACHE_ARROW_REPOSITORY"]
+if apache_arrow_repository.nil?
+  raise "Specify APACHE_ARROW_REPOSITORY environment variable"
+end
+require "#{apache_arrow_repository}/dev/tasks/linux-packages/package-task"
 
 class PackagesRedDataToolsOrgPackageTask < PackageTask
   include Helper::Repository
