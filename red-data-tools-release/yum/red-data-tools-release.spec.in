@@ -4,7 +4,7 @@ Summary: Red Data Tools release files
 Name: red-data-tools-release
 Version: @VERSION@
 Release: 1
-License: ASL-2.0
+License: Apache-2.0
 URL: https://packages.red-data-tools.org/
 Source: %{name}-%{version}.tar.gz
 Group: System Environment/Base
@@ -37,15 +37,18 @@ cd %{name}-%{version}
 %{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-*
 
 %post
-if grep -q 'Amazon Linux release 2' /etc/system-release 2>/dev/null; then
-  dnf config-manager --disable red-data-tools-centos
-  dnf config-manager --enable red-data-tools-linux
+if grep -q 'Amazon Linux' /etc/system-release 2>/dev/null; then
+  dnf config-manager --disable red-data-tools-almalinux
+  dnf config-manager --enable red-data-tools-amazon-linux
 else
   dnf config-manager --disable red-data-tools-amazon-linux
-  dnf config-manager --enable red-data-tools-centos
+  dnf config-manager --enable red-data-tools-almalinux
 fi
 
 %changelog
+* Sat Oct 05 2024 Sutou Kouhei <kou@clear-code.com> - 2024.10.5-1
+- New upstream release.
+
 * Mon Jan 13 2020 Kouhei Sutou <kou@clear-code.com> - 2019.11.8-1
 - Use the same version as red-data-tools-keyring-archive.
 

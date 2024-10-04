@@ -4,9 +4,10 @@ require_relative "../packages-red-data-tools-org-package-task"
 
 class RedDataToolsReleasePackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
+    year, month, day = repository_version.split(".").collect(&:to_i)
     super("red-data-tools-release",
           repository_version,
-          latest_commit_time(File.join(__dir__, "..")))
+          Time.new(year, month, day))
   end
 
   def define
@@ -38,16 +39,11 @@ class RedDataToolsReleasePackageTask < PackagesRedDataToolsOrgPackageTask
   def generate_repo_files
     targets = [
       {
-        id: "centos",
-        label: "CentOS $releasever",
+        id: "almalinux",
+        label: "AlmaLinux $releasever",
+        distribution: "almalinux",
         version: "$releasever",
         enabled: "1",
-      },
-      {
-        id: "amazon-linux",
-        label: "Amazon Linux 2",
-        version: "7",
-        enabled: "0",
       },
     ]
     targets.each do |target|
@@ -56,7 +52,7 @@ class RedDataToolsReleasePackageTask < PackagesRedDataToolsOrgPackageTask
         repo.puts(<<-REPOSITORY)
 [#{repository_name}-#{target[:id]}]
 name=#{repository_label} for #{target[:label]} - $basearch
-baseurl=#{repository_url}/centos/#{target[:version]}/$basearch/
+baseurl=#{repository_url}/#{target[:distribution]}/#{target[:version]}/$basearch/
 gpgcheck=1
 enabled=#{target[:enabled]}
         REPOSITORY
@@ -88,7 +84,8 @@ enabled=#{target[:enabled]}
 
   def yum_targets_default
     [
-      "centos-8",
+      "almalinux-8",
+      "almalinux-9",
     ]
   end
 

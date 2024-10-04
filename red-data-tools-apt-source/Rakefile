@@ -4,9 +4,10 @@ require_relative "../packages-red-data-tools-org-package-task"
 
 class RedDataToolsAptSourcePackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
+    year, month, day = repository_version.split(".").collect(&:to_i)
     super("red-data-tools-apt-source",
           repository_version,
-          latest_commit_time(File.join(__dir__, "..")))
+          Time.new(year, month, day))
   end
 
   def define
@@ -35,11 +36,10 @@ class RedDataToolsAptSourcePackageTask < PackagesRedDataToolsOrgPackageTask
 
   def apt_targets_default
     [
-      "debian-buster",
-      "debian-bullseye",
-      "ubuntu-bionic",
+      "debian-bookworm",
       "ubuntu-focal",
-      "ubuntu-hirsute",
+      "ubuntu-jammy",
+      "ubuntu-noble",
     ]
   end
 
@@ -74,22 +74,6 @@ class RedDataToolsAptSourcePackageTask < PackagesRedDataToolsOrgPackageTask
           cp(deb, latest_deb)
         end
         task :latest => latest_deb
-
-        # For backward compatibility.
-        # Users can install the apt-source package by
-        # the old "apt install ./XXX-archive-keyring_*.deb".
-        pakcage_archive_keyring =
-          @package.gsub(/apt-source\z/, "archive-keyring")
-        latest_archive_keyring_deb = [
-          apt_dir,
-          "repositories",
-          distribution,
-          "#{pakcage_archive_keyring}-latest-#{code_name}.deb",
-        ].join("/")
-        file latest_archive_keyring_deb => deb do
-          cp(deb, latest_archive_keyring_deb)
-        end
-        task :latest => latest_archive_keyring_deb
       end
       task :release => :latest
     end

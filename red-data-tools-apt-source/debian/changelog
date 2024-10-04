@@ -1,3 +1,9 @@
+red-data-tools-apt-source (2024.10.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Sutou Kouhei <kou@clear-code.com>  Sat, 05 Oct 2024 00:00:00 +0900
+
 red-data-tools-apt-source (2020.8.7-1) unstable; urgency=low
 
   * New upstream release.

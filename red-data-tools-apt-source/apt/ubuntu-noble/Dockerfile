@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM ubuntu:noble
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \

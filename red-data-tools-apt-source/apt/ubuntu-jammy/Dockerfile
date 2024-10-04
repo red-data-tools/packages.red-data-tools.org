@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:jammy
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \

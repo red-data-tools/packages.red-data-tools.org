@@ -3,10 +3,10 @@ Section: misc
 Priority: important
 Maintainer: Red Data Tools <packages@red-data-tools.org>
 Build-Depends:
-  debhelper (>= 9),
+  debhelper (>= 12),
   gnupg,
   lsb-release
-Standards-Version: 3.9.7
+Standards-Version: 3.9.8
 Homepage: https://red-data-tools.github.io/
 
 Package: red-data-tools-apt-source
@@ -16,7 +16,6 @@ Replaces: red-data-tools-archive-keyring (<< 2020.8.7-1)
 Breaks: red-data-tools-archive-keyring (<< 2020.8.7-1)
 Depends:
   ${misc:Depends},
-  apt-transport-https,
   gnupg
 Description: GnuPG archive key and APT source of the Red Data Tools archive
  The Red Data Tools project digitally signs its Release files. This
