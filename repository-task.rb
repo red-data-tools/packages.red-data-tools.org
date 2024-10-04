@@ -84,7 +84,6 @@ class RepositoryTask
     [
       ["almalinux", "9"],
       ["almalinux", "8"],
-      ["centos", "7"],
     ]
   end
 
@@ -346,7 +345,6 @@ class RepositoryTask
 
   def apt_targets_default
     [
-      ["debian", "bullseye", "main"],
       ["debian", "bookworm", "main"],
       ["debian", "trixie", "main"],
       ["ubuntu", "focal", "universe"],
