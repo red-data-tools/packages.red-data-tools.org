@@ -1,4 +1,4 @@
-FROM centos:8
+FROM almalinux:8
 
 ARG DEBUG
 
@@ -6,6 +6,7 @@ RUN \
   quiet=$([ "${DEBUG}" = "yes" ] || echo "--quiet") && \
   dnf install -y ${quiet} epel-release && \
   dnf install -y --enablerepo=powertools ${quiet} \
+    ccache \
     cmake \
     gcc-c++ \
     libarchive \

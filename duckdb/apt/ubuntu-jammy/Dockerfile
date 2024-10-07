@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:jammy
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \
@@ -10,6 +10,7 @@ RUN \
   quiet=$([ "${DEBUG}" = "yes" ] || echo "-qq") && \
   apt update ${quiet} && \
   apt install -y -V ${quiet} \
+    ccache \
     cmake \
     debhelper \
     devscripts \

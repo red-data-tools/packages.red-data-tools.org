@@ -7,23 +7,12 @@
 export DH_OPTIONS
 
 %:
-	dh $@
-
-override_dh_auto_clean:
-	dh_auto_clean --buildsystem=cmake
+	dh $@ --buildsystem=cmake
 
 override_dh_auto_configure:
 	dh_auto_configure \
 	  --buildsystem=cmake \
 	  -- \
 	  -DCMAKE_BUILD_TYPE=Release \
-	  -DINSTALL_LIB_DIR=/usr/lib/$$(dpkg-architecture -qDEB_HOST_MULTIARCH)
-
-override_dh_auto_build:
-	dh_auto_build --buildsystem=cmake
-
-override_dh_auto_install:
-	dh_auto_install --buildsystem=cmake
-
-override_dh_auto_test:
-	dh_auto_test --buildsystem=cmake
+	  -DINSTALL_LIB_DIR=/usr/lib/$$(dpkg-architecture -qDEB_HOST_MULTIARCH) \
+	  -DOVERRIDE_GIT_DESCRIBE=v$$(basename $$(pwd) | sed -e 's/^duckdb-//')

@@ -23,12 +23,12 @@ DuckDB is an in-process SQL OLAP database management system.
 %build
 %cmake \
   -DCMAKE_BUILD_TYPE=Release \
-  -DINSTALL_LIB_DIR=%{_libdir}
-%make_build
+  -DINSTALL_LIB_DIR=%{_libdir} \
+  -DOVERRIDE_GIT_DESCRIBE=v%{version}
+%cmake_build
 
 %install
-%make_install
-mv ${RPM_BUILD_ROOT}/usr/lib/cmake ${RPM_BUILD_ROOT}%{_libdir}/
+%cmake_install
 %ldconfig_scriptlets
 
 %files
@@ -50,6 +50,9 @@ Libraries and header files for %{name}
 %{_libdir}/cmake/*
 
 %changelog
+* Tue Sep 24 2024 Sutou Kouhei <kou@clear-code.com> - 1.1.1-1
+- New upstream release.
+
 * Mon Sep 06 2021 Sutou Kouhei <kou@clear-code.com> - 0.2.9-1
 - New upstream release.
 

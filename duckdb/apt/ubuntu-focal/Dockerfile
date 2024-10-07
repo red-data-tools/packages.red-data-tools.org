@@ -10,6 +10,7 @@ RUN \
   quiet=$([ "${DEBUG}" = "yes" ] || echo "-qq") && \
   apt update ${quiet} && \
   apt install -y -V ${quiet} \
+    ccache \
     cmake \
     debhelper \
     devscripts \

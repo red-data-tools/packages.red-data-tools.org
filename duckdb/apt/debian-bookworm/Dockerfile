@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bookworm
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \
@@ -10,9 +10,9 @@ RUN \
   quiet=$([ "${DEBUG}" = "yes" ] || echo "-qq") && \
   apt update ${quiet} && \
   apt install -y -V ${quiet} \
+    ccache \
     cmake \
     debhelper \
     devscripts \
     python3 && \
-  apt clean && \
-  rm -rf /var/lib/apt/lists/*
+  apt clean
