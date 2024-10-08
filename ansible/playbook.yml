@@ -16,8 +16,13 @@
         - apt-listchanges
         - cron
         - fail2ban
+        - git
+        - gpg
         - logrotate
         - lv
+        - rsync
+        - ruby
+        - unattended-upgrades
         - vim
         - zsh
     - name: Use VIM as the default editor
@@ -30,6 +35,23 @@
     - name: Set hostname
       hostname:
         name: "{{ inventory_hostname }}"
+    - name: Reboot automatically when package upgrade requires restart
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "^(//)?Unattended-Upgrade::Automatic-Reboot "
+        line: "Unattended-Upgrade::Automatic-Reboot \"true\";"
+    - name: Send notification when packages upgraded automatically
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "^(//)?Unattended-Upgrade::Mail "
+        line: "Unattended-Upgrade::Mail \"root\";"
+    - name: Enable NTP
+      command: timedatectl set-ntp true
+    - name: "sudo: NOPASSWD"
+      copy:
+        src: etc/sudoers.d/sudo-nopasswd
+        dest: /etc/sudoers.d/sudo-nopasswd
+        mode: 0400
 
     # User
     - name: Create "packages" user
@@ -64,13 +86,27 @@
         owner: packages
         group: packages
         mode: 0600
-    - name: Create ~packages/public/
+    - name: Create ~packages/.../
       file:
-        path: ~packages/public/
+        path: ~packages/{{ item }}
         state: directory
         owner: packages
         group: packages
         mode: 0755
+      with_items:
+        - public
+        - public/almalinux
+        - public/almalinux/8
+        - public/almalinux/9
+        - public/debian
+        - public/debian/dists
+        - public/debian/pool/bookworm
+        - public/debian/pool/trixie
+        - public/ubuntu
+        - public/ubuntu/dists
+        - public/ubuntu/pool/focal
+        - public/ubuntu/pool/jammy
+        - public/ubuntu/pool/noble
 
     # Apache
     - name: Install Apache
@@ -80,8 +116,8 @@
     - name: Keep more Apache logs
       lineinfile:
         path: /etc/logrotate.d/apache2
-        regexp: "^	rotate "
-        line: "	rotate 3650"
+        regexp: "^    rotate "
+        line: "    rotate 3650"
     - name: Put Apache configuration
       copy:
         src: "{{ item }}"
@@ -175,30 +211,36 @@
         - Restart Postfix
 
     # milter manager
+    - name: Add GPG key for APT repository
+      get_url:
+        url: https://packagecloud.io/milter-manager/repos/gpgkey
+        dest: /etc/apt/keyrings/milter-manager.asc
     - name: Add APT repository for milter manager
       apt_repository:
-        repo: ppa:milter-manager/ppa
+        repo: |
+          deb [signed-by=/etc/apt/keyrings/milter-manager.asc] https://packagecloud.io/milter-manager/repos/debian/ bookworm main
+        filename: "milter-manager"
     - name: Install milters
       apt:
         name:
           - milter-manager
-          - milter-greylist
-    - name: Add milter-manager user to greylist group
-      user:
-        name: milter-manager
-        append: yes
-        groups:
-          - greylist
-          - postfix
-    - name: Configure milter-greylist
-      copy:
-        src: "{{ item }}"
-        dest: /{{ item }}
-      with_items:
-        - etc/milter-greylist/greylist.conf
-        - etc/default/milter-greylist
-      notify:
-        - Restart milter-greylist
+          # - milter-greylist
+    # - name: Add milter-manager user to greylist group
+    #   user:
+    #     name: milter-manager
+    #     append: yes
+    #     groups:
+    #       - greylist
+    #       - postfix
+    # - name: Configure milter-greylist
+    #   copy:
+    #     src: "{{ item }}"
+    #     dest: /{{ item }}
+    #   with_items:
+    #     - etc/milter-greylist/greylist.conf
+    #     - etc/default/milter-greylist
+    #   notify:
+    #     - Restart milter-greylist
     - name: Create milter manager directory
       file:
         path: /var/spool/postfix/milter-manager/
