@@ -82,6 +82,7 @@ class RepositoryTask
 
   def yum_targets
     [
+      ["almalinux", "10"],
       ["almalinux", "9"],
       ["almalinux", "8"],
     ]
@@ -347,7 +348,6 @@ class RepositoryTask
     [
       ["debian", "bookworm", "main"],
       ["debian", "trixie", "main"],
-      ["ubuntu", "focal", "universe"],
       ["ubuntu", "jammy", "universe"],
       ["ubuntu", "noble", "universe"],
     ]
