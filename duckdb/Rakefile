@@ -5,8 +5,8 @@ require_relative "../packages-red-data-tools-org-package-task"
 class DuckDBPackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
     super("duckdb",
-          "1.1.1",
-          Time.parse("2024-09-24"))
+          "1.4.2",
+          Time.parse("2025-11-12"))
   end
 
   private
@@ -23,8 +23,7 @@ class DuckDBPackageTask < PackagesRedDataToolsOrgPackageTask
 
   def apt_targets_default
     [
-      "debian-bookworm",
-      "ubuntu-focal",
+      "debian-trixie",
       "ubuntu-jammy",
       "ubuntu-noble",
     ]
@@ -32,6 +31,7 @@ class DuckDBPackageTask < PackagesRedDataToolsOrgPackageTask
 
   def yum_targets_default
     [
+      "almalinux-10",
       "almalinux-9",
       "almalinux-8",
     ]

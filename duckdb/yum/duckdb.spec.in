@@ -50,6 +50,9 @@ Libraries and header files for %{name}
 %{_libdir}/cmake/*
 
 %changelog
+* Wed Nov 12 2025 Sutou Kouhei <kou@clear-code.com> - 1.4.2-1
+- New upstream release.
+
 * Tue Sep 24 2024 Sutou Kouhei <kou@clear-code.com> - 1.1.1-1
 - New upstream release.
 
