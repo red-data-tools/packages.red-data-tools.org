@@ -350,6 +350,7 @@ class RepositoryTask
       ["debian", "trixie", "main"],
       ["ubuntu", "jammy", "universe"],
       ["ubuntu", "noble", "universe"],
+      ["ubuntu", "resolute", "universe"],
     ]
   end
 
