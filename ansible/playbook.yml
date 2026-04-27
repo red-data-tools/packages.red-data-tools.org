@@ -1,12 +1,13 @@
 - hosts: package-servers
   become: yes
+  vars:
+    ruby: ruby
+    ruby_api_version: 3.3.0
+    passenger_version: 6.1.2
+  vars_files:
+    - vars/private.yml
   tasks:
     # Base
-    - name: Upgrade packages
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-        upgrade: safe
     - name: Install base packages
       apt:
         name: "{{ item }}"
@@ -16,12 +17,16 @@
         - apt-listchanges
         - cron
         - fail2ban
+        - gcc
         - git
         - gpg
+        - less
+        - libc-dev
         - logrotate
-        - lv
+        - make
         - rsync
         - ruby
+        - ruby-dev
         - unattended-upgrades
         - vim
         - zsh
@@ -52,8 +57,18 @@
         src: etc/sudoers.d/sudo-nopasswd
         dest: /etc/sudoers.d/sudo-nopasswd
         mode: 0400
+    - name: Install gems
+      gem:
+        name: "{{ item }}"
+        state: latest
+        user_install: no
+      with_items:
+        - base64
+        - bundler
+        - forwardable
+        - stringio
 
-    # User
+    # User: packages
     - name: Create "packages" user
       user:
         name: packages
@@ -108,11 +123,59 @@
         - public/ubuntu/pool/jammy
         - public/ubuntu/pool/noble
 
+    # User: rubygems-builder
+    - name: Create "rubygems-builder" user
+      user:
+        name: rubygems-builder
+    - name: Put ~rubygems-builder/.forward
+      copy:
+        content: "root"
+        dest: ~rubygems-builder/.forward
+        owner: rubygems-builder
+        group: rubygems-builder
+    - name: Clone builder
+      become_user: rubygems-builder
+      vars:
+        ansible_ssh_pipelining: true
+      git:
+        repo: https://github.com/rubygems-ruby-4-0-ubuntu-24-04/builder.git
+        dest: ~rubygems-builder/builder
+    - name: Remove Gemfile.lock
+      file:
+        path: ~rubygems-builder/builder/webhook-receiver/Gemfile.lock
+        state: absent
+    - name: Update gems
+      become_user: rubygems-builder
+      shell: |
+        bundle config set path vendor/bundle
+        bundle install
+      args:
+        chdir: ~rubygems-builder/builder/webhook-receiver/
+      notify:
+        - Restart Apache
+      vars:
+        ansible_ssh_pipelining: true
+    - name: Put configuration files
+      template:
+        src: home/rubygems-builder/builder/webhook-receiver/.github_token.jinja
+        dest: /home/rubygems-builder/builder/webhook-receiver/.github_token
+        owner: rubygems-builder
+        group: rubygems-builder
+        mode: 0600
+
     # Apache
-    - name: Install Apache
+    - name: Install Apache and related packages
       apt:
         name:
           - apache2
+          - apache2-dev
+          - build-essential
+          - libapr1-dev
+          - libaprutil1-dev
+          - libcurl4-openssl-dev
+          - libssl-dev
+          - ruby-dev
+          - zlib1g-dev
     - name: Keep more Apache logs
       lineinfile:
         path: /etc/logrotate.d/apache2
@@ -124,15 +187,43 @@
         dest: /{{ item }}
       with_items:
         - etc/apache2/sites-available/packages.red-data-tools.org.conf
+    - name: Install Passenger
+      gem:
+        name: passenger
+        version: "{{ passenger_version }}"
+        user_install: no
+      register: passenger
+    - name: Build Passenger
+      command: passenger-install-apache2-module --languages ruby --auto
+      when: passenger.changed
+    - name: Put Passenger configuration files
+      template:
+        src: etc/apache2/mods-available/{{ item }}.jinja
+        dest: /etc/apache2/mods-available/{{ item }}
+      with_items:
+        - passenger.conf
+        - passenger.load
+      register: passenger_config_files
+    - name: Enable Passenger
+      command: a2enmod passenger
+      when: passenger_config_files.changed
+      notify:
+        - Restart Apache
     - name: Enable our Apache configuration
       command: a2ensite packages.red-data-tools.org
     - name: Disable default Apache configuration
       command: a2dissite 000-default
       notify:
         - Restart Apache
+    - name: Disable Apache modules
+      command: a2dismod {{ item }}
+      with_items:
+        - mpm_event
+        - mpm_prefork
     - name: Enable Apache modules
       command: a2enmod {{ item }}
       with_items:
+        - mpm_worker
         - ssl
       notify:
         - Restart Apache
@@ -218,7 +309,7 @@
     - name: Add APT repository for milter manager
       apt_repository:
         repo: |
-          deb [signed-by=/etc/apt/keyrings/milter-manager.asc] https://packagecloud.io/milter-manager/repos/debian/ bookworm main
+          deb [signed-by=/etc/apt/keyrings/milter-manager.asc] https://packagecloud.io/milter-manager/repos/debian/ trixie main
         filename: "milter-manager"
     - name: Install milters
       apt:

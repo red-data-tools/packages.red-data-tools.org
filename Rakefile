@@ -15,10 +15,19 @@ end
 repository_task = RedDataToolsRepositoryTask.new
 repository_task.define
 
+user = ENV["ANSIBLE_GPG_USER"] || ENV["USER"]
+file "ansible/password" => "ansible/password.#{user}.asc" do |task|
+  sh("gpg",
+     "--output", task.name,
+     "--decrypt", task.prerequisites.first)
+  chmod(0600, task.name)
+end
+
 desc "Apply the Ansible configurations"
 task :deploy do
   sh("ansible-playbook",
-     "--inventory-file", "ansible/hosts",
+     "--inventory", "ansible/hosts",
+     "--vault-password-file", "ansible/password",
      "ansible/playbook.yml")
 end
 

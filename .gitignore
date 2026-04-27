@@ -1,6 +1,7 @@
 /GPG-KEY-*
 /*.gpg
 /*.gpg~
+/ansible/password
 /ansible/playbook.retry
 /repositories/
 /*/*.tar.gz
