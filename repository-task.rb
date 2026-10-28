@@ -346,7 +346,6 @@ class RepositoryTask
 
   def apt_targets_default
     [
-      ["debian", "bookworm", "main"],
       ["debian", "trixie", "main"],
       ["ubuntu", "jammy", "universe"],
       ["ubuntu", "noble", "universe"],
