@@ -371,7 +371,6 @@ class RepositoryTask
     [
       "amd64",
       "arm64",
-      "i386",
     ]
   end
 
