@@ -21,10 +21,12 @@ class PackagesRedDataToolsOrgPackageTask < PackageTask
   end
 
   def release(target_namespace)
-    sh("rsync",
-       "-av",
-       "#{repositories_dir(target_namespace)}/",
-       "packages@packages.red-data-tools.org:public/incoming/")
+    sh("rclone",
+       "copy",
+       "--verbose",
+       "--progress",
+       repositories_dir(target_namespace),
+       "#{repository_storage_base_path}/incoming")
   end
 
   def define_clean_tasks

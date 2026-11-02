@@ -16,8 +16,10 @@ module Helper
       "https://packages.red-data-tools.org"
     end
 
-    def repository_rsync_base_path
-      "packages@packages.red-data-tools.org:public"
+    # rclone's remote path. You can use S3 by
+    # ":s3,provider=AWS,env_auth=true:${BUCKET}/${PREFIX}".
+    def repository_storage_base_path
+      ":sftp,ssh='ssh packages@packages.red-data-tools.org':public"
     end
 
     def repository_version

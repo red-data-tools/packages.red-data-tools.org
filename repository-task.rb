@@ -48,6 +48,27 @@ class RepositoryTask
     value
   end
 
+  def rclone(command, *args)
+    sh("rclone", command, "--verbose", "--progress", *args)
+  end
+
+  def remote_path(path)
+    "#{repository_storage_base_path}/#{path}"
+  end
+
+  # Uploads metadata except index files (repomd.xml, Release and so
+  # on) at first and then uploads index files and removes old
+  # metadata. If we upload index files before metadata referred from
+  # them, clients may fail to download the metadata.
+  def upload_metadata(source, destination, index_files, filters=[])
+    rclone("copy",
+           *index_files.collect {|file| "--filter=- #{file}"},
+           *filters,
+           source,
+           destination)
+    rclone("sync", *filters, source, destination)
+  end
+
   def shorten_gpg_key_id(id)
     id[-8..-1]
   end
@@ -100,28 +121,13 @@ class RepositoryTask
         task :download => repositories_dir do
           yum_distributions.each do |distribution|
             dir = "#{repositories_dir}/base/#{distribution}"
-
             # Ensure directory on server.
-            empty_dir = "#{dir}.empty"
-            rm_rf(empty_dir)
-            mkdir_p(empty_dir)
-            sh("rsync",
-               "-av",
-               "#{empty_dir}/",
-               "#{repository_rsync_base_path}/#{distribution}/")
-
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "--include=*/",
-               "--include=*/*/",
-               "--include=*/*/repodata/",
-               "--include=*/*/repodata/*",
-               "--include=*/*/repodata/*/*",
-               "--exclude=*",
-               "#{repository_rsync_base_path}/#{distribution}/",
-               dir)
+            rclone("mkdir", remote_path(distribution))
+            rclone("sync",
+                   "--filter=+ /*/*/repodata/**",
+                   "--filter=- **",
+                   remote_path(distribution),
+                   dir)
           end
         end
       end
@@ -129,22 +135,15 @@ class RepositoryTask
       namespace :incoming do
         desc "Download incoming packages"
         task :download => repositories_dir do
-          command_line = [
-            "rsync",
-            "-avz",
-            "--progress",
-            "--delete",
-            "--delete-excluded",
-          ]
-          yum_distributions.each do |distribution|
-            command_line << "--include=#{distribution}/"
-            command_line << "--include=#{distribution}/*"
-            command_line << "--include=#{distribution}/**/*"
+          filters = yum_distributions.collect do |distribution|
+            "--filter=+ /#{distribution}/**"
           end
-          command_line << "--exclude=*"
-          command_line << "#{repository_rsync_base_path}/incoming/"
-          command_line << "#{repositories_dir}/incoming"
-          sh(*command_line)
+          filters << "--filter=- **"
+          rclone("sync",
+                 "--delete-excluded",
+                 *filters,
+                 remote_path("incoming"),
+                 "#{repositories_dir}/incoming")
         end
 
         desc "Sign packages"
@@ -220,12 +219,10 @@ class RepositoryTask
       desc "Upload repositories"
       task :upload => repositories_dir do
         yum_distributions.each do |distribution|
-          sh("rsync",
-             "-avz",
-             "--progress",
-             "--exclude=*/*/repodata/",
-             "#{repositories_dir}/incoming/#{distribution}/",
-             "#{repository_rsync_base_path}/#{distribution}/")
+          rclone("copy",
+                 "--filter=- /*/*/repodata/**",
+                 "#{repositories_dir}/incoming/#{distribution}",
+                 remote_path(distribution))
         end
 
         yum_targets.each do |distribution, version|
@@ -235,12 +232,10 @@ class RepositoryTask
           Dir.glob("#{incoming_version_dir}/*") do |incoming_arch_dir|
             next unless File.directory?(incoming_arch_dir)
             arch = File.basename(incoming_arch_dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{incoming_arch_dir}/repodata",
-               "#{repository_rsync_base_path}/#{distribution}/#{version}/#{arch}")
+            repodata_path = "#{distribution}/#{version}/#{arch}/repodata"
+            upload_metadata("#{incoming_arch_dir}/repodata",
+                            remote_path(repodata_path),
+                            ["/repomd.xml"])
           end
         end
       end
@@ -252,12 +247,7 @@ class RepositoryTask
             dir = "#{repositories_dir}/incoming/#{distribution}"
             rm_rf(dir)
             mkdir_p(dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{dir}/",
-               "#{repository_rsync_base_path}/incoming/#{distribution}/")
+            rclone("sync", dir, remote_path("incoming/#{distribution}"))
           end
         end
       end
@@ -271,12 +261,7 @@ class RepositoryTask
             relative_path = "#{distribution}/#{version}"
             destination_dir = "#{recovery_dir}/#{relative_path}"
             mkdir_p(destination_dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{repository_rsync_base_path}/#{relative_path}/",
-               destination_dir)
+            rclone("sync", remote_path(relative_path), destination_dir)
           end
         end
 
@@ -306,18 +291,14 @@ class RepositoryTask
             Dir.glob("#{version_dir}/*/repodata") do |repodata_dir|
               arch_dir = File.dirname(repodata_dir)
               destination = [
-                repository_rsync_base_path,
                 distribution,
                 version,
                 File.basename(arch_dir),
                 File.basename(repodata_dir),
               ].join("/")
-              sh("rsync",
-                 "-avz",
-                 "--progress",
-                 "--delete",
-                 "#{repodata_dir}/",
-                 destination)
+              upload_metadata(repodata_dir,
+                              remote_path(destination),
+                              ["/repomd.xml"])
             end
           end
         end
@@ -381,12 +362,7 @@ class RepositoryTask
           apt_distributions.each do |distribution|
             base_dists_dir = "#{repositories_dir}/base/#{distribution}/dists"
             mkdir_p(base_dists_dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{repository_rsync_base_path}/#{distribution}/dists/",
-               base_dists_dir)
+            rclone("sync", remote_path("#{distribution}/dists"), base_dists_dir)
           end
         end
       end
@@ -394,24 +370,17 @@ class RepositoryTask
       namespace :incoming do
         desc "Download incoming packages"
         task :download => repositories_dir do
-          command_line = [
-            "rsync",
-            "-avz",
-            "--progress",
-            "--delete",
-            "--delete-excluded",
-          ]
+          filters = []
           apt_distributions.each do |distribution|
-            command_line << "--include=#{distribution}/"
-            command_line << "--include=#{distribution}/*.*"
-            command_line << "--include=#{distribution}/pool/"
-            command_line << "--include=#{distribution}/pool/*"
-            command_line << "--include=#{distribution}/pool/**/*"
+            filters << "--filter=+ /#{distribution}/*.*"
+            filters << "--filter=+ /#{distribution}/pool/**"
           end
-          command_line << "--exclude=*"
-          command_line << "#{repository_rsync_base_path}/incoming/"
-          command_line << "#{repositories_dir}/incoming"
-          sh(*command_line)
+          filters << "--filter=- **"
+          rclone("sync",
+                 "--delete-excluded",
+                 *filters,
+                 remote_path("incoming"),
+                 "#{repositories_dir}/incoming")
         end
 
         desc "Sign packages"
@@ -509,33 +478,25 @@ class RepositoryTask
       desc "Upload repositories"
       task :upload => [repositories_dir] do
         apt_distributions.each do |distribution|
-          distribution_dir = "#{repositories_dir}/incoming/#{distribution}/"
+          distribution_dir = "#{repositories_dir}/incoming/#{distribution}"
           if File.exist?(distribution_dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--exclude=dists/",
-               distribution_dir,
-               "#{repository_rsync_base_path}/#{distribution}")
+            rclone("copy",
+                   "--filter=- /dists/**",
+                   distribution_dir,
+                   remote_path(distribution))
           end
-          dists_dir = "#{repositories_dir}/merged/#{distribution}/dists/"
+          dists_dir = "#{repositories_dir}/merged/#{distribution}/dists"
           if File.exist?(dists_dir)
-            command_line = [
-              "rsync",
-              "-avz",
-              "--progress",
-              "--delete",
-            ]
+            filters = []
             Dir.glob("#{dists_dir}/*") do |dists_code_name_dir|
               code_name = File.basename(dists_code_name_dir)
-              command_line << "--include=#{code_name}/"
-              command_line << "--include=#{code_name}/*"
-              command_line << "--include=#{code_name}/**/*"
+              filters << "--filter=+ /#{code_name}/**"
             end
-            command_line << "--exclude=*"
-            command_line << dists_dir
-            command_line << "#{repository_rsync_base_path}/#{distribution}/dists"
-            sh(*command_line)
+            filters << "--filter=- **"
+            upload_metadata(dists_dir,
+                            remote_path("#{distribution}/dists"),
+                            ["/*/Release", "/*/Release.gpg", "/*/InRelease"],
+                            filters)
           end
         end
       end
@@ -547,12 +508,7 @@ class RepositoryTask
             dir = "#{repositories_dir}/incoming/#{distribution}"
             rm_rf(dir)
             mkdir_p(dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{dir}/",
-               "#{repository_rsync_base_path}/incoming/#{distribution}/")
+            rclone("sync", dir, remote_path("incoming/#{distribution}"))
           end
         end
       end
@@ -566,12 +522,7 @@ class RepositoryTask
             relative_path = "#{distribution}/pool/#{code_name}"
             destination_dir = "#{recovery_dir}/#{relative_path}"
             mkdir_p(destination_dir)
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{repository_rsync_base_path}/#{relative_path}/",
-               destination_dir)
+            rclone("sync", remote_path(relative_path), destination_dir)
           end
         end
 
@@ -636,12 +587,9 @@ class RepositoryTask
         task :upload do
           apt_targets.each do |distribution, code_name, component|
             relative_dir = "#{distribution}/dists/#{code_name}"
-            sh("rsync",
-               "-avz",
-               "--progress",
-               "--delete",
-               "#{recovery_dir}/#{relative_dir}/",
-               "#{repository_rsync_base_path}/#{relative_dir}")
+            upload_metadata("#{recovery_dir}/#{relative_dir}",
+                            remote_path(relative_dir),
+                            ["/Release", "/Release.gpg", "/InRelease"])
           end
         end
       end
