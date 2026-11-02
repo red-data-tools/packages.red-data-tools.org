@@ -36,10 +36,10 @@ class RedDataToolsAptSourcePackageTask < PackagesRedDataToolsOrgPackageTask
 
   def apt_targets_default
     [
-      "debian-bookworm",
-      "ubuntu-focal",
+      "debian-trixie",
       "ubuntu-jammy",
       "ubuntu-noble",
+      "ubuntu-resolute",
     ]
   end
 

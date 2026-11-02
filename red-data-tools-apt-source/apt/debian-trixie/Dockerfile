@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM debian:trixie
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \
@@ -13,5 +13,4 @@ RUN \
     debhelper \
     devscripts \
     gnupg && \
-  apt clean && \
-  rm -rf /var/lib/apt/lists/*
+  apt clean

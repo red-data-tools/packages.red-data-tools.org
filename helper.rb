@@ -21,7 +21,7 @@ module Helper
     end
 
     def repository_version
-      "2024.10.5"
+      "2026.10.30"
     end
 
     def repository_gpg_key_ids

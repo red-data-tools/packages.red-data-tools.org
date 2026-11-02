@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM ubuntu:resolute
 
 RUN \
   echo "debconf debconf/frontend select Noninteractive" | \
@@ -13,4 +13,5 @@ RUN \
     debhelper \
     devscripts \
     gnupg && \
-  apt clean
+  apt clean && \
+  rm -rf /var/lib/apt/lists/*

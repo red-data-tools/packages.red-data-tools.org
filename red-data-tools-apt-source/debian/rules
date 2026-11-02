@@ -11,9 +11,19 @@ export DH_OPTIONS
 
 override_dh_auto_build:
 	gpg \
+	  --no-autostart \
 	  --no-default-keyring \
-	  --keyring ./red-data-tools-archive-keyring.gpg \
+	  --no-options \
+	  --lock-never \
+	  --trustdb-name ./red-data-tools-key-database \
+	  --keyring ./red-data-tools-archive-keyring.kbx \
 	  --import keys
+	gpg \
+	  --no-default-keyring \
+	  --no-options \
+	  --keyring ./red-data-tools-archive-keyring.kbx \
+	  --export \
+	  --armor > red-data-tools-archive-keyring.asc
 
 	( \
 	  distribution=$$(lsb_release --id --short | tr 'A-Z' 'a-z'); \
@@ -27,12 +37,12 @@ override_dh_auto_build:
 	  echo "URIs: https://packages.red-data-tools.org/$${distribution}/"; \
 	  echo "Suites: $${code_name}"; \
 	  echo "Components: $${component}"; \
-	  echo "Signed-By: /usr/share/keyrings/red-data-tools-archive-keyring.gpg"; \
+	  echo "Signed-By: /usr/share/keyrings/red-data-tools-archive-keyring.asc"; \
 	) > red-data-tools.sources
 
 override_dh_install:
 	install -d debian/tmp/usr/share/keyrings/
-	install -m 0644 red-data-tools-archive-keyring.gpg \
+	install -m 0644 red-data-tools-archive-keyring.asc \
 	  debian/tmp/usr/share/keyrings/
 
 	install -d debian/tmp/etc/apt/sources.list.d/
