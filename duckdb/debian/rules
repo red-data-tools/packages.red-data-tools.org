@@ -16,3 +16,6 @@ override_dh_auto_configure:
 	  -DCMAKE_BUILD_TYPE=Release \
 	  -DINSTALL_LIB_DIR=/usr/lib/$$(dpkg-architecture -qDEB_HOST_MULTIARCH) \
 	  -DOVERRIDE_GIT_DESCRIBE=v$$(basename $$(pwd) | sed -e 's/^duckdb-//')
+
+override_dh_dwz:
+	# libduckdb.so is too large for dwz: "Too many DIEs, not optimizing"

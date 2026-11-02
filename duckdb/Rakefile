@@ -5,8 +5,8 @@ require_relative "../packages-red-data-tools-org-package-task"
 class DuckDBPackageTask < PackagesRedDataToolsOrgPackageTask
   def initialize
     super("duckdb",
-          "1.4.2",
-          Time.parse("2025-11-12"))
+          "2.0.0",
+          Time.parse("2026-10-21"))
   end
 
   private
@@ -26,6 +26,7 @@ class DuckDBPackageTask < PackagesRedDataToolsOrgPackageTask
       "debian-trixie",
       "ubuntu-jammy",
       "ubuntu-noble",
+      "ubuntu-resolute",
     ]
   end
 
